@@ -30,7 +30,6 @@ html.js .page { color: var(--ink); }
 .stage-time { position: absolute; left: 0; right: 0; max-width: 1480px; margin-inline: auto; padding-inline: var(--gutter); top: calc(var(--section-pad) * 0.38); font-size: var(--fs-small); letter-spacing: 0.04em; font-variant-numeric: tabular-nums lining-nums; color: color-mix(in srgb, currentColor 72%, transparent); }
 /* 첫 화면의 날짜는 막 위에. 막이 오르면 함께 오르며 사라진다 */
 .curtain__time { position: absolute; right: var(--gutter); top: 30svh; max-width: 11em; text-align: right; text-wrap: balance; font-size: var(--fs-micro); letter-spacing: 0.12em; color: var(--ivory); opacity: 0.9; pointer-events: none; will-change: transform, opacity; }
-.water-still .curtain__time, .reduced .curtain__time { display: none; }
 @media (min-width: 1024px) { .curtain__time { left: 0; right: 0; max-width: none; text-align: center; top: 31svh; } }
 
 /* ---- 첫 화면 ---- */
