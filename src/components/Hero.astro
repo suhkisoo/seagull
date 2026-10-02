@@ -1,16 +1,14 @@
 ---
-// 첫 화면. variant 'a'는 포스터를 잇는 세로 제목, 'b'는 수평선 위의 가로 제목. docs/plan.md 2장.
+// 첫 화면. 2단계에서 고른 A안, 포스터를 잇는 세로 제목. docs/plan.md 2.1.
 import { Picture } from 'astro:assets';
 import lakeHouse from '../assets/lake-house.webp';
 import lakeReflection from '../assets/lake-reflection.webp';
 import { show } from '../content/show';
 import WaterBand from './WaterBand.astro';
-interface Props { variant: 'a' | 'b' }
-const { variant } = Astro.props;
+const variant = 'a';
 const titleChars = [...show.title];
-const titleHtml = variant === 'a'
-  ? `<span class="title title--a">${titleChars.map((c) => `<span class="title__char">${c}</span>`).join('')}</span>`
-  : `<span class="title title--b">${show.title}</span>`;
+const charHtml = titleChars.map((c) => `<span class="title__char">${c}</span>`).join('');
+const titleHtml = `<span class="title title--a">${charHtml}</span>`;
 ---
 <header class={`hero hero--${variant}`} id="top">
   <div class="hero__sky">
@@ -24,11 +22,10 @@ const titleHtml = variant === 'a'
       <p>{show.company}</p>
       <p>{show.credits.author}</p>
       <p>{show.credits.directing}</p>
-      {variant === 'b' && <p class="hero__meta-when">{show.periodShort}<br />{show.venue.name}</p>}
     </div>
     <h1 class="hero__title" data-title set:html={titleHtml}></h1>
     {show.originalTitle && <p class="hero__original" aria-label={show.originalTitle}>{show.originalTitle}</p>}
-    {variant === 'a' && <p class="hero__when">{show.periodShort}<br />{show.venue.name}</p>}
+    <p class="hero__when"><span class="hero__when-short">{show.periodShort}</span><span class="hero__when-full">{show.period}</span><br />{show.venue.name}</p>
   </div>
   <WaterBand titleHtml={titleHtml} variant={variant} />
 </header>
@@ -41,21 +38,16 @@ const titleHtml = variant === 'a'
   .hero--a .title__char + .title__char { margin-top: 16px; }
   .hero--a .hero__original { left: calc(var(--gutter) + var(--fs-title-a) + 20px); bottom: 12px; writing-mode: vertical-rl; }
   .hero--a .hero__when { right: var(--gutter); bottom: calc(var(--button-h) + 52px); }
+  .hero__when-full { display: none; }
+  @media (min-width: 1024px) { .hero__when-short { display: none; } .hero__when-full { display: inline; } }
   .hero--a .hero__meta { position: absolute; left: var(--gutter); top: var(--gutter); }
-  /* B안: 가로 제목, 수평선 바로 위 */
-  .hero--b .hero__title { left: var(--gutter); bottom: 32px; font-size: var(--fs-title-b); white-space: nowrap; letter-spacing: 0.02em; }
-  .hero--b .hero__original { right: var(--gutter); bottom: calc(var(--fs-title-b) + 44px); }
-  .hero--b .hero__meta { position: static; }
-  .hero--b .hero__meta-when { margin-top: 12px; font-size: var(--fs-caption); }
   @media (min-width: 1024px) {
     .hero--a .hero__meta { top: 24px; }
-    .hero--b .hero__meta-when { position: absolute; right: var(--gutter); bottom: calc(var(--button-h) + 52px); text-align: right; margin: 0; white-space: nowrap; }
   }
-  .title--a, .title--b { font-family: 'Seagull Title', var(--font); }
+  .title--a { font-family: 'Seagull Title', var(--font); }
   /* 정지 수면의 거울상은 제목과 같은 자리에 선다 */
   .water__mirror--a { left: var(--gutter); top: 12px; font-size: var(--fs-title-a); font-weight: 700; line-height: 1; width: 1em; }
   .water__mirror--a .title__char { display: block; }
   .water__mirror--a .title__char + .title__char { margin-top: 16px; }
-  .water__mirror--b { left: var(--gutter); font-size: var(--fs-title-b); font-weight: 700; line-height: 1; white-space: nowrap; letter-spacing: 0.02em; top: 32px; }
   .water__mirror { font-family: 'Seagull Title', var(--font); }
 </style>

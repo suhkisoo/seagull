@@ -2,8 +2,8 @@
 // 호수 띠. 페이지에 하나뿐인 예매 버튼이 여기 산다. docs/plan.md 3.1, 4.2.
 import { show } from '../content/show';
 import { ticketState } from '../scripts/state.server';
-interface Props { titleHtml: string; variant: 'a' | 'b' }
-const { titleHtml, variant } = Astro.props;
+interface Props { titleHtml: string; variant?: 'a' }
+const { titleHtml, variant = 'a' } = Astro.props;
 const st = ticketState(); // 빌드 시점 상태(JS 없을 때 그대로 보인다)
 ---
 <div class="water is-hero" data-water="css" data-variant={variant}>

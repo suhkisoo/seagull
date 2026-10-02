@@ -28,7 +28,7 @@ export const lights: Light[] = [
   { id: 'hero-dusk', skyTop: palette.deep, skyBot: '#4C5A4C', bgTop: palette.olive, bgBot: palette.deep, text: palette.ivory, sparkle: palette.ivory, wind: 0.15 },
   { id: 'about', skyTop: palette.sun, skyBot: palette.olive, bgTop: palette.ivory, bgBot: palette.ivory, text: palette.floor, sparkle: palette.ivory, wind: 0.0 },
   { id: 'people', skyTop: palette.morningShadow, skyBot: palette.olive, bgTop: palette.morningRoom, bgBot: palette.morningRoom, text: palette.floor, sparkle: palette.ivory, wind: 0.0 },
-  { id: 'two-years', skyTop: palette.deep, skyBot: palette.floor, bgTop: palette.morningRoom, bgBot: palette.deep, text: palette.ivory, sparkle: palette.ivory, wind: 0.45 },
-  { id: 'tickets', skyTop: palette.deep, skyBot: palette.floor, bgTop: palette.deep, bgBot: palette.floor, text: palette.ivory, sparkle: palette.ivory, wind: 0.6 },
+  { id: 'two-years', skyTop: palette.deep, skyBot: palette.floor, bgTop: palette.morningRoom, bgBot: palette.deep, text: palette.ivory, sparkle: palette.ivory, wind: 0.35 },
+  { id: 'tickets', skyTop: palette.deep, skyBot: palette.floor, bgTop: palette.deep, bgBot: palette.floor, text: palette.ivory, sparkle: palette.ivory, wind: 0.4 },
   { id: 'credits', skyTop: palette.floor, skyBot: palette.floor, bgTop: palette.floor, bgBot: palette.floor, text: palette.ivory, sparkle: palette.deep, wind: 0.1 },
 ];

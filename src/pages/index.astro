@@ -1,12 +1,24 @@
 ---
+// 한 페이지, 여섯 구간. 첫 화면은 2단계에서 고른 A안(세로 제목). docs/brief.md 4장, docs/plan.md 2.1.
 import Base from '../layouts/Base.astro';
-import { show } from '../content/show';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import People from '../components/People.astro';
+import TwoYears from '../components/TwoYears.astro';
+import Tickets from '../components/Tickets.astro';
+import Credits from '../components/Credits.astro';
+import { validateShow } from '../content/validate';
+validateShow();
 ---
-<Base noindex>
-  <main style="padding: 96px 24px; max-width: 32em;">
-    <h1 style="font-weight:700; font-size: 26px; line-height:1.2;">〈{show.title}〉 {show.company}</h1>
-    <p style="margin-top:16px;">〔2단계 실험실. 첫 화면 두 안을 보고 하나를 고른다.〕</p>
-    <p style="margin-top:16px;"><a href="./lab/a/">A안. 포스터를 잇는 세로 제목</a></p>
-    <p><a href="./lab/b/">B안. 수평선 위의 가로 제목</a></p>
+<Base>
+  <Hero />
+  <main>
+    <About />
+    <People />
+    <TwoYears />
+    <Tickets />
+    <Credits />
+    <div class="after-water" aria-hidden="true"></div>
   </main>
+  <script src="../scripts/entry.ts"></script>
 </Base>

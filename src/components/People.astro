@@ -1,0 +1,29 @@
+---
+// 나오는 사람들. 아침의 실내, 창살 그림자. 일곱 배역을 같은 크기로. 누르면 창이 열린다. docs/plan.md 2.1 "사람들", 3.1의 10.
+import { show } from '../content/show';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<section class="section section--people" id="people" data-light="people" aria-labelledby="people-title">
+  <div class="section__inner">
+    <h2 class="section__title" id="people-title" tabindex="-1">나오는 사람들</h2>
+    <hr class="rule" />
+    <ul class="people" role="list">
+      {show.roles.map((r) => (
+        <li class="person">
+          <details class="window" data-window>
+            <summary class="window__summary">
+              <span class="person__role">{r.name}</span>
+              <span class="person__actors">{r.actors.map((a) => <span class="person__actor">{a}</span>)}</span>
+            </summary>
+            <div class="window__body">
+              <p class="person__script">{r.scriptName}{r.scriptNote && <span class="person__note">{r.scriptNote}</span>}</p>
+              {r.photo && <img class="person__photo" src={`${base}/${r.photo}`} alt={`${r.actors.join(', ')}, ${r.name}`} width="300" height="400" loading="lazy" decoding="async" />}
+              {r.line && <p class="person__line">{r.line}</p>}
+            </div>
+          </details>
+        </li>
+      ))}
+    </ul>
+    <hr class="rule" />
+  </div>
+</section>

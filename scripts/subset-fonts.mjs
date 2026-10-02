@@ -14,7 +14,7 @@ const { show } = await import('../src/content/show.ts').catch(async () => {
 const srcText = readFileSync(new URL('../src/content/show.ts', import.meta.url), 'utf8');
 // 내용 파일의 문자열 리터럴 안 글자를 모두 모은다 (주석은 뺀다)
 const literals = [...srcText.replace(/\/\/.*$/gm, '').matchAll(/'((?:[^'\\]|\\.)*)'/g)].map((m) => m[1]).join('');
-const uiText = '예매하기 예매 일정 보기 예매 마감 매진 종료 공연이 끝났습니다 월일 오픈 추후 공개 영상 네이버 지도 열기 카카오맵 주소 복사 복사됨 공유 캘린더에 넣기 구글 캘린더 파일 받기 텀블벅 러닝타임 인터미션 관람 연령 티켓 가격 좌석 작품 소개 나오는 사람들 공연 일정과 예매 오시는 길 만든 사람들 인스타그램 문의 소리 켜기 끄기 기울기 분 시간 회차 출연 〔 〕 자리 연출의 말 0123456789:.·~()〈〉, …';
+const uiText = '길게 눌러 복사하세요 링크 복사됨 홍보영상 영상을 누르면 재생됩니다 가격과 좌석 예매 오픈 ›예매하기 예매 일정 보기 예매 마감 매진 종료 공연이 끝났습니다 월일 오픈 추후 공개 영상 네이버 지도 열기 카카오맵 주소 복사 복사됨 공유 캘린더에 넣기 구글 캘린더 파일 받기 텀블벅 러닝타임 인터미션 관람 연령 티켓 가격 좌석 작품 소개 나오는 사람들 공연 일정과 예매 오시는 길 만든 사람들 인스타그램 문의 소리 켜기 끄기 기울기 분 시간 회차 출연 〔 〕 자리 연출의 말 0123456789:.·~()〈〉, …';
 const heroChars = new Set((show ? [show.title, show.originalTitle, show.company, show.credits.author, show.credits.directing, show.periodShort, show.period, show.venue.name].join('') : '') + uiText);
 const allChars = new Set(literals + uiText);
 const titleChars = '갈매기';

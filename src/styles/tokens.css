@@ -11,8 +11,7 @@
 
   --font: 'Seagull Serif', 'Noto Serif KR', 'Seagull Fallback', serif;
 
-  --fs-title-a: clamp(72px, 21.5vw, 120px);   /* A안 세로 글자 하나. 390에서 84 */
-  --fs-title-b: clamp(80px, 24.6vw, 208px);   /* B안 가로. 390에서 96 */
+  --fs-title-a: min(clamp(72px, 21.5vw, 120px), 11svh);   /* 세로 글자 하나. 390에서 84. 짧은 화면은 높이에 묶는다 */
   --fs-original: clamp(14px, 3.6vw, 16px);
   --fs-digits: clamp(44px, 11.3vw, 56px);
   --fs-h2: clamp(26px, 6.7vw, 32px);

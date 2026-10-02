@@ -1,4 +1,5 @@
 @import './tokens.css';
+@import './sections.css';
 
 /* 서브셋 폰트. docs/plan.md 5.1. 제목 세 글자는 head에 인라인, 나머지는 여기 */
 @font-face { font-family: 'Seagull Fallback'; src: local('Noto Sans KR'), local('Noto Sans CJK KR'), local('Apple SD Gothic Neo'), local('Malgun Gothic'); size-adjust: 105%; ascent-override: 109.6%; descent-override: 27.2%; line-gap-override: 0%; }
@@ -44,6 +45,9 @@ html.js .curtain { display: block; }
 .water__line { position: absolute; left: var(--gutter); bottom: calc(var(--safe-bottom) + 24px); max-width: 70%; font-size: var(--fs-water-line); line-height: 1.5; color: var(--ivory);
   opacity: 0; transition: opacity 1200ms; pointer-events: none; z-index: 3; text-wrap: balance; }
 .water.is-calm .water__line { opacity: 0.9; }
+/* 첫 화면에서는 제목의 비친 상(왼쪽 기둥)을 피해 오른쪽 열에 놓는다. docs/plan.md 2.1 */
+.water.is-hero .water__line { left: calc(var(--gutter) + var(--fs-title-a) + 28px); max-width: calc(100% - var(--gutter) * 2 - var(--fs-title-a) - 28px); }
+@media (min-width: 1024px) { .water.is-hero .water__line { left: calc(var(--gutter) + var(--fs-title-a) + 120px); max-width: 600px; } }
 .water:not(.is-calm) .water__line { transition-duration: 400ms; }
 .water.is-band .water__line { bottom: auto; top: 12px; right: calc(var(--gutter) + var(--ticket-w, 160px) + 16px); max-width: none; font-size: 14px; line-height: 20px; max-height: 60px; overflow: hidden; display: flex; align-items: center; min-height: var(--button-h); }
 .ticket { position: absolute; right: var(--gutter); top: 12px; z-index: 4; display: inline-flex; align-items: center; justify-content: center; min-width: 140px; height: var(--button-h); padding: 0 18px;
@@ -56,14 +60,13 @@ html.js .curtain { display: block; }
 @keyframes css-ripple { from { transform: scale(1); opacity: 0.9; } to { transform: scale(14); opacity: 0; } }
 .water-debug { position: absolute; left: 8px; top: 8px; margin: 0; font: 11px/1.3 ui-monospace, monospace; color: var(--ivory); background: rgb(0 0 0 / 0.5); padding: 4px 6px; z-index: 9; white-space: pre-wrap; max-width: 60%; }
 
+/* 자바스크립트가 없으면 띠는 처음부터 좁고 거울상은 없다. 정보와 예매 링크는 그대로 */
+html:not(.js) .water { height: var(--water-band); }
+html:not(.js) .water__mirror { display: none; }
+html:not(.js) .water.is-hero .ticket { top: 12px; }
+
 /* 띠 뒤에 가려질 자리 */
 .after-water { height: var(--water-band); }
-
-/* ---- lab 전용 임시 구간 ---- */
-.lab-filler { min-height: 160vh; background: linear-gradient(to bottom, var(--olive), var(--deep) 30%, var(--floor)); padding: var(--section-pad) var(--gutter); color: var(--ivory); }
-.lab-filler p { max-width: 30em; opacity: 0.7; font-size: var(--fs-caption); }
-.lab-nav { position: fixed; right: 12px; top: 8px; z-index: 20; font-size: 12px; opacity: 0.55; }
-.lab-nav a { margin-right: 12px; }
 
 @media (prefers-reduced-motion: reduce) {
   .water canvas { display: none; }

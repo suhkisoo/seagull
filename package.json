@@ -13,6 +13,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "shots": "node scripts/shots.mjs",
+    "og": "node scripts/make-og.mjs",
     "check:size": "node scripts/check-bundle-size.mjs dist"
   },
   "dependencies": {

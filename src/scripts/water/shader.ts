@@ -58,7 +58,7 @@ void main() {
   highp float t = u_gains.w;
   float amb = u_gains.x;
   float a1 = p.x * 0.045 + t * 1.0472, a2 = p.y * 0.09 - t * 0.8378 + p.x * 0.02;
-  g += amb * vec2(0.045 * cos(a1) + 0.02 * cos(a2), 0.09 * cos(a2)) * 2.0;
+  g += amb * vec2(0.045 * cos(a1) + 0.02 * cos(a2), 0.09 * cos(a2)) * 1.4;
 #if ${AMB} >= 2
   float a3 = p.x * 0.11 - p.y * 0.07 + t * 1.2566;
   g += amb * 0.5 * vec2(0.11 * cos(a3), -0.07 * cos(a3));

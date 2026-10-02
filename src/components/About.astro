@@ -1,0 +1,27 @@
+---
+// 작품 소개. 정오의 빛. 갈래 표기, 소개 글, 대표 대사, 영상, 연출의 말. docs/plan.md 2.1 "작품".
+import { show } from '../content/show';
+import Video from './Video.astro';
+---
+<section class="section section--about" id="about" data-light="about" aria-labelledby="about-title">
+  <div class="section__inner">
+    <h2 class="section__title" id="about-title" tabindex="-1">작품 소개</h2>
+    {show.genreNote && <p class="section__caption">{show.genreNote}</p>}
+    <hr class="rule" />
+    <div class="prose">
+      {show.texts.synopsis.map((p) => <p>{p}</p>)}
+    </div>
+    <blockquote class="quote">
+      <p class="quote__text">{show.texts.mainLine.text}</p>
+      <footer class="quote__source">{show.texts.mainLine.source}</footer>
+    </blockquote>
+    {show.video.youtubeId && <hr class="rule" />}
+    <Video />
+    {show.texts.directorsNote && (
+      <div class="prose prose--note">
+        <h3 class="section__sub">연출의 말</h3>
+        {show.texts.directorsNote.split('\n\n').map((p) => <p>{p}</p>)}
+      </div>
+    )}
+  </div>
+</section>

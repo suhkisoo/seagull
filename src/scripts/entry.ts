@@ -1,19 +1,15 @@
 // 진입 모듈. 첫 페인트 뒤 유휴 시간에 수면과 스크롤을 시작한다. docs/plan.md 5.2.
 import { show } from '../content/show';
-import { ticketState, applyTicketState } from './state';
+import { initTickets } from './tickets';
 
 const root = document.documentElement;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const q = new URLSearchParams(location.search);
 const off = reduced || q.get('quality') === 'still' || q.get('water') === 'off';
 
-function applyState() {
-  const btn = document.querySelector<HTMLAnchorElement>('[data-ticket-button]');
-  if (btn) applyTicketState(btn, ticketState(null));
-}
-applyState();
-setInterval(applyState, 60000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden) applyState(); });
+initTickets();
+// 고정 주소로 들어오면 그 구간 제목에 포커스를 둔다
+if (location.hash) { const h = document.getElementById(location.hash.slice(1)); const t = h?.matches('[tabindex]') ? h : h?.querySelector<HTMLElement>('[tabindex="-1"]'); t?.focus({ preventScroll: true }); }
 
 // 멈춤 대사 줄 고르기. 첫 줄은 대표 대사, 그 뒤는 받은 줄을 섞어서
 const lines = [show.texts.mainLine.text, ...show.texts.waterLines.filter(Boolean)];
@@ -57,6 +53,7 @@ async function start() {
   if (!water) { wrapper.dataset.water = 'still'; if (canvas) canvas.remove(); root.classList.add('water-still'); cssRipple(); }
   let band = false;
   createScroll(root, water, { onProgress: (p) => { band = p > 0.98; } });
+  if (document.querySelector('[data-video]')) { const { initVideo } = await import('./video'); initVideo(water); }
   // 잔잔해지면 대사가 떠오른다
   let wasCalm = false;
   const obs = new MutationObserver(() => { const c = wrapper.classList.contains('is-calm'); if (c && !wasCalm) nextLine(band); wasCalm = c; });

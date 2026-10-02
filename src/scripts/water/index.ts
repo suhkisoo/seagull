@@ -65,7 +65,7 @@ export function createWater(opts: WaterOptions) {
   const U: Record<string, WebGLUniformLocation | null> = {};
   const uniformNames = ['u_size', 'u_ripple', 'u_params', 'u_gains', 'u_light', 'u_glow', 'u_titleRect', 'u_video', 'u_colSurface', 'u_colDeep', 'u_colSparkle', 'u_title', 'u_base', 'u_baseMix', 'u_titleOn', 'u_refract'];
   const rippleBuf = new Float32Array(8 * 4);
-  let titleRect = [0, 0, 1, 1], titleReady = false;
+  let titleRect = [0, 0, 1, 1], titleReady = false, bakedScroll = 0;
 
   function compile(type: number, src: string) {
     const sh = gl!.createShader(type)!; gl!.shaderSource(sh, src); gl!.compileShader(sh);
@@ -176,7 +176,7 @@ export function createWater(opts: WaterOptions) {
     gl!.pixelStorei(gl!.UNPACK_FLIP_Y_WEBGL, 0);
     gl!.texImage2D(gl!.TEXTURE_2D, 0, gl!.RGBA, c1.width, c1.height, 0, gl!.RGBA, gl!.UNSIGNED_BYTE, out);
     // 캔버스 좌표의 제목 상자(수평선 위라 y가 음수). 반사는 세로로 1.2배 늘린다
-    titleRect = [tr.left - cr.left - pad, (tr.top - cr.top - pad), W, H];
+    titleRect = [tr.left - cr.left - pad, (tr.top - cr.top - pad), W, H]; bakedScroll = window.scrollY;
     titleReady = true;
   }
   function glowRect() {
@@ -253,7 +253,7 @@ export function createWater(opts: WaterOptions) {
     if (fixedCalm !== null) calm = fixedCalm;
     const windT = fixedWind ?? state.light.wind;
     wind += (windT - wind) * (1 - Math.exp(-(Math.min(dt, 100) / 1000) / 2));
-    const amb = (0.15 + wind) * (1 - 0.85 * calm);
+    const amb = (0.12 + 0.6 * wind) * (1 - 0.85 * calm);
     wrapper.style.setProperty('--calm', calm.toFixed(3));
     if (calm > 0.85 && !wrapper.classList.contains('is-calm')) wrapper.classList.add('is-calm');
     else if (calm < 0.5 && wrapper.classList.contains('is-calm')) wrapper.classList.remove('is-calm');
@@ -271,8 +271,10 @@ export function createWater(opts: WaterOptions) {
     gl!.uniform4f(U.u_light, state.lightDir[0], state.lightDir[1], state.sparkleDir[0], state.sparkleDir[1]);
     const g = glowRect();
     gl!.uniform4f(U.u_glow, g[0], g[1], g[2], button.getAttribute('aria-disabled') === 'true' ? 0.18 : 0.42);
-    gl!.uniform4f(U.u_titleRect, titleRect[0], titleRect[1], titleRect[2], titleRect[3] * 1.2);
-    gl!.uniform1f(U.u_titleOn, titleReady && titleRect[1] + titleRect[3] > -600 ? 1 : 0);
+    // 제목은 스크롤과 함께 올라간다. 구운 자리에서 스크롤 차이만큼 옮긴다
+    const ty = titleRect[1] - (window.scrollY - bakedScroll);
+    gl!.uniform4f(U.u_titleRect, titleRect[0], ty, titleRect[2], titleRect[3] * 1.2);
+    gl!.uniform1f(U.u_titleOn, titleReady && ty + titleRect[3] > -600 ? 1 : 0);
     gl!.uniform4f(U.u_video, state.video[0], state.video[1], state.video[2], state.video[3]);
     gl!.uniform3fv(U.u_colSurface, state.light.surface); gl!.uniform3fv(U.u_colDeep, state.light.deep); gl!.uniform3fv(U.u_colSparkle, state.light.sparkle);
     gl!.uniform1f(U.u_baseMix, baseMixOpt * (1 - Math.min(1, waterTop / Math.max(1, cssH * 0.5))));

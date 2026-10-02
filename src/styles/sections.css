@@ -1,0 +1,123 @@
+/* 첫 화면 아래 다섯 구간. 빛은 구간마다 고정된 CSS, 암전은 위아래 20svh의 그라데이션(docs/plan.md 3.3). 상자, 카드, 그림자 없음. 괘선은 얇은 가로선뿐 */
+:root { --blackout: 20svh; --rule: color-mix(in srgb, currentColor 22%, transparent); }
+.section { position: relative; color: var(--ivory); padding: calc(var(--blackout) + var(--section-pad) * 0.5) 0 calc(var(--blackout) + var(--section-pad) * 0.5);
+  background: linear-gradient(to bottom, var(--floor) 0, var(--s-top) var(--blackout), var(--s-bot) calc(100% - var(--blackout)), var(--floor) 100%); }
+.section__inner { padding: 0 var(--gutter); max-width: 1200px; margin: 0 auto; }
+@media (min-width: 1024px) { .section__inner { padding: 0; margin: 0 var(--gutter); max-width: none; } }
+.section__title { font-size: var(--fs-h2); font-weight: 700; line-height: 1.25; letter-spacing: 0.01em; }
+.section__title--sub { margin-top: var(--section-pad); }
+.section__sub { font-size: var(--fs-h3); font-weight: 700; line-height: 1.3; margin-bottom: 12px; }
+.section__caption { font-size: var(--fs-caption); line-height: 1.6; opacity: 0.75; margin-top: 8px; }
+.rule { border: 0; border-top: 1px solid var(--rule); margin: 20px 0; }
+.prose { max-width: 36em; }
+.prose p + p { margin-top: 1em; }
+.prose--note { margin-top: 48px; }
+.quote { margin: 48px 0 0; max-width: 30em; }
+.quote__text { font-size: var(--fs-line); line-height: 1.6; }
+.quote__source { font-size: var(--fs-caption); opacity: 0.75; margin-top: 8px; text-align: right; }
+
+/* 글자 줄로 된 동작. 버튼 모양이 아니고 밑줄 없는 글자 한 줄, 닿는 높이 44px */
+.action { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: none; min-height: 44px; display: inline-flex; align-items: center; letter-spacing: 0.01em; }
+.action::before { content: '›'; margin-right: 10px; opacity: 0.6; }
+.action + .action { margin-left: 24px; }
+.action--text::before { content: none; }
+.action-row { margin-top: 8px; }
+.action-list { list-style: none; margin: 24px 0 0; padding: 0; }
+.action-list li { display: flex; align-items: center; flex-wrap: wrap; min-height: 44px; }
+.action-list--ruled li { border-top: 1px solid var(--rule); }
+.action-list--ruled li:last-child { border-bottom: 1px solid var(--rule); }
+.action-row__label { margin-right: 24px; opacity: 0.75; font-size: var(--fs-caption); }
+.action__done { margin-left: 16px; font-size: var(--fs-caption); opacity: 0.85; }
+html:not(.js) .js-only { display: none; }
+
+/* ---- 작품 소개. 정오 ---- */
+.section--about { --s-top: var(--ivory); --s-bot: var(--ivory); color: var(--floor); }
+.section--about::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: var(--floor); opacity: var(--video-dim, 0); transition: opacity 800ms; }
+.section--about .section__inner { position: relative; z-index: 1; }
+.video { margin-top: 32px; max-width: 720px; }
+.video__facade { display: block; width: 100%; aspect-ratio: var(--video-aspect, 16 / 9); background: var(--deep); border: 0; padding: 0; cursor: pointer; position: relative; overflow: clip; }
+.video__poster { display: block; width: 100%; height: 100%; object-fit: cover; }
+.video__poster--blank { display: block; width: 100%; height: 100%; background: linear-gradient(to bottom, var(--olive), var(--floor)); }
+.video__frame { display: block; width: 100%; aspect-ratio: var(--video-aspect, 16 / 9); border: 0; }
+.video__hint { font-size: var(--fs-caption); opacity: 0.75; margin-top: 8px; }
+
+/* ---- 나오는 사람들. 아침의 실내, 창살 그림자 ---- */
+.section--people { --s-top: var(--morning-room); --s-bot: var(--morning-room); color: var(--floor); padding-bottom: 24px;
+  background: linear-gradient(to bottom, var(--floor) 0, var(--s-top) var(--blackout), var(--s-bot) 100%); }
+.section--people::before { content: ''; position: absolute; inset: var(--blackout) 0 0 0; pointer-events: none; transform: translate3d(0, var(--shadow-shift, 0px), 0);
+  --bar: color-mix(in srgb, var(--morning-shadow) 55%, transparent);
+  background-image: linear-gradient(var(--bar), var(--bar)), linear-gradient(var(--bar), var(--bar)), linear-gradient(var(--bar), var(--bar));
+  background-size: 6px 100%, 6px 100%, 6px 100%; background-repeat: no-repeat; background-position: 0 0, calc(50% - 12px) 0, 100% 0; }
+@media (min-width: 1024px) {
+  .section--people::before { background-image: linear-gradient(var(--bar), var(--bar)), linear-gradient(var(--bar), var(--bar)), linear-gradient(var(--bar), var(--bar)), linear-gradient(var(--bar), var(--bar)), linear-gradient(var(--bar), var(--bar));
+    background-size: 8px 100%, 8px 100%, 8px 100%, 8px 100%, 8px 100%; background-position: 3% 0, 29% 0, 52.5% 0, 76% 0, 95% 0; }
+}
+.section--people .section__inner { position: relative; }
+.people { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; }
+.person { min-height: 120px; border-bottom: 1px solid var(--rule); }
+.person:nth-child(odd) { padding-right: 16px; }
+.person:nth-child(even) { padding-left: 16px; }
+.person:last-child { border-bottom: 0; }
+.people + .rule { margin-top: 0; }
+.window { height: 100%; position: relative; }
+.window[open] { background: var(--ivory); }
+.window__summary { list-style: none; cursor: pointer; padding: 20px 0; min-height: 120px; display: flex; flex-direction: column; gap: 6px; }
+.window__summary::-webkit-details-marker { display: none; }
+.window[open] .window__summary { padding-left: 8px; padding-right: 8px; margin: 0 -8px; }
+.person__role { font-size: var(--fs-h3); font-weight: 700; line-height: 1.3; }
+.person__actors { font-size: var(--fs-caption); line-height: 1.6; display: flex; flex-direction: column; }
+.window__body { padding: 0 0 24px; font-size: var(--fs-caption); line-height: 1.6; max-width: 30em; }
+.person__script { opacity: 0.85; }
+.person__note { display: block; }
+.person__photo { display: block; width: 100%; max-width: 168px; height: auto; aspect-ratio: 3 / 4; object-fit: cover; margin-top: 16px; }
+.person__line { margin-top: 16px; font-size: var(--fs-body); }
+@media (min-width: 1024px) {
+  .people { grid-template-columns: repeat(7, 1fr); column-gap: 40px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .person { border-bottom: 0; min-height: 0; }
+  .person:nth-child(odd), .person:nth-child(even) { padding: 0; }
+  .window__summary { min-height: 100px; }
+}
+
+/* ---- 2년. 낮은 빛이 밤으로 ---- */
+.section--two-years { --s-top: var(--morning-room); --s-bot: var(--deep); min-height: 150svh; padding: 0; color: var(--ivory);
+  background: linear-gradient(to bottom, var(--s-top) 0, var(--deep) 45%, var(--deep) 85%, var(--floor) 100%); }
+.stage-direction { position: absolute; left: var(--gutter); top: 55%; font-size: var(--fs-line); line-height: 1.6; max-width: 24em; }
+
+/* ---- 일정과 예매, 오시는 길. 늦가을 밤 ---- */
+.section--tickets { --s-top: var(--deep); --s-bot: var(--floor); }
+.showtimes { border: 0; padding: 0; margin: 0; min-width: 0; }
+.showtimes__day { padding-top: 8px; }
+.showtimes__date { font-size: var(--fs-h3); font-weight: 400; line-height: 1.4; }
+.showtimes__cells { display: flex; gap: 12px; margin-top: 8px; }
+.cell { position: relative; flex: 0 0 auto; min-width: 150px; white-space: nowrap; min-height: 72px; display: flex; align-items: baseline; gap: 10px; padding: 8px 12px; cursor: pointer; background: transparent; color: inherit; transition: background 200ms, color 200ms; }
+.cell__time { font-size: var(--fs-digits); font-weight: 700; line-height: 1; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.cell__status { font-size: var(--fs-caption); }
+.cell__link { font-size: var(--fs-caption); margin-left: auto; }
+.cell:has(.cell__input:checked) { background: var(--amber); color: var(--floor); }
+.cell:has(.cell__input:focus-visible) { outline: 2px solid var(--amber); outline-offset: 3px; }
+.cell[data-sold-out], .cell.is-past { color: color-mix(in srgb, var(--ivory) 55%, transparent); }
+.cell[data-sold-out]:has(.cell__input:checked), .cell.is-past:has(.cell__input:checked) { background: color-mix(in srgb, var(--amber) 35%, transparent); color: var(--ivory); }
+.cast { min-height: 24px; }
+.cast__list { margin: 0; font-size: var(--fs-caption); line-height: 1.6; }
+.cast__head dd { margin: 0 0 8px; font-weight: 700; }
+.cast__row { display: flex; gap: 16px; }
+.cast__row dt { flex: 0 0 6em; opacity: 0.75; }
+.cast__row dd { margin: 0; }
+.info { margin: 0; }
+.info__row { display: flex; gap: 16px; min-height: 44px; align-items: center; }
+.info__row dt { flex: 0 0 7em; opacity: 0.75; font-size: var(--fs-caption); }
+.info__row dd { margin: 0; }
+.venue__name { font-size: var(--fs-h3); line-height: 1.4; margin-top: 16px; }
+.venue__address { line-height: 1.6; }
+
+/* ---- 끝. 가장 어두운 초록 ---- */
+.section--credits { --s-top: var(--floor); --s-bot: var(--floor); background: var(--floor); padding-bottom: calc(var(--section-pad) * 0.5); }
+.crew { margin: 0; font-size: var(--fs-caption); line-height: 1.7; }
+.crew__row { display: flex; gap: 16px; padding: 4px 0; }
+.crew__row dt { flex: 0 0 5em; opacity: 0.75; }
+.crew__row dd { margin: 0; }
+.credits__meta { font-size: var(--fs-caption); line-height: 1.6; opacity: 0.85; margin-top: 32px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .section--about::after, .cell { transition: none; }
+}
