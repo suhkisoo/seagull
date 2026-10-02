@@ -29,10 +29,9 @@ export function ticketState(picked: ShowTime | null, t = now()): TicketState {
   const last = show.shows.reduce((a, b) => (KST(a.startAt) > KST(b.startAt) ? a : b));
   const endOfRun = KST(last.startAt) + running;
   const bookPage = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/book/`;
-  const hasLink = !!show.booking.commonUrl || show.shows.some((s) => s.url) || !!show.booking.apiUrl;
+  // 이 페이지의 예매 흐름(/book/)이 늘 있으므로 링크는 늘 있다. 오픈 시각이 비면 바로 예매 흐름으로 간다(연출의 지시)
   if (t >= endOfRun) return { id: 'ended', label: '공연이 끝났습니다' };
-  if (!show.booking.openAt || !hasLink) return { id: 'see-schedule', label: '예매 일정 보기', href: '#tickets' };
-  if (t < KST(show.booking.openAt)) return { id: 'before-open', label: `${fmtOpen(show.booking.openAt)} 예매 오픈`, href: '#tickets' };
+  if (show.booking.openAt && t < KST(show.booking.openAt)) return { id: 'before-open', label: `${fmtOpen(show.booking.openAt)} 예매 오픈`, href: '#tickets' };
   const available = show.shows.filter((s) => !s.soldOut && t < KST(s.startAt));
   if (available.length === 0 && !picked) return { id: 'closed', label: '예매 마감' };
   if (picked) {
@@ -42,8 +41,7 @@ export function ticketState(picked: ShowTime | null, t = now()): TicketState {
     return ext ? { id: 'open', label: `${fmtShow(picked)} 예매하기`, href: ext, external: true } : { id: 'open', label: `${fmtShow(picked)} 예매하기`, href: `${bookPage}?show=${picked.id}` };
   }
   if (show.booking.commonUrl) return { id: 'open', label: '예매하기', href: show.booking.commonUrl, external: true };
-  if (show.booking.apiUrl) return { id: 'open', label: '예매하기', href: bookPage };
-  return { id: 'see-schedule', label: '예매하기', href: '#tickets' };
+  return { id: 'open', label: '예매하기', href: bookPage };
 }
 export function applyTicketState(el: HTMLAnchorElement | HTMLButtonElement, st: TicketState) {
   el.textContent = st.label;

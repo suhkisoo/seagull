@@ -2,6 +2,7 @@
 // 공연 일정과 예매, 오시는 길. 늦가을 밤. 회차를 고르면 그 칸에만 호박빛. docs/plan.md 2.1 "일정과 예매", 3.1의 13~17.
 import { show } from '../content/show';
 import { fmtDay, fmtDate, fmtTime, dayKey, epoch } from '../scripts/format';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const days = new Map<string, typeof show.shows>();
 for (const s of show.shows) { const k = dayKey(s.startAt); if (!days.has(k)) days.set(k, []); days.get(k)!.push(s); }
 const buildNow = Date.now();
@@ -44,6 +45,8 @@ const castOf = (s: (typeof show.shows)[number]) => show.roles.map((r) => ({ role
         </div>
       ))}
     </fieldset>
+    <p class="action-row"><a class="action" href={`${base}/book/`} data-book-link>좌석 고르고 예매하기</a></p>
+    <hr class="rule" />
     <dl class="info">
       {(show.runningMinutes || show.intermission) && (
         <div class="info__row"><dt>러닝타임</dt><dd>{show.runningMinutes ? `${show.runningMinutes}분` : ''}{show.runningMinutes && show.intermission ? ', ' : ''}{show.intermission}</dd></div>

@@ -62,11 +62,11 @@ html:not(.js) .js-only { display: none; }
 .person:last-child { border-bottom: 0; }
 .people + .rule { margin-top: 0; }
 .window { height: 100%; position: relative; }
-.window { transition: background-color 700ms; }
-.window[open] { background-color: var(--ivory); }
+/* 창이 열리면 상자가 아니라 빛이 든다. 위에서 스며들어 아래로 사라지는 밝음, 가장자리 없음 */
+.window { transition: background-color 700ms; background: radial-gradient(140% 90% at 50% 0%, color-mix(in srgb, var(--ivory) 0%, transparent), transparent 70%); }
+.window[open] { background: radial-gradient(140% 90% at 50% 0%, color-mix(in srgb, var(--ivory) 70%, transparent), transparent 75%); }
 .window__summary { list-style: none; cursor: pointer; padding: 20px 0; min-height: 120px; display: flex; flex-direction: column; gap: 6px; }
 .window__summary::-webkit-details-marker { display: none; }
-.window[open] .window__summary { padding-left: 8px; padding-right: 8px; margin: 0 -8px; }
 .person__role { font-size: var(--fs-h3); font-weight: 700; line-height: 1.3; }
 .person__actors { font-size: var(--fs-caption); line-height: 1.6; display: flex; flex-direction: column; }
 .window__body { padding: 0 0 24px; font-size: var(--fs-caption); line-height: 1.6; max-width: 30em; }

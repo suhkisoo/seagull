@@ -85,14 +85,14 @@ const seatSort = (a: string, b: string) => a[0] === b[0] ? Number(a.slice(1)) - 
 function renderSeats() {
   for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-seat]')) {
     const id = btn.dataset.seat!; const taken = status.taken.includes(id);
-    btn.classList.toggle('is-taken', taken); btn.disabled = taken || seatPrice == null;
+    btn.classList.toggle('is-taken', taken); btn.disabled = taken || (seatPrice == null && !store.demo);
     btn.classList.toggle('is-picked', seats.has(id)); btn.setAttribute('aria-pressed', String(seats.has(id)));
   }
   const left = Math.max(0, hall.balcony.max - status.balconyTaken);
   if (balcony > left) balcony = left;
   document.querySelector<HTMLElement>('[data-balcony-count]')!.textContent = String(balcony);
   document.querySelector<HTMLElement>('[data-balcony-left]')!.textContent = left === 0 ? '남은 자리 없음' : `${left}명 남음`;
-  (document.querySelector('[data-balcony-plus]') as HTMLButtonElement).disabled = balcony >= left || balconyPrice == null;
+  (document.querySelector('[data-balcony-plus]') as HTMLButtonElement).disabled = balcony >= left || (balconyPrice == null && !store.demo);
   (document.querySelector('[data-balcony-minus]') as HTMLButtonElement).disabled = balcony <= 0;
 }
 document.querySelector('[data-hall]')!.addEventListener('click', (e) => {

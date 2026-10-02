@@ -46,6 +46,7 @@ export function initTickets() {
     picked = show.shows.find((s) => s.id === input.value) ?? null;
     for (const list of document.querySelectorAll<HTMLElement>('[data-cast-for]')) list.hidden = list.dataset.castFor !== input.value;
     applyState(); trackLamp();
+    const link = document.querySelector<HTMLAnchorElement>('[data-book-link]'); if (link) link.search = `?show=${input.value}`;
   });
   applyState();
   setInterval(applyState, 60000);
