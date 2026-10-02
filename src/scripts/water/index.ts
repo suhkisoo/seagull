@@ -28,6 +28,7 @@ export type WaterState = {
   sparkleDir: [number, number];
   glade: [number, number, number, number];  // 빛의 길 x, 세기, 반폭, 아지랑이. 스크롤 모듈이 막에 따라 정한다
   gladeCol: [number, number, number];
+  storm: number;                            // 4막의 폭풍 0~1
 };
 
 function hex(c: string): [number, number, number] {
@@ -63,13 +64,13 @@ export function createWater(opts: WaterOptions) {
   const baseMixOpt = qnum('reflection') ?? 0.9; // P15. 기본으로 그림의 반영을 쓴다. ?reflection=0 이면 색만
   let lossCount = 0, lossTimes: number[] = [], lost = false, raf = 0, running = false, frameCount = 0;
   const samples: number[] = []; let slowWindows = 0, goodWindows = 0, lastChange = 0, debugEl: HTMLElement | null = null;
-  const state: WaterState = { light: { surface: hex('#5B6041'), deep: hex('#262E27'), sparkle: hex('#ABAB76'), wind: 0.15 }, video: [0, 0, 0, 0], lamp: [0, 0, 1, 0], baseMix: 1, baseRect: [0, 1, 1], lightDir: [0, -0.4], sparkleDir: [0, 0], glade: [0, 0, 10, 0], gladeCol: [1, 1, 0.94] };
+  const state: WaterState = { light: { surface: hex('#5B6041'), deep: hex('#262E27'), sparkle: hex('#ABAB76'), wind: 0.15 }, video: [0, 0, 0, 0], lamp: [0, 0, 1, 0], baseMix: 1, baseRect: [0, 1, 1], lightDir: [0, -0.4], sparkleDir: [0, 0], glade: [0, 0, 10, 0], gladeCol: [1, 1, 0.94], storm: 0 };
 
   // ----- GL 객체 -----
   let prog: WebGLProgram | null = null, progTier: Tier | -1 = -1;
   let buf: WebGLBuffer | null = null, titleTex: WebGLTexture | null = null, baseTex: WebGLTexture | null = null;
   const U: Record<string, WebGLUniformLocation | null> = {};
-  const uniformNames = ['u_size', 'u_ripple', 'u_params', 'u_gains', 'u_light', 'u_glow', 'u_titleRect', 'u_video', 'u_colSurface', 'u_colDeep', 'u_colSparkle', 'u_title', 'u_base', 'u_baseMix', 'u_titleOn', 'u_refract', 'u_lamp', 'u_baseRect', 'u_glade', 'u_gladeCol'];
+  const uniformNames = ['u_size', 'u_ripple', 'u_params', 'u_gains', 'u_light', 'u_glow', 'u_titleRect', 'u_video', 'u_colSurface', 'u_colDeep', 'u_colSparkle', 'u_title', 'u_base', 'u_baseMix', 'u_titleOn', 'u_refract', 'u_lamp', 'u_baseRect', 'u_glade', 'u_gladeCol', 'u_storm'];
   const rippleBuf = new Float32Array(8 * 4);
   let titleRect = [0, 0, 1, 1], titleReady = false, bakedScroll = 0;
 
@@ -289,6 +290,7 @@ export function createWater(opts: WaterOptions) {
     gl!.uniform4f(U.u_lamp, state.lamp[0], state.lamp[1], state.lamp[2], state.lamp[3]);
     gl!.uniform4f(U.u_glade, state.glade[0], state.glade[1], state.glade[2], state.glade[3]);
     gl!.uniform3f(U.u_gladeCol, state.gladeCol[0], state.gladeCol[1], state.gladeCol[2]);
+    gl!.uniform1f(U.u_storm, state.storm);
     gl!.uniform1f(U.u_refract, refract);
     gl!.drawArrays(gl!.TRIANGLES, 0, 3);
     if (debugEl && (frameCount % 30) === 0) {

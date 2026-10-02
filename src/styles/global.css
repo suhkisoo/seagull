@@ -28,6 +28,9 @@ a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.28e
 html.js .page { color: var(--ink); }
 /* 장면의 날짜. 구간 사이 암전 속에 하나씩 놓인다(content/show.ts texts.stageTimes) */
 .stage-time { position: absolute; left: 0; right: 0; max-width: 1480px; margin-inline: auto; padding-inline: var(--gutter); top: calc(var(--section-pad) * 0.38); font-size: var(--fs-small); letter-spacing: 0.04em; font-variant-numeric: tabular-nums lining-nums; color: color-mix(in srgb, currentColor 72%, transparent); }
+/* 4막은 날짜 아래에 첫 지문의 시각, 빛, 소리. 암전 속에서 읽힌다 */
+.stage-time--long { top: calc(var(--section-pad) * 0.2); }
+.stage-time__direction { margin-top: 10px; max-width: 24em; line-height: 1.85; color: color-mix(in srgb, currentColor 82%, transparent); }
 /* 첫 화면의 날짜는 막 위에. 막이 오르면 함께 오르며 사라진다 */
 .curtain__time { position: absolute; right: var(--gutter); top: 30svh; max-width: 11em; text-align: right; text-wrap: balance; font-size: var(--fs-micro); letter-spacing: 0.12em; color: var(--ivory); opacity: 0.9; pointer-events: none; will-change: transform, opacity; }
 @media (min-width: 1024px) { .curtain__time { left: 0; right: 0; max-width: none; text-align: center; top: 31svh; } }

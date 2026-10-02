@@ -25,6 +25,7 @@ uniform vec4 u_glow;              // 버튼 불빛 중심 x, y, 반지름, 세�
 uniform vec4 u_lamp;              // 고른 회차의 불빛 x, y, 반지름, 세기
 uniform vec4 u_glade;             // 수평선 위 빛이 물에 비친 길. x, 세기, 수평선에서의 반폭(CSS px), 한낮의 아지랑이 0~1
 uniform vec3 u_gladeCol;
+uniform float u_storm;            // 4막의 폭풍 0~1. 덩어리진 바람, 너울, 마루의 물거품
 uniform vec3 u_baseRect;          // 바탕 텍스처가 놓인 그림의 left, width, 반영 높이(CSS px)
 uniform vec4 u_titleRect;         // x, y, w, h (캔버스 좌표)
 uniform vec4 u_video;             // 영상 빛 rgb, 세기
@@ -64,6 +65,9 @@ void main() {
   // 바람의 잔물결. 방향과 파장이 서로 맞지 않는 결 몇 개를 더한다. 수평선에 가까울수록(멀수록) 잘고, 비스듬히 보이니 세로로 눌린다
   float persp = mix(2.4, 1.0, sqrt(dn));
   vec2 q = vec2(p.x, p.y * 2.2) * persp;
+  // 4막. 폭풍 이틀째. 바람이 덩어리로 불어 거친 자리와 덜 거친 자리가 물 위를 지나간다
+  float gust = 0.5 + 0.5 * sin(dot(vec2(0.83, 0.55), q) * 0.0042 - t * 0.85) * sin(dot(vec2(-0.37, 0.93), q) * 0.0029 + t * 0.53);
+  amb *= mix(1.0, 0.35 + 1.5 * gust, u_storm);
   vec2 d1 = vec2(0.970, 0.243), d2 = vec2(-0.829, 0.559), d3 = vec2(0.447, 0.894);
   float k1 = 0.029, k2 = 0.044, k3 = 0.067;
   g += amb * sqrt(persp) * (d1 * k1 * 1.00 * cos(dot(d1, q) * k1 + t * 0.93)
@@ -82,6 +86,10 @@ void main() {
 #endif
   // 한낮(2막 정오, 덥다). 수평선 가까이에서 공기가 일렁인다
   g.x += u_glade.w * 0.05 * sin(p.y * 1.7 + p.x * 0.021 + t * 7.0) * pow(1.0 - dn, 2.0);
+  // 집채만 한 파도. 긴 너울 하나가 방문자 쪽으로 밀려온다. 멈추면 잦아들지만 다 가라앉지는 않는다
+  vec2 d7 = vec2(0.28, 0.96);
+  float k7 = 0.017, ph7 = dot(d7, q) * k7 - t * 1.25;
+  g += u_storm * (1.0 - 0.6 * u_gains.z) * sqrt(persp) * d7 * k7 * 1.9 * cos(ph7);
   vec3 n = normalize(vec3(-g, 1.0));
 
   // 제목의 거울점. 잔잔할수록 변위가 작아 상이 또렷하다
@@ -123,6 +131,15 @@ void main() {
   col = mix(col, vec3(0.973, 0.973, 0.925), title * pow(1.0 - dn, 1.4) * 0.62);
   // 빛의 길. 1막은 막 뜬 달, 2막은 왼편 호수에 비친 해. 원반은 그리지 않고 물에 비친 길만 그린다.
   // 수평선에서는 가늘고 가까울수록 넓어진다. 잔물결의 줄과 기울기가 맞는 곳에서 부서져 반짝이고, 닿으면 흩어진다
+  if (u_storm > 0.01) {
+    // 바람 쪽 비탈은 어둡고 반대쪽은 밝다. 밤에도 물결의 덩치가 보인다
+    col *= 1.0 + u_storm * clamp(g.y * 9.0, -0.35, 0.35);
+    // 너울의 마루에 흰 물거품. 바람이 센 자리에서만 끊어져 보인다
+    float crest = pow(max(0.0, sin(ph7)), 14.0);
+    float br = 0.5 + 0.5 * sin(p.x * 0.045 + q.y * 0.01 + t * 0.7) * sin(p.x * 0.013 - t * 0.4);
+    float foam = crest * smoothstep(0.45, 0.9, gust * br + 0.25) * u_storm * (1.0 - 0.7 * u_gains.z) * pow(1.0 - dn, 0.5);
+    col = mix(col, vec3(0.78, 0.80, 0.74), foam * 0.38);
+  }
   if (u_glade.y > 0.001) {
     float gw = u_glade.z * mix(1.0, 3.4, dn);
     float gx = (p.x + n.x * disp * 2.5 - u_glade.x) / max(gw, 1.0);

@@ -22,6 +22,8 @@ const byId = (id: string) => lights.find((l) => l.id === id) ?? lights[0];
 const FLOOR = hex(palette.floor), DEEP = hex(palette.deep), IVORY = hex(palette.ivory);
 // 막 뜬 달의 빛. 한밤의 푸른 달빛이 아니라 식은 아이보리(조명팀 타임라인 §17, 지시서 6장)
 const MOON = mix(IVORY, hex(palette.sun), 0.3);
+// 4막. 갓을 씌운 램프 하나의 빛이 정면의 유리문을 지나 정원과 호수로 나간다. 호박빛이 아니라 누렇게 식은 아이보리
+const DOOR = mix(mix(IVORY, hex(palette.sun), 0.55), FLOOR, 0.15);
 
 export type ScrollHooks = { onProgress?: (p: number) => void };
 
@@ -34,7 +36,7 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
   let lastTree = -1;
   const probe = document.createElement('div'); probe.style.cssText = 'position:fixed;top:0;left:0;height:100svh;width:0;pointer-events:none;visibility:hidden;padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:content-box';
   document.body.appendChild(probe);
-  let svh = 0, safe = 0, heroPx = 0, bandPx = 0, endPx = 0, maxY = 0, aboutTop = 0, aboutBot = 0, duskStart = performance.now();
+  let svh = 0, safe = 0, heroPx = 0, bandPx = 0, endPx = 0, maxY = 0, aboutTop = 0, aboutBot = 0, actTop = 0, actBot = 0, duskStart = performance.now();
   const heroTitle = root.querySelector<HTMLElement>('[data-title]'), endTitle = root.querySelector<HTMLElement>('[data-end-title]');
   let reflectEl = heroTitle;
 
@@ -47,6 +49,8 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
     maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
     const ab = root.querySelector<HTMLElement>('[data-light="about"]')?.getBoundingClientRect();
     if (ab) { aboutTop = ab.top + window.scrollY; aboutBot = ab.bottom + window.scrollY; }
+    const tk = root.querySelector<HTMLElement>('[data-light="tickets"]')?.getBoundingClientRect();
+    if (tk) { actTop = tk.top + window.scrollY; actBot = tk.bottom + window.scrollY; }
     stops = [];
     const secs = [...root.querySelectorAll<HTMLElement>('[data-light]')];
     secs.forEach((el, i) => {
@@ -127,7 +131,8 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
     const bandRoom = roomAt(y + svh - h);
     // 밤의 물은 하늘빛의 윤기도 가라앉는다. 그래야 달의 길과 램프만 남는다
     const night = 1 - smooth((lum(bandRoom.c) - 0.03) / 0.25);
-    const B: L = { skyTop: mix(DEEP, bandRoom.c, 0.2), skyBot: FLOOR, sparkle: mix(mix(IVORY, bandRoom.c, 0.25), DEEP, 0.8 * night), wind: bandRoom.w };
+    // 밤의 물은 초록의 어둠이다(4막 정원은 캄캄, 끝은 가장 어두운 초록)
+    const B: L = { skyTop: mix(mix(DEEP, bandRoom.c, 0.2), FLOOR, 0.45 * night), skyBot: mix(FLOOR, hex('#1C221D'), 0.5 * night), sparkle: mix(mix(IVORY, bandRoom.c, 0.25), FLOOR, 0.88 * night), wind: bandRoom.w };
     const L = p > 0 ? lerpL(L1, B, p) : L1;
     // 빛의 길. 1막은 막이 오르면 호수로 시야가 열리고 지평선 위의 달이 물에 비친다(지문). 저물도록 머물러도 옅게 떠오른다.
     // 2막 정오에는 왼편 호수에 해가 비쳐 반짝이고 수평선이 일렁인다. 둘 다 원반은 그리지 않는다
@@ -136,10 +141,14 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
     const moonW = Math.max(smooth(p / 0.7), 0.35 * smooth((duskT - 0.25) / 0.75)) * (1 - smooth((ry - aboutTop) / (0.5 * svh)));
     // 2막의 늙은 보리수 그늘. 정오의 방 오른쪽 위에서 잎 그림자가 드리운다(나무는 무대의 상수 다운, 물 가까운 오른쪽)
     if (treeLeaves && Math.abs(aboutW - lastTree) > 0.004) { lastTree = aboutW; treeLeaves.style.opacity = (aboutW * 0.95).toFixed(3); }
+    // 4막(일정과 예매, 오시는 길). 폭풍 이틀째. 정면 유리문으로 나간 램프 빛이 거친 물에 부서진다.
+    // 끝(만든 사람들)에 들어서면 바람이 잦아들어 맺음의 제목이 비친다
+    const actW = actBot > actTop ? smooth((ry - actTop) / (0.6 * svh)) * (1 - smooth((ry - actBot + 0.2 * svh) / (0.5 * svh))) : 0;
     if (water) {
-      const r = aboutW / (moonW + aboutW + 1e-3), vw = window.innerWidth;
-      water.state.glade = [vw * (0.54 + (0.2 - 0.54) * r), moonW * 0.8 + aboutW * 0.45, 9 + 30 * r, aboutW];
-      water.state.gladeCol = [MOON[0] + (IVORY[0] - MOON[0]) * r, MOON[1] + (IVORY[1] - MOON[1]) * r, MOON[2] + (IVORY[2] - MOON[2]) * r];
+      const sum = moonW + aboutW + actW + 1e-3, a = moonW / sum, b = aboutW / sum, c = actW / sum, vw = window.innerWidth;
+      water.state.glade = [vw * (0.54 * a + 0.2 * b + 0.47 * c), moonW * 0.8 + aboutW * 0.45 + actW * 0.42, 9 * a + 39 * b + 24 * c, aboutW];
+      water.state.gladeCol = [0, 1, 2].map((i) => MOON[i] * a + IVORY[i] * b + DOOR[i] * c) as RGB;
+      water.state.storm = actW;
     }
     if (water) { water.state.light.surface = L.skyTop; water.state.light.deep = L.skyBot; water.state.light.sparkle = L.sparkle; water.state.light.wind = L.wind; water.state.lightDir = [0, -0.4 + 0.3 * duskT]; }
     if (people) { const pr = people.getBoundingClientRect(); if (pr.bottom > 0 && pr.top < svh) root.style.setProperty('--shadow-shift', `${Math.max(-16, Math.min(16, -pr.top * 0.025)).toFixed(1)}px`); }
