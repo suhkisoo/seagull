@@ -1,0 +1,12 @@
+---
+import Base from '../layouts/Base.astro';
+import { show } from '../content/show';
+---
+<Base noindex>
+  <main style="padding: 96px 24px; max-width: 32em;">
+    <h1 style="font-weight:700; font-size: 26px; line-height:1.2;">〈{show.title}〉 {show.company}</h1>
+    <p style="margin-top:16px;">〔2단계 실험실. 첫 화면 두 안을 보고 하나를 고른다.〕</p>
+    <p style="margin-top:16px;"><a href="./lab/a/">A안. 포스터를 잇는 세로 제목</a></p>
+    <p><a href="./lab/b/">B안. 수평선 위의 가로 제목</a></p>
+  </main>
+</Base>

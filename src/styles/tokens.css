@@ -1,0 +1,41 @@
+/* docs/plan.md 1장의 색, 서체, 글자 크기 단계 */
+:root {
+  --floor: #262E27;
+  --deep: #3E4838;
+  --olive: #5B6041;
+  --sun: #ABAB76;
+  --ivory: #F8F8EC;
+  --amber: #CDA668;
+  --morning-shadow: #AEBFB7;
+  --morning-room: #DDE0D4;
+
+  --font: 'Seagull Serif', 'Noto Serif KR', 'Seagull Fallback', serif;
+
+  --fs-title-a: clamp(72px, 21.5vw, 120px);   /* A안 세로 글자 하나. 390에서 84 */
+  --fs-title-b: clamp(80px, 24.6vw, 208px);   /* B안 가로. 390에서 96 */
+  --fs-original: clamp(14px, 3.6vw, 16px);
+  --fs-digits: clamp(44px, 11.3vw, 56px);
+  --fs-h2: clamp(26px, 6.7vw, 32px);
+  --fs-h3: clamp(20px, 5.1vw, 22px);
+  --fs-line: clamp(20px, 5.1vw, 24px);
+  --fs-water-line: 16px;
+  --fs-body: clamp(17px, 4.4vw, 18px);
+  --fs-button: 17px;
+  --fs-caption: clamp(14px, 3.6vw, 15px);
+
+  --gutter: 24px;
+  --section-pad: 96px;
+  --button-h: 48px;
+
+  /* 수면 띠. 초기값은 첫 화면의 물 높이. docs/plan.md 3.6과 4.2 */
+  --water-hero: calc(38svh + env(safe-area-inset-bottom, 0px));
+  --water-band: calc(max(15svh, 88px) + env(safe-area-inset-bottom, 0px));
+  --water-h: var(--water-hero);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  --calm: 0;         /* 0 살아 있음 ~ 1 잔잔함. 수면 모듈이 쓴다 */
+  --curtain: 0;      /* 0 내려옴 ~ 1 올라감 */
+}
+@media (min-width: 1024px) {
+  :root { --gutter: 8vw; --section-pad: 160px; --button-h: 56px; --fs-water-line: 17px; }
+}

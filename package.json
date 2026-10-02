@@ -1,0 +1,26 @@
+{
+  "name": "seagull-landing",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "prebuild": "node scripts/subset-fonts.mjs",
+    "predev": "node scripts/subset-fonts.mjs",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "shots": "node scripts/shots.mjs",
+    "check:size": "node scripts/check-bundle-size.mjs dist"
+  },
+  "dependencies": {
+    "@fontsource/noto-serif-kr": "^5.3.0",
+    "astro": "^7.3.5",
+    "subset-font": "^2.9.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1"
+  }
+}
