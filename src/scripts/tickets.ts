@@ -15,7 +15,7 @@ function trackLamp() {
   const r = cell.getBoundingClientRect(), b = band.getBoundingClientRect();
   const dist = b.top - r.bottom; // 칸이 띠보다 얼마나 위에 있나
   const vis = dist > -r.height && r.top < innerHeight ? 0.45 + 0.55 * Math.max(0, 1 - Math.max(0, dist) / innerHeight) : 0;
-  water.state.lamp = [r.left + r.width / 2, b.top + Math.min(60, Math.max(0, dist) * 0.2), r.width * 0.6, 0.4 * vis];
+  water.state.lamp = [r.left + r.width / 2, b.top + Math.min(60, Math.max(0, dist) * 0.2), r.width * 0.9, 1.6 * vis];
 }
 window.addEventListener('scroll', trackLamp, { passive: true });
 window.addEventListener('resize', trackLamp, { passive: true });
