@@ -55,6 +55,22 @@ for (const [name, now] of states) {
   console.log(name, await page.evaluate(() => document.querySelector('[data-ticket-button]')?.textContent));
   await ctx.close();
 }
+// 예매 흐름(미리보기 가격)과 관리 화면
+{
+  const U = url('book/?show=1113-1930&seat=15000&balcony=10000&goods=3000');
+  const click = (p, sel) => p.click(sel, { force: true, timeout: 5000 });
+  for (const [key, vp, mobile] of [['m390', { width: 390, height: 844 }, true], ['d1440', { width: 1440, height: 900 }, false]]) {
+    const ctx = await browser.newContext({ viewport: vp, deviceScaleFactor: 1, isMobile: mobile, hasTouch: mobile });
+    const page = await ctx.newPage(); await page.goto(U); await page.waitForTimeout(700); await shot(page, `${out}/${key}-50-book-show.jpg`);
+    await click(page, '[data-step-next]'); await page.waitForTimeout(700); await click(page, '[data-seat="D6"]'); await click(page, '[data-seat="D7"]'); await click(page, '[data-balcony-plus]'); await page.waitForTimeout(400); await shot(page, `${out}/${key}-51-book-seats.jpg`);
+    await click(page, '[data-step-next]'); await page.waitForTimeout(700); await click(page, '[data-goods="pinbadge"] [data-qty-plus]'); await page.waitForTimeout(200); await shot(page, `${out}/${key}-52-book-goods.jpg`);
+    await click(page, '[data-step-next]'); await page.waitForTimeout(600); await page.fill('#bk-name', '홍길동'); await page.fill('#bk-phone', '010-1234-5678'); await page.waitForTimeout(200);
+    await click(page, '[data-step-next]'); await page.waitForTimeout(700); await shot(page, `${out}/${key}-53-book-confirm.jpg`);
+    await click(page, '[data-step-next]'); await page.waitForTimeout(900); await shot(page, `${out}/${key}-54-book-done.jpg`);
+    await page.goto(url('admin/')); await page.waitForTimeout(500); await page.fill('#ad-token', 'x'); await click(page, '[data-login] button'); await page.waitForTimeout(600); await shot(page, `${out}/${key}-55-admin.jpg`);
+    await ctx.close();
+  }
+}
 // 대체 경로. 움직임 줄임, 자바스크립트 없음, WebGL 없음
 let ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
 let page = await ctx.newPage(); await page.goto(url()); await page.waitForTimeout(1500); await page.touchscreen.tap(200, 700); await page.waitForTimeout(300);

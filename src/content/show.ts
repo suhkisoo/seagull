@@ -50,9 +50,25 @@ export const show = {
   pricing: '',                                    // 비면 "추후 공개"
   booking: {
     openAt: '',                                   // 예매 오픈 시각 ISO. 비면 "예매 일정 보기"
-    commonUrl: '',                                // 공통 예매 링크
+    commonUrl: '',                                // 외부 예매처 링크. 비면 이 페이지의 예매 흐름(/book/)을 쓴다
     vendorName: '',                               // 예매처 이름
+    // 이 페이지의 예매 흐름(연출의 지시로 3단계 뒤에 추가). 좌석을 고르고 계좌로 입금하면 기획팀이 확인한다
+    apiUrl: '',                                   // Apps Script 웹 앱 주소 【빈칸】. 비면 예매 흐름은 미리보기(저장되지 않음)
+    seatPrice: null as number | null,             // 지정석 가격(원) 【빈칸】
+    balconyPrice: null as number | null,          // 발코니 가격(원) 【빈칸】. 비면 지정석과 같다
+    account: { bank: '', number: '', holder: '' }, // 입금 계좌 【빈칸】
+    holdHours: 24,                                // 입금 대기 시간. 지나면 기획팀이 관리 화면에서 자리를 풀 수 있다
+    contact: '',                                  // 예매 문의(카카오톡 채널, 전화 등) 【빈칸】
   },
+  // 굿즈. 9/17 인스타 일정표와 9/21 기획 스탭회의 기준 【확인】. 가격과 재고는 【빈칸】. price가 비면 "추후 공개"로 보이고 고를 수 없다
+  goods: [
+    { id: 'programbook', name: '프로그램북', price: null as number | null, stock: null as number | null, note: '' },
+    { id: 'pinbadge', name: '핀배지', price: null as number | null, stock: null as number | null, note: '' },
+    { id: 'bookmark-ticket', name: '책갈피(티켓)', price: null as number | null, stock: null as number | null, note: '' },
+    { id: 'bookmark-poster', name: '책갈피(포스터)', price: null as number | null, stock: null as number | null, note: '' },
+    { id: 'stamp-sticker', name: '우표 스티커', price: null as number | null, stock: null as number | null, note: '' },
+    { id: 'actor-poster', name: '배우 포스터', price: null as number | null, stock: null as number | null, note: '11종 가운데 고른다' },
+  ],
   tumblbug: { url: '', startAt: '', endAt: '' },  // 기간 안에서만 보인다
   roles: [
     { id: 'arkadina', name: '아르카지나', scriptName: '이리나 니콜라예브나 아르카지나 (남편 성으로는 트레플레바)', scriptNote: '배우', actors: ['박세은', '서채림'], photo: '', line: '' },

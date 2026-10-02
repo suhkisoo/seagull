@@ -101,7 +101,8 @@ html:not(.js) .js-only { display: none; }
 .cell:has(.cell__input:focus-visible) { outline: 2px solid var(--amber); outline-offset: 3px; }
 .cell[data-sold-out], .cell.is-past { color: color-mix(in srgb, var(--ivory) 55%, transparent); }
 .cell[data-sold-out]:has(.cell__input:checked), .cell.is-past:has(.cell__input:checked) { background: color-mix(in srgb, var(--amber) 35%, transparent); color: var(--ivory); }
-.cast { min-height: 24px; }
+.cast { padding-left: 12px; }
+.cast__list { padding: 8px 0 4px; }
 .cast__list { margin: 0; font-size: var(--fs-caption); line-height: 1.6; }
 .cast__head dd { margin: 0 0 8px; font-weight: 700; }
 .cast__row { display: flex; gap: 16px; }

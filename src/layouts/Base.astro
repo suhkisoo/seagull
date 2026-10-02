@@ -51,7 +51,7 @@ const jsonLd = JSON.stringify({
     <style set:html={fontCss}></style>
     <script is:inline>
       // 첫 페인트 전에 상태를 미리 정한다. 날짜별 판정은 진입 모듈이 다시 한다
-      (function(){var d=document.documentElement;d.classList.add('js');if(matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('reduced');})();
+      (function(){var d=document.documentElement;d.classList.add('js');if(matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('reduced');if('scrollRestoration' in history)history.scrollRestoration='manual';if(!location.hash){scrollTo(0,0);addEventListener('load',function(){if(scrollY>0&&!location.hash)scrollTo(0,0);},{once:true});}})();
     </script>
     <slot name="head" />
   </head>

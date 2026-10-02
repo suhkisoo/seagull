@@ -8,7 +8,7 @@ export type TicketState =
   | { id: 'closed'; label: string }
   | { id: 'sold-out'; label: string }
   | { id: 'past'; label: string }
-  | { id: 'open'; label: string; href: string; external: true };
+  | { id: 'open'; label: string; href: string; external?: true };
 
 const KST = (iso: string) => new Date(iso).getTime();
 export function now(): number {
@@ -28,7 +28,8 @@ export function ticketState(picked: ShowTime | null, t = now()): TicketState {
   const running = (show.runningMinutes ?? 180) * 60 * 1000;
   const last = show.shows.reduce((a, b) => (KST(a.startAt) > KST(b.startAt) ? a : b));
   const endOfRun = KST(last.startAt) + running;
-  const hasLink = !!show.booking.commonUrl || show.shows.some((s) => s.url);
+  const bookPage = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/book/`;
+  const hasLink = !!show.booking.commonUrl || show.shows.some((s) => s.url) || !!show.booking.apiUrl;
   if (t >= endOfRun) return { id: 'ended', label: '공연이 끝났습니다' };
   if (!show.booking.openAt || !hasLink) return { id: 'see-schedule', label: '예매 일정 보기', href: '#tickets' };
   if (t < KST(show.booking.openAt)) return { id: 'before-open', label: `${fmtOpen(show.booking.openAt)} 예매 오픈`, href: '#tickets' };
@@ -37,9 +38,11 @@ export function ticketState(picked: ShowTime | null, t = now()): TicketState {
   if (picked) {
     if (picked.soldOut) return { id: 'sold-out', label: '매진' };
     if (t >= KST(picked.startAt)) return { id: 'past', label: '종료' };
-    return { id: 'open', label: `${fmtShow(picked)} 예매하기`, href: picked.url || show.booking.commonUrl, external: true };
+    const ext = picked.url || show.booking.commonUrl;
+    return ext ? { id: 'open', label: `${fmtShow(picked)} 예매하기`, href: ext, external: true } : { id: 'open', label: `${fmtShow(picked)} 예매하기`, href: `${bookPage}?show=${picked.id}` };
   }
   if (show.booking.commonUrl) return { id: 'open', label: '예매하기', href: show.booking.commonUrl, external: true };
+  if (show.booking.apiUrl) return { id: 'open', label: '예매하기', href: bookPage };
   return { id: 'see-schedule', label: '예매하기', href: '#tickets' };
 }
 export function applyTicketState(el: HTMLAnchorElement | HTMLButtonElement, st: TicketState) {
@@ -49,7 +52,7 @@ export function applyTicketState(el: HTMLAnchorElement | HTMLButtonElement, st: 
   if (el instanceof HTMLAnchorElement) {
     if (clickable) { el.setAttribute('href', (st as { href: string }).href); el.removeAttribute('aria-disabled'); el.removeAttribute('tabindex'); }
     else { el.removeAttribute('href'); el.setAttribute('aria-disabled', 'true'); el.setAttribute('role', 'button'); }
-    if ('external' in st) { el.target = '_blank'; el.rel = 'noopener'; } else { el.removeAttribute('target'); el.removeAttribute('rel'); }
+    if ('external' in st && st.external) { el.target = '_blank'; el.rel = 'noopener'; } else { el.removeAttribute('target'); el.removeAttribute('rel'); }
   }
   document.documentElement.dataset.ticketState = st.id;
 }

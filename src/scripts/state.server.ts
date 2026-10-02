@@ -5,8 +5,9 @@ export function ticketState(picked: ShowTime | null = null, t = Date.now()) {
   const running = (show.runningMinutes ?? 180) * 60 * 1000;
   const last = show.shows.reduce((a, b) => (KST(a.startAt) > KST(b.startAt) ? a : b));
   if (t >= KST(last.startAt) + running) return { id: 'ended', label: '공연이 끝났습니다' } as const;
-  const hasLink = !!show.booking.commonUrl || show.shows.some((s) => s.url);
+  const hasLink = !!show.booking.commonUrl || show.shows.some((s) => s.url) || !!show.booking.apiUrl;
   if (!show.booking.openAt || !hasLink) return { id: 'see-schedule', label: '예매 일정 보기', href: '#tickets' } as const;
   if (show.booking.commonUrl) return { id: 'open', label: '예매하기', href: show.booking.commonUrl, external: true } as const;
+  if (show.booking.apiUrl) return { id: 'open', label: '예매하기', href: `${import.meta.env.BASE_URL.replace(/\/$/, '')}/book/` } as const;
   return { id: 'see-schedule', label: '예매하기', href: '#tickets' } as const;
 }

@@ -1,0 +1,111 @@
+/* 예매와 관리 화면. 같은 서체, 같은 괘선, 상자 없음. 고른 자리에만 호박빛 */
+.book { background: linear-gradient(to bottom, var(--deep) 0, var(--floor) 60svh); color: var(--ivory); min-height: 100svh; padding: 48px var(--gutter) 0; max-width: 1200px; margin: 0 auto; }
+@media (min-width: 1024px) { .book { padding: 72px var(--gutter) 0; max-width: none; } }
+.book__head { max-width: 36em; }
+.book__eyebrow { font-size: var(--fs-caption); opacity: 0.75; }
+.book__eyebrow a { text-decoration: none; }
+.book__title { font-size: var(--fs-h2); font-weight: 700; line-height: 1.25; margin-top: 8px; }
+.book__lead { margin-top: 16px; }
+.book__demo { margin-top: 12px; font-size: var(--fs-caption); padding: 8px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); color: var(--amber); }
+.steps { list-style: none; margin: 40px 0 0; padding: 0; }
+.step { border-top: 1px solid var(--rule); padding: 20px 0; }
+.step:last-child { border-bottom: 1px solid var(--rule); }
+.step__title { font-size: var(--fs-h3); font-weight: 700; line-height: 1.3; display: flex; align-items: baseline; gap: 12px; }
+.step__num { font-size: var(--fs-caption); font-weight: 400; opacity: 0.7; min-width: 1.2em; }
+.step.is-done .step__title { cursor: pointer; opacity: 0.85; }
+.step__summary { font-size: var(--fs-caption); opacity: 0.8; margin: 4px 0 0 calc(1.2em + 12px); }
+.step__summary:empty { display: none; }
+.step__body { display: none; margin-top: 16px; }
+.step.is-open .step__body { display: block; }
+.step:not(.is-open):not(.is-done) { opacity: 0.45; }
+.step__hint { font-size: var(--fs-caption); opacity: 0.8; margin-bottom: 16px; max-width: 36em; }
+.step__picked { margin-top: 12px; font-size: var(--fs-caption); min-height: 1.6em; }
+
+/* 1. 회차 */
+.pick { border: 0; padding: 0; margin: 0; }
+.pick__row { display: flex; align-items: baseline; gap: 16px; min-height: 56px; padding: 6px 12px; margin: 0 -12px; cursor: pointer; transition: background 400ms, color 300ms; }
+.pick__row:has(input:checked) { background: var(--amber); color: var(--floor); }
+.pick__row:has(input:disabled) { opacity: 0.5; cursor: default; }
+.pick__row:has(input:focus-visible) { outline: 2px solid var(--amber); outline-offset: 2px; }
+.pick__day { flex: 0 0 9em; }
+.pick__time { font-size: var(--fs-h3); font-weight: 700; font-variant-numeric: tabular-nums; }
+.pick__note { font-size: var(--fs-caption); margin-left: auto; }
+
+/* 2. 좌석. 무대가 아래. A열이 무대에 가장 가깝다 */
+.hall { max-width: 640px; }
+.hall__balcony { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; font-size: var(--fs-caption); margin-bottom: 20px; }
+@media (max-width: 419px) { .hall__balcony { justify-content: center; } .hall__balcony-side:last-child { display: none; } .hall__balcony-side:first-child { width: 100%; text-align: center; } .hall__balcony-side:first-child::after { content: ' · 오른쪽'; } }
+.hall__balcony-side { opacity: 0.7; white-space: nowrap; }
+.balcony { display: inline-flex; align-items: center; gap: 10px; }
+.balcony__btn, .qty__btn { width: 44px; height: 44px; border: 1px solid var(--rule); background: transparent; color: inherit; font: inherit; font-size: 20px; cursor: pointer; }
+.balcony__btn:disabled, .qty__btn:disabled { opacity: 0.35; cursor: default; }
+.balcony__count { font-variant-numeric: tabular-nums; min-width: 3em; text-align: center; }
+.balcony__count output { font-size: var(--fs-h3); font-weight: 700; }
+.balcony__left { opacity: 0.7; white-space: nowrap; }
+.seats { display: flex; flex-direction: column; gap: 6px; }
+.seats__row { display: grid; grid-template-columns: 1em 1fr 1em; align-items: center; gap: 4px; }
+.seats__label { font-size: 12px; opacity: 0.6; text-align: center; }
+.seats__cells { display: flex; justify-content: center; gap: 3px; }
+.seats__aisle { width: 10px; }
+.seat { width: 21px; height: 28px; padding: 0; border: 1px solid color-mix(in srgb, var(--ivory) 35%, transparent); background: transparent; color: var(--ivory); font: inherit; font-size: 11px; cursor: pointer; transition: background 300ms, color 200ms, box-shadow 500ms; }
+@media (min-width: 420px) { .seat { width: 30px; height: 32px; font-size: 13px; } .seats__cells { gap: 6px; } .seats__aisle { width: 14px; } .seats__row { grid-template-columns: 1.2em 1fr 1.2em; gap: 8px; } }
+@media (min-width: 1024px) { .seat { width: 40px; height: 40px; font-size: 14px; } }
+.seat:hover:not(:disabled) { border-color: var(--amber); }
+.seat.is-picked { background: var(--amber); color: var(--floor); border-color: var(--amber); box-shadow: 0 0 22px color-mix(in srgb, var(--amber) 55%, transparent); }
+.seat.is-taken, .seat:disabled { color: color-mix(in srgb, var(--ivory) 25%, transparent); border-color: color-mix(in srgb, var(--ivory) 12%, transparent); cursor: default; background: repeating-linear-gradient(45deg, transparent 0 4px, color-mix(in srgb, var(--ivory) 10%, transparent) 4px 5px); }
+.seat.is-taken.is-picked { background: var(--amber); }
+.seat--legend { display: inline-block; vertical-align: middle; width: 18px; height: 18px; margin: 0 4px 0 12px; pointer-events: none; }
+.seats__legend { font-size: var(--fs-caption); opacity: 0.85; margin-top: 16px; }
+.hall__stage { margin-top: 20px; text-align: center; font-size: var(--fs-caption); letter-spacing: 0.3em; padding: 10px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.hall__entrance { font-size: var(--fs-caption); opacity: 0.6; margin-top: 8px; }
+
+/* 3. 굿즈 */
+.goods { list-style: none; margin: 0; padding: 0; max-width: 640px; }
+.goods__row { display: flex; align-items: center; gap: 16px; min-height: 56px; border-top: 1px solid var(--rule); padding: 8px 0; }
+.goods__row:last-child { border-bottom: 1px solid var(--rule); }
+.goods__name { flex: 1; }
+.goods__note { display: block; font-size: var(--fs-caption); opacity: 0.7; }
+.goods__price { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.goods__soon { font-size: var(--fs-caption); opacity: 0.6; white-space: nowrap; }
+.qty { display: inline-flex; align-items: center; gap: 8px; }
+.qty__n { min-width: 1.6em; text-align: center; font-variant-numeric: tabular-nums; }
+
+/* 4. 예매자 */
+.field { display: grid; gap: 6px; max-width: 24em; margin-bottom: 16px; }
+.field label { font-size: var(--fs-caption); opacity: 0.8; }
+.field input, .admin__filter select { background: transparent; border: 0; border-bottom: 1px solid color-mix(in srgb, var(--ivory) 40%, transparent); color: inherit; font: inherit; padding: 8px 0; min-height: 44px; border-radius: 0; }
+.field input:focus-visible { outline: none; border-bottom-color: var(--amber); }
+.field__note { font-size: var(--fs-caption); opacity: 0.7; max-width: 30em; }
+.field__error { font-size: var(--fs-caption); color: var(--amber); min-height: 1.6em; margin-top: 8px; }
+
+/* 5. 확인, 완료 */
+.bill { margin: 0; display: grid; grid-template-columns: 7em 1fr; gap: 6px 16px; max-width: 36em; font-size: var(--fs-caption); }
+.bill dt { opacity: 0.7; } .bill dd { margin: 0; }
+.pay { margin-top: 24px; border-top: 1px solid var(--rule); padding-top: 16px; max-width: 36em; }
+.pay__total { font-size: var(--fs-h3); } .pay__total strong { font-weight: 700; }
+.pay__account { margin-top: 8px; } .pay__account strong { font-weight: 700; }
+.pay__note { font-size: var(--fs-caption); opacity: 0.8; margin-top: 8px; }
+.done { margin-top: 40px; border-top: 1px solid var(--rule); padding-top: 20px; }
+.done .bill { margin-top: 16px; }
+
+/* 띠. 예매 페이지는 캔버스 없이 정지한 물. 버튼이 다음 단계를 연다 */
+.water--static { height: var(--water-band); }
+.water--static .ticket { top: 12px; }
+.ticket:disabled { filter: saturate(0.4) brightness(0.8); cursor: default; }
+.ticket[hidden] { display: none; }
+
+/* 관리 */
+.admin__login { margin-top: 32px; }
+.admin__tools { display: flex; flex-wrap: wrap; gap: 8px 24px; align-items: center; margin-top: 24px; font-size: var(--fs-caption); }
+.admin__filter { display: inline-flex; align-items: center; gap: 8px; }
+.admin__counts { margin: 20px 0; display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; font-size: var(--fs-caption); }
+.admin__counts dt { opacity: 0.7; } .admin__counts dd { margin: 0; }
+.admin__hint { font-size: var(--fs-caption); opacity: 0.8; max-width: 40em; }
+.admin__table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: var(--fs-caption); }
+.admin__table th, .admin__table td { text-align: left; padding: 8px 8px 8px 0; border-top: 1px solid var(--rule); vertical-align: top; }
+.admin__table th { font-weight: 400; opacity: 0.7; }
+.admin__table tr[data-status="취소"] td { opacity: 0.45; }
+.admin__table tr[data-status="입금확인"] td:nth-child(8) { color: var(--amber); }
+.admin__table .action { min-height: 36px; margin-right: 12px; }
+.admin__table .action::before { content: none; }
+@media (max-width: 760px) { .admin__table thead { display: none; } .admin__table tr { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; padding: 10px 0; border-top: 1px solid var(--rule); } .admin__table td { border: 0; padding: 2px 0; } }

@@ -28,6 +28,14 @@
 * `?reflection=1` 그림의 반영을 첫 화면 수면의 바탕으로 쓰는 안(P15).
 * `npm run shots` 가 `docs/shots/`에 스크린샷을 찍는다(설치된 Chromium 사용). `npm run check:size` 가 첫 화면 JS 크기를 잰다. `npm run og` 가 포스터로 og 이미지를 다시 만든다.
 
+## 예매(좌석 고르기)와 기획팀 관리
+
+`/book/`에서 회차, 좌석, 굿즈를 고르고 계좌로 입금하면 `/admin/`에서 기획팀이 입금을 확인하거나 자리를 푼다. 장부는 구글 시트이고 그 앞에 Apps Script 웹 앱이 있다. 설치는 `backend/Code.gs` 맨 위의 여섯 줄을 따른다(기획팀 구글 계정, 10분). 나온 웹 앱 주소를 `src/content/show.ts`의 `booking.apiUrl`에 넣고 다시 빌드한다. 주소가 비어 있으면 예매 흐름은 미리보기(이 브라우저에만 저장)로 돌고, `?seat=15000&balcony=10000&goods=3000`처럼 가격을 넣어 볼 수 있다.
+
+* 가격은 `booking.seatPrice`, `booking.balconyPrice`(비면 지정석과 같다), `goods[].price`. 계좌는 `booking.account`. 입금 대기 시간은 `booking.holdHours`. 문의처는 `booking.contact`.
+* 관리 암호는 `Code.gs`의 `ADMIN_TOKEN`이다. 기획팀만 알고 있으면 된다. `/admin/`은 검색에 걸리지 않게 `noindex`다.
+* 시트에서 상태 칸을 직접 "취소"나 "입금확인"으로 바꿔도 사이트에 그대로 반영된다.
+
 ## 내용 고치는 법
 
 전부 `src/content/show.ts` 한 파일이다. 고친 뒤 `npm run build`를 돌리면 빌드가 내용을 검사해 경고를 찍는다. 화면 코드에는 날짜나 이름이 없다.

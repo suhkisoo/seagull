@@ -32,19 +32,18 @@ const castOf = (s: (typeof show.shows)[number]) => show.roles.map((r) => ({ role
               </label>
             ))}
           </div>
+          <div class="cast" aria-live="polite">
+            {list.map((s) => (
+              <dl class="cast__list" data-cast-for={s.id} hidden>
+                <div class="cast__head"><dt class="visually-hidden">회차</dt><dd>{fmtTime(s.startAt)} 출연</dd></div>
+                {castOf(s).map((c) => <div class="cast__row"><dt>{c.role}</dt><dd>{c.actor || '추후 공개'}</dd></div>)}
+              </dl>
+            ))}
+          </div>
           <hr class="rule" />
         </div>
       ))}
     </fieldset>
-    <div class="cast" data-cast aria-live="polite">
-      {show.shows.map((s) => (
-        <dl class="cast__list" data-cast-for={s.id} hidden>
-          <div class="cast__head"><dt class="visually-hidden">회차</dt><dd>{fmtDay(s.startAt)} {fmtTime(s.startAt)} 출연</dd></div>
-          {castOf(s).map((c) => <div class="cast__row"><dt>{c.role}</dt><dd>{c.actor || '추후 공개'}</dd></div>)}
-        </dl>
-      ))}
-    </div>
-    <hr class="rule" />
     <dl class="info">
       {(show.runningMinutes || show.intermission) && (
         <div class="info__row"><dt>러닝타임</dt><dd>{show.runningMinutes ? `${show.runningMinutes}분` : ''}{show.runningMinutes && show.intermission ? ', ' : ''}{show.intermission}</dd></div>

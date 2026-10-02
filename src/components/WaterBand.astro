@@ -13,6 +13,6 @@ const st = ticketState(); // 빌드 시점 상태(JS 없을 때 그대로 보인
   <canvas aria-hidden="true"></canvas>
   <p class="water__line" aria-hidden="true"></p>
   {'href' in st
-    ? <a class="ticket" data-ticket-button href={st.href} data-state={st.id} target={'external' in st ? '_blank' : undefined} rel={'external' in st ? 'noopener' : undefined}>{st.label}</a>
+    ? <a class="ticket" data-ticket-button href={st.href} data-state={st.id} target={'external' in st && st.external ? '_blank' : undefined} rel={'external' in st && st.external ? 'noopener' : undefined}>{st.label}</a>
     : <a class="ticket" data-ticket-button role="button" aria-disabled="true" data-state={st.id}>{st.label}</a>}
 </div>

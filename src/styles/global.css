@@ -1,5 +1,6 @@
 @import './tokens.css';
 @import './sections.css';
+@import './booking.css';
 
 /* 서브셋 폰트. docs/plan.md 5.1. 제목 세 글자는 head에 인라인, 나머지는 여기 */
 @font-face { font-family: 'Seagull Fallback'; src: local('Noto Sans KR'), local('Noto Sans CJK KR'), local('Apple SD Gothic Neo'), local('Malgun Gothic'); size-adjust: 105%; ascent-override: 109.6%; descent-override: 27.2%; line-gap-override: 0%; }
@@ -22,14 +23,16 @@ a { color: inherit; }
 /* 위쪽은 안개 낀 아이보리 빛으로 밝아지고, 저물수록 초록의 어둠이 올라온다 */
 .hero__haze { position: absolute; inset: 0; background: linear-gradient(to bottom, color-mix(in srgb, var(--ivory) 55%, transparent) 0, color-mix(in srgb, var(--ivory) 18%, transparent) 30%, transparent 58%); mix-blend-mode: screen; opacity: calc(1 - var(--dusk, 0.25) * 0.9); transition: opacity 400ms; }
 .hero__painting-veil { position: absolute; inset: 0; background: linear-gradient(to bottom, var(--deep) 0, var(--deep) 45%, color-mix(in srgb, var(--deep) 60%, transparent) 62%, transparent 75%); opacity: calc(var(--dusk, 0.25) * 0.85); transition: opacity 400ms; }
-/* 막. 아이보리 거즈 한 장. 주름은 부드러운 명암의 세로 결이고 아랫단은 수평선 바로 위에 걸린다 */
-.curtain { position: absolute; left: -2%; right: -2%; top: 0; height: calc(62svh + 6px); pointer-events: none; transform-origin: 50% 0;
-  --c1: color-mix(in srgb, var(--ivory) 42%, transparent); --c2: color-mix(in srgb, var(--ivory) 16%, transparent); --c3: color-mix(in srgb, var(--deep) 14%, transparent);
+/* 막. 옅은 거즈 한 장. 넓고 부드러운 주름 몇 개, 아랫단의 가는 빛. 그림이 비쳐 보인다 */
+.curtain { position: absolute; left: -2%; right: -2%; top: 0; height: calc(62svh + 4px); pointer-events: none; transform-origin: 50% 0;
+  --f1: color-mix(in srgb, var(--ivory) 26%, transparent); --f2: color-mix(in srgb, var(--ivory) 9%, transparent); --f3: color-mix(in srgb, var(--deep) 7%, transparent);
   background:
-    linear-gradient(to bottom, color-mix(in srgb, var(--ivory) 22%, transparent), transparent 35%, transparent 86%, color-mix(in srgb, var(--ivory) 30%, transparent) 97%, color-mix(in srgb, var(--ivory) 55%, transparent) 100%),
-    repeating-linear-gradient(90deg, var(--c1) 0, var(--c2) 34px, var(--c3) 58px, var(--c2) 84px, var(--c1) 118px),
-    repeating-linear-gradient(90deg, transparent 0, color-mix(in srgb, var(--ivory) 10%, transparent) 147px, transparent 311px);
-  mask-image: linear-gradient(to bottom, black 94%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 94%, transparent 100%); will-change: transform; }
+    linear-gradient(to bottom, color-mix(in srgb, var(--ivory) 14%, transparent), transparent 30%, transparent 90%, color-mix(in srgb, var(--ivory) 28%, transparent) 99.4%, color-mix(in srgb, var(--ivory) 60%, transparent) 100%),
+    repeating-linear-gradient(90deg, var(--f1) 0, var(--f2) 70px, var(--f3) 125px, var(--f2) 180px, var(--f1) 250px);
+  opacity: 0.85; will-change: transform; }
+@media (min-width: 1024px) { .curtain { background:
+    linear-gradient(to bottom, color-mix(in srgb, var(--ivory) 14%, transparent), transparent 30%, transparent 90%, color-mix(in srgb, var(--ivory) 28%, transparent) 99.4%, color-mix(in srgb, var(--ivory) 60%, transparent) 100%),
+    repeating-linear-gradient(90deg, var(--f1) 0, var(--f2) 120px, var(--f3) 210px, var(--f2) 300px, var(--f1) 420px); } }
 .curtain { display: none; }
 html.js .curtain { display: block; }
 .water-still .curtain, .reduced .curtain { display: none; }
