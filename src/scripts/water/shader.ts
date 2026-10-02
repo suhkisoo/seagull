@@ -59,21 +59,30 @@ void main() {
   }
   highp float t = u_gains.w;
   float amb = u_gains.x;
-  float a1 = p.x * 0.045 + t * 1.0472, a2 = p.y * 0.09 - t * 0.8378 + p.x * 0.02;
-  g += amb * vec2(0.045 * cos(a1) + 0.02 * cos(a2), 0.09 * cos(a2)) * 1.4;
+  // 바람의 잔물결. 방향과 파장이 서로 맞지 않는 결 몇 개를 더한다. 수평선에 가까울수록(멀수록) 잘고, 비스듬히 보이니 세로로 눌린다
+  float persp = mix(2.4, 1.0, sqrt(dn));
+  vec2 q = vec2(p.x, p.y * 2.2) * persp;
+  vec2 d1 = vec2(0.970, 0.243), d2 = vec2(-0.829, 0.559), d3 = vec2(0.447, 0.894);
+  float k1 = 0.029, k2 = 0.044, k3 = 0.067;
+  g += amb * sqrt(persp) * (d1 * k1 * 1.00 * cos(dot(d1, q) * k1 + t * 0.93)
+                    + d2 * k2 * 0.62 * cos(dot(d2, q) * k2 - t * 1.31 + 1.7)
+                    + d3 * k3 * 0.40 * cos(dot(d3, q) * k3 + t * 1.73 + 4.1)) * 1.15;
 #if ${AMB} >= 2
-  float a3 = p.x * 0.11 - p.y * 0.07 + t * 1.2566;
-  g += amb * 0.5 * vec2(0.11 * cos(a3), -0.07 * cos(a3));
+  vec2 d4 = vec2(-0.196, 0.981), d5 = vec2(0.883, -0.469);
+  float k4 = 0.103, k5 = 0.151;
+  g += amb * sqrt(persp) * (d4 * k4 * 0.26 * cos(dot(d4, q) * k4 - t * 2.27 + 0.6)
+                    + d5 * k5 * 0.17 * cos(dot(d5, q) * k5 + t * 2.89 + 2.3)) * 1.15;
 #endif
 #if ${AMB} >= 3
-  float a4 = -p.x * 0.19 + p.y * 0.13 + t * 2.0944;
-  g += amb * 0.25 * vec2(-0.19 * cos(a4), 0.13 * cos(a4));
+  vec2 d6 = vec2(0.600, 0.800);
+  float k6 = 0.221;
+  g += amb * sqrt(persp) * d6 * k6 * 0.10 * cos(dot(d6, q) * k6 - t * 3.41 + 5.2) * 1.15;
 #endif
   vec3 n = normalize(vec3(-g, 1.0));
 
   // 제목의 거울점. 잔잔할수록 변위가 작아 상이 또렷하다
   float calm = u_gains.z;
-  float disp = u_refract * (1.0 + 0.012 * depth) * mix(1.0, 0.25, calm);
+  float disp = u_refract * (1.0 + 0.005 * depth) * mix(1.0, 0.3, calm);
   vec2 tp = vec2(p.x, waterTop - depth) + n.xy * disp;
   vec2 uv = (tp - u_titleRect.xy) / u_titleRect.zw;
   float inside = step(0.0, uv.x) * step(uv.x, 1.0) * step(0.0, uv.y) * step(uv.y, 1.0);
@@ -104,10 +113,10 @@ void main() {
   }
 #if ${SPEC ? 1 : 0}
   vec3 L = normalize(vec3(u_light.xy + u_light.zw * 0.6, 0.7));
-  float spec = pow(max(dot(n, normalize(L + vec3(0.0, 0.0, 1.0))), 0.0), 40.0) * u_gains.y;
-  col += spec * u_colSparkle * 0.22;
+  float spec = pow(max(dot(n, normalize(L + vec3(0.0, 0.0, 1.0))), 0.0), 60.0) * u_gains.y;
+  col += spec * u_colSparkle * 0.28 * (1.0 - 0.5 * dn);
 #endif
-  col = mix(col, vec3(0.973, 0.973, 0.925), title * (1.0 - 0.55 * dn) * 0.75);
+  col = mix(col, vec3(0.973, 0.973, 0.925), title * pow(1.0 - dn, 1.4) * 0.62);
   col += glow * GLOW_COL;
   col += u_video.rgb * u_video.a * (1.0 - dn) * 0.6;
   gl_FragColor = vec4(col, 1.0);

@@ -170,7 +170,8 @@ export function createWater(opts: WaterOptions) {
     // 세로로 번진 사본(G)과 선명한 사본(R)을 한 장에 넣는다
     const c2 = document.createElement('canvas'); c2.width = c1.width; c2.height = c1.height;
     const c2x = c2.getContext('2d')!;
-    for (let k = 0; k < 12; k++) { c2x.globalAlpha = 0.22 * (1 - k / 12); c2x.drawImage(c1, 0, k * 2.5 * s); }
+    // 세로로 고르게 번진 사본. 1px 간격의 옅은 사본을 여러 장 겹쳐 계단이 생기지 않게 한다
+    const N = 30; for (let k = 0; k < N; k++) { c2x.globalAlpha = 0.11 * (1 - k / N); c2x.drawImage(c1, (k % 2) * 0.6 * s, k * 1.1 * s); }
     const id1 = ctx.getImageData(0, 0, c1.width, c1.height).data;
     const id2 = c2x.getImageData(0, 0, c2.width, c2.height).data;
     const out = new Uint8Array(c1.width * c1.height * 4);
@@ -256,7 +257,7 @@ export function createWater(opts: WaterOptions) {
     if (fixedCalm !== null) calm = fixedCalm;
     const windT = fixedWind ?? state.light.wind;
     wind += (windT - wind) * (1 - Math.exp(-(Math.min(dt, 100) / 1000) / 2));
-    const amb = (0.12 + 0.6 * wind) * (1 - 0.85 * calm);
+    const amb = (0.1 + 0.55 * wind) * (1 - 0.85 * calm);
     wrapper.style.setProperty('--calm', calm.toFixed(3));
     if (calm > 0.85 && !wrapper.classList.contains('is-calm')) wrapper.classList.add('is-calm');
     else if (calm < 0.5 && wrapper.classList.contains('is-calm')) wrapper.classList.remove('is-calm');

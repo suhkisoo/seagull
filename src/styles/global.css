@@ -6,70 +6,87 @@
 @font-face { font-family: 'Seagull Fallback'; src: local('Noto Sans KR'), local('Noto Sans CJK KR'), local('Apple SD Gothic Neo'), local('Malgun Gothic'); size-adjust: 105%; ascent-override: 109.6%; descent-override: 27.2%; line-gap-override: 0%; }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { overflow-x: clip; background: var(--floor); color: var(--ivory); font-family: var(--font); -webkit-text-size-adjust: 100%; }
-body { margin: 0; min-height: 100vh; min-height: 100svh; word-break: keep-all; overflow-wrap: anywhere; line-height: 1.75; font-size: var(--fs-body); }
-h1, h2, h3, p { margin: 0; }
-a { color: inherit; }
-:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+html { overflow-x: clip; background: var(--floor); color: var(--ivory); font-family: var(--font); -webkit-text-size-adjust: 100%; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; font-kerning: normal; }
+body { margin: 0; min-height: 100vh; min-height: 100svh; word-break: keep-all; overflow-wrap: anywhere; line-height: 1.8; font-size: var(--fs-body); font-weight: 400; }
+h1, h2, h3, p, figure, blockquote, dl, dd { margin: 0; }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.28em; }
+::selection { background: var(--amber); color: var(--floor); }
+:focus-visible { outline: 1px solid var(--amber); outline-offset: 4px; }
+[hidden] { display: none !important; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.num { font-variant-numeric: tabular-nums lining-nums; }
+
+/* 방. 페이지 전체의 빛 한 겹. 스크롤 모듈이 --room과 --ink를 바꾼다. 구간 사이의 암전도 이 빛이 어두워졌다 밝아지는 것이다 */
+.room { position: fixed; inset: 0; z-index: -1; background: var(--room); pointer-events: none; }
+/* 물에서 올라오는 낮은 빛. 저녁과 밤의 구간에서만 */
+.room::after { content: ''; position: absolute; inset: 0; opacity: var(--glow, 0);
+  background: radial-gradient(140% 62% at 50% 100%, color-mix(in srgb, var(--sun) 55%, var(--ivory)) 0, color-mix(in srgb, var(--sun) 40%, transparent) 30%, transparent 72%); }
+html.js .page { color: var(--ink); }
 
 /* ---- 첫 화면 ---- */
-.hero { position: relative; min-height: 100vh; min-height: 100svh; overflow: clip;
-  background: linear-gradient(to bottom, var(--bg-top, var(--sun)) 0%, var(--bg-bot, var(--olive)) 22%, var(--bg-bot, var(--olive)) 100%); color: var(--ivory); }
+.hero { position: relative; min-height: 100vh; min-height: 100svh; overflow: clip; background: var(--olive); color: var(--ivory); }
 .hero__sky { position: absolute; inset: 0; overflow: clip; }
-/* 그림(872×1246)의 수면선(위에서 430px, 34.5%)을 페이지의 수평선(62svh)에 맞춘다. 폭이 모자라면 폭에 맞추고 위를 자른다.
-   그림의 물 부분은 첫 화면의 살아 있는 물 뒤에 있다가, 물이 띠로 물러나면 그대로 드러난다 */
+/* 그림(872×1246)의 수면선(위에서 430px, 34.5%)을 페이지의 수평선(62svh)에 맞춘다. 폭이 모자라면 폭에 맞추고 위를 자른다 */
 .hero__painting { --pw: max(100vw, calc(62svh / 0.345 * 0.6998)); position: absolute; left: 50%; top: calc(62svh - 0.4931 * var(--pw)); width: var(--pw); height: auto; transform: translateX(-50%); display: block; max-width: none; }
-/* 위쪽은 안개 낀 아이보리 빛으로 밝아지고, 저물수록 초록의 어둠이 올라온다 */
-.hero__haze { position: absolute; inset: 0; background: linear-gradient(to bottom, color-mix(in srgb, var(--ivory) 55%, transparent) 0, color-mix(in srgb, var(--ivory) 18%, transparent) 30%, transparent 58%); mix-blend-mode: screen; opacity: calc(1 - var(--dusk, 0.25) * 0.9); transition: opacity 400ms; }
-.hero__painting-veil { position: absolute; inset: 0; background: linear-gradient(to bottom, var(--deep) 0, var(--deep) 45%, color-mix(in srgb, var(--deep) 60%, transparent) 62%, transparent 75%); opacity: calc(var(--dusk, 0.25) * 0.85); transition: opacity 400ms; }
-/* 막. 옅은 거즈 한 장. 넓고 부드러운 주름 몇 개, 아랫단의 가는 빛. 그림이 비쳐 보인다 */
-.curtain { position: absolute; left: -2%; right: -2%; top: 0; height: calc(62svh + 4px); pointer-events: none; transform-origin: 50% 0;
-  --f1: color-mix(in srgb, var(--ivory) 26%, transparent); --f2: color-mix(in srgb, var(--ivory) 9%, transparent); --f3: color-mix(in srgb, var(--deep) 7%, transparent);
+/* 글자를 읽히게 하는 옅은 그늘. 위는 단체 표기 뒤, 오른쪽 아래는 날짜 뒤. 머물면 초록의 어둠이 위에서 내려온다 */
+.hero__shade { position: absolute; inset: 0; pointer-events: none;
   background:
-    linear-gradient(to bottom, color-mix(in srgb, var(--ivory) 14%, transparent), transparent 30%, transparent 90%, color-mix(in srgb, var(--ivory) 28%, transparent) 99.4%, color-mix(in srgb, var(--ivory) 60%, transparent) 100%),
-    repeating-linear-gradient(90deg, var(--f1) 0, var(--f2) 70px, var(--f3) 125px, var(--f2) 180px, var(--f1) 250px);
-  opacity: 0.85; will-change: transform; }
-@media (min-width: 1024px) { .curtain { background:
-    linear-gradient(to bottom, color-mix(in srgb, var(--ivory) 14%, transparent), transparent 30%, transparent 90%, color-mix(in srgb, var(--ivory) 28%, transparent) 99.4%, color-mix(in srgb, var(--ivory) 60%, transparent) 100%),
-    repeating-linear-gradient(90deg, var(--f1) 0, var(--f2) 120px, var(--f3) 210px, var(--f2) 300px, var(--f1) 420px); } }
+    linear-gradient(to bottom, color-mix(in srgb, var(--floor) 42%, transparent) 0, transparent 26%),
+    linear-gradient(to top, color-mix(in srgb, var(--floor) 30%, transparent) 0, transparent 22%) 0 0 / 100% 62svh no-repeat; }
+.hero__sky::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 38svh; pointer-events: none;
+  background: linear-gradient(to bottom, transparent 0, color-mix(in srgb, var(--floor) 35%, transparent) 40%, var(--floor) 100%); }
+.hero__dusk { position: absolute; inset: 0 0 38svh 0; pointer-events: none; background: linear-gradient(to bottom, var(--floor) 0, color-mix(in srgb, var(--floor) 55%, transparent) 55%, transparent 100%); opacity: calc((var(--dusk, 0.25) - 0.25) * 1.1); }
+
+/* 막. 거즈 한 장. 균일하게 비치고 뒤의 그림을 조금 흐리게 한다. 주름은 넓고 아주 옅다. 아랫단에 가는 빛 */
+.curtain { position: absolute; left: -2%; right: -2%; top: 0; height: calc(62svh + 3px); pointer-events: none; transform-origin: 50% 0; will-change: transform;
+  background:
+    linear-gradient(to bottom, transparent calc(100% - 3px), color-mix(in srgb, var(--ivory) 55%, transparent) calc(100% - 3px), color-mix(in srgb, var(--ivory) 55%, transparent) calc(100% - 2px), transparent calc(100% - 2px)),
+    repeating-linear-gradient(90deg, transparent 0, color-mix(in srgb, var(--ivory) 7%, transparent) 9vw, transparent 18vw, color-mix(in srgb, var(--floor) 5%, transparent) 26vw, transparent 34vw),
+    color-mix(in srgb, var(--ivory) 17%, transparent); }
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .curtain { -webkit-backdrop-filter: blur(2.5px) saturate(0.85); backdrop-filter: blur(2.5px) saturate(0.85); }
+}
 .curtain { display: none; }
 html.js .curtain { display: block; }
 .water-still .curtain, .reduced .curtain { display: none; }
+
 .hero__content { position: absolute; inset: 0 0 var(--water-hero) 0; padding: var(--gutter); pointer-events: none; }
 .hero__content > * { pointer-events: auto; }
-.hero__meta { font-size: var(--fs-caption); line-height: 1.6; max-width: 20em; }
-.hero__meta p + p { margin-top: 0; }
-.hero__title { font-weight: 700; line-height: 1; letter-spacing: 0.01em; position: absolute; }
-.hero__original { font-size: var(--fs-original); letter-spacing: 0.08em; font-weight: 400; color: transparent; -webkit-text-stroke: 1px color-mix(in srgb, var(--ivory) 70%, transparent); position: absolute; }
-.hero__when { position: absolute; font-size: var(--fs-caption); line-height: 1.6; text-align: right; white-space: nowrap; }
-@media (min-width: 1024px) { .hero__when { font-size: var(--fs-h3); line-height: 1.5; } }
+.hero__meta { font-size: var(--fs-micro); line-height: 1.85; letter-spacing: 0.06em; max-width: 22em; }
+.hero__meta p:first-child { letter-spacing: 0.1em; }
+.hero__title { font-weight: 700; line-height: 1; position: absolute; text-shadow: none; }
+.hero__original { font-size: var(--fs-original); letter-spacing: 0.32em; font-weight: 400; color: transparent; -webkit-text-stroke: 0.8px color-mix(in srgb, var(--ivory) 80%, transparent); position: absolute; }
+.hero__when { position: absolute; font-size: var(--fs-small); line-height: 1.7; text-align: right; white-space: nowrap; letter-spacing: 0.02em; }
+.hero__when-venue { display: block; font-size: var(--fs-micro); letter-spacing: 0.08em; opacity: 0.88; margin-top: 2px; }
+@media (min-width: 1024px) { .hero__when { font-size: 19px; } .hero__when-venue { font-size: 14px; } .hero__meta { font-size: 13.5px; } }
 
 /* ---- 호수 띠 ---- */
-.water { position: fixed; inset: auto 0 0 0; height: var(--water-h); overflow: clip; z-index: 5; --water-top-line: 1px;
-  background: linear-gradient(to bottom, var(--sky-top, var(--olive)) 0, var(--sky-bot, var(--floor)) 100%); }
+.water { position: fixed; inset: auto 0 0 0; height: var(--water-h); overflow: clip; z-index: 5;
+  background: linear-gradient(to bottom, var(--sky-top, var(--deep)) 0, var(--sky-bot, var(--floor)) 100%); }
 .water__still { position: absolute; inset: 0; overflow: clip; pointer-events: none; }
-.water__mirror { position: absolute; left: 0; right: 0; top: 0; transform-origin: 50% 50%; transform: scaleY(-1); opacity: 0.55; filter: blur(1.2px);
-  mask-image: linear-gradient(to bottom, black 0, transparent 85%); -webkit-mask-image: linear-gradient(to bottom, black 0, transparent 85%); color: var(--ivory); }
-.water canvas { position: absolute; left: 0; bottom: 0; width: 100%; height: var(--water-hero); pointer-events: none; opacity: 0; transition: opacity 600ms; display: block; }
-.water::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: color-mix(in srgb, var(--ivory) 12%, transparent); z-index: 2; }
-.water__line { position: absolute; left: var(--gutter); bottom: calc(var(--safe-bottom) + 24px); max-width: 70%; font-size: var(--fs-water-line); line-height: 1.5; color: var(--ivory);
-  opacity: 0; filter: blur(5px); transition: opacity 1200ms, filter 1600ms; pointer-events: none; z-index: 3; text-wrap: balance; }
-.water.is-calm .water__line { opacity: 0.92; filter: blur(0); }
-.water:not(.is-calm) .water__line { filter: blur(4px); }
+.water__mirror { position: absolute; left: 0; right: 0; top: 0; transform-origin: 50% 50%; transform: scaleY(-1); opacity: 0.4; filter: blur(1.6px);
+  mask-image: linear-gradient(to bottom, black 0, transparent 80%); -webkit-mask-image: linear-gradient(to bottom, black 0, transparent 80%); color: var(--ivory); }
+.water canvas { position: absolute; left: 0; bottom: 0; width: 100%; height: var(--water-hero); pointer-events: none; opacity: 0; transition: opacity 900ms var(--ease); display: block; }
+/* 수평선. 가는 빛 한 줄 */
+.water::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: color-mix(in srgb, var(--ivory) 22%, transparent); z-index: 2; }
+.water__line { position: absolute; left: var(--gutter); bottom: calc(var(--safe-bottom) + 28px); max-width: 70%; font-size: var(--fs-water-line); line-height: 1.65; color: var(--ivory); letter-spacing: 0.01em;
+  opacity: 0; filter: blur(6px); transition: opacity 1600ms var(--ease), filter 2000ms var(--ease); pointer-events: none; z-index: 3; text-wrap: balance; }
+.water.is-calm .water__line { opacity: 0.86; filter: blur(0); }
+.water:not(.is-calm) .water__line { filter: blur(5px); transition-duration: 500ms; }
 /* 첫 화면에서는 제목의 비친 상(왼쪽 기둥)을 피해 오른쪽 열에 놓는다. docs/plan.md 2.1 */
-.water.is-hero .water__line { left: calc(var(--gutter) + var(--fs-title-a) + 28px); max-width: calc(100% - var(--gutter) * 2 - var(--fs-title-a) - 28px); }
-@media (min-width: 1024px) { .water.is-hero .water__line { left: calc(var(--gutter) + var(--fs-title-a) + 120px); max-width: 600px; } }
-.water:not(.is-calm) .water__line { transition-duration: 400ms; }
-.water.is-band .water__line { bottom: auto; top: 12px; right: calc(var(--gutter) + var(--ticket-w, 160px) + 16px); max-width: none; font-size: 14px; line-height: 20px; max-height: 60px; overflow: hidden; display: flex; align-items: center; min-height: var(--button-h); }
-.ticket { position: absolute; right: var(--gutter); top: 12px; z-index: 4; display: inline-flex; align-items: center; justify-content: center; min-width: 140px; height: var(--button-h); padding: 0 18px;
-  background: var(--amber); color: var(--floor); font-size: var(--fs-button); font-weight: 400; text-decoration: none; letter-spacing: 0.01em; white-space: nowrap;
-  box-shadow: 0 0 24px color-mix(in srgb, var(--amber) 35%, transparent); transition: box-shadow 300ms, filter 300ms; }
-.ticket[aria-disabled="true"] { filter: saturate(0.4) brightness(0.8); cursor: default; }
-.ticket:active { box-shadow: 0 0 40px color-mix(in srgb, var(--amber) 55%, transparent); }
-.water.is-hero .ticket { top: 24px; }
-.css-ripple { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ivory) 60%, transparent); animation: css-ripple 900ms ease-out forwards; pointer-events: none; z-index: 2; }
-@keyframes css-ripple { from { transform: scale(1); opacity: 0.9; } to { transform: scale(14); opacity: 0; } }
+.water.is-hero .water__line { left: calc(var(--gutter) + var(--fs-title-a) + 32px); max-width: calc(100% - var(--gutter) * 2 - var(--fs-title-a) - 32px); }
+@media (min-width: 1024px) { .water.is-hero .water__line { left: calc(var(--gutter) + var(--fs-title-a) + 120px); max-width: 560px; } }
+.water.is-band .water__line { bottom: auto; top: 12px; right: calc(var(--gutter) + var(--ticket-w, 160px) + 16px); max-width: none; font-size: 13.5px; line-height: 20px; max-height: 60px; overflow: hidden; display: flex; align-items: center; min-height: var(--button-h); }
+
+/* 예매 버튼. 호박빛 면 하나. 그림자 대신 바로 아래 물에 불빛이 비친다 */
+.ticket { position: absolute; right: var(--gutter); top: 12px; z-index: 4; display: inline-flex; align-items: center; justify-content: center; min-width: 136px; height: var(--button-h); padding: 0 26px;
+  background: var(--amber); color: var(--floor); font: inherit; font-size: var(--fs-button); font-weight: 400; text-decoration: none; letter-spacing: 0.06em; white-space: nowrap; border: 0; cursor: pointer;
+  transition: background-color 400ms var(--ease), color 400ms var(--ease); }
+.ticket:hover { background: color-mix(in srgb, var(--amber) 88%, var(--ivory)); }
+.ticket[aria-disabled="true"] { background: color-mix(in srgb, var(--amber) 45%, var(--deep)); color: color-mix(in srgb, var(--ivory) 80%, transparent); cursor: default; }
+.water.is-hero .ticket { top: 28px; }
+.css-ripple { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ivory) 55%, transparent); animation: css-ripple 1100ms var(--ease) forwards; pointer-events: none; z-index: 2; }
+@keyframes css-ripple { from { transform: scale(1); opacity: 0.8; } to { transform: scale(16); opacity: 0; } }
 .water-debug { position: absolute; left: 8px; top: 8px; margin: 0; font: 11px/1.3 ui-monospace, monospace; color: var(--ivory); background: rgb(0 0 0 / 0.5); padding: 4px 6px; z-index: 9; white-space: pre-wrap; max-width: 60%; }
 
 /* 자바스크립트가 없으면 띠는 처음부터 좁고 거울상은 없다. 정보와 예매 링크는 그대로 */

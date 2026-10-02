@@ -6,8 +6,9 @@ import { fmtDay, fmtTime } from '../scripts/format';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 <Base title={`예매 관리. ${show.meta.title}`} description="기획팀 예매 관리" noindex>
-  <main class="book admin" data-admin data-api={show.booking.apiUrl} data-hold-hours={show.booking.holdHours}>
-    <header class="book__head">
+  <main class="book admin page" data-admin data-api={show.booking.apiUrl} data-hold-hours={show.booking.holdHours}>
+    <div class="wrap">
+    <header class="book__head grid">
       <p class="book__eyebrow"><a href={`${base}/`}>〈{show.title}〉 {show.company}</a></p>
       <h1 class="book__title">예매 관리</h1>
       <p class="book__demo" data-demo hidden>지금은 미리보기입니다. 이 브라우저에서 신청한 예매만 보입니다.</p>
@@ -31,6 +32,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       </table>
       <p class="field__error" data-admin-error aria-live="polite"></p>
     </section>
+    </div>
     <div class="after-water" aria-hidden="true"></div>
   </main>
   <script src="../scripts/admin.ts"></script>

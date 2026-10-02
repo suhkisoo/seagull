@@ -1,7 +1,7 @@
 ---
-// 공연 일정과 예매, 오시는 길. 늦가을 밤. 회차를 고르면 그 칸에만 호박빛. docs/plan.md 2.1 "일정과 예매", 3.1의 13~17.
+// 공연 일정과 예매, 오시는 길. 늦가을 밤. 회차를 고르면 그 칸에만 호박빛. docs/plan.md 2.1 "일정과 예매", 3.1의 13~17, 9.5.3.
 import { show } from '../content/show';
-import { fmtDay, fmtDate, fmtTime, dayKey, epoch } from '../scripts/format';
+import { fmtDate, fmtTime, fmtWeekday, dayKey, epoch } from '../scripts/format';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const days = new Map<string, typeof show.shows>();
 for (const s of show.shows) { const k = dayKey(s.startAt); if (!days.has(k)) days.set(k, []); days.get(k)!.push(s); }
@@ -12,61 +12,73 @@ const naver = show.venue.naverMap || `https://map.naver.com/p/search/${q}`;
 const kakao = show.venue.kakaoMap || `https://map.kakao.com/?q=${q}`;
 const openText = show.booking.openAt ? `${fmtDate(show.booking.openAt)} ${fmtTime(show.booking.openAt)}` : '추후 공개';
 const castOf = (s: (typeof show.shows)[number]) => show.roles.map((r) => ({ role: r.name, actor: s.cast[r.id] || '' }));
+const bookHref = show.booking.commonUrl || `${base}/book/`;
+const bookExternal = !!show.booking.commonUrl;
 ---
 <section class="section section--tickets" id="tickets" data-light="tickets" aria-labelledby="tickets-title">
-  <div class="section__inner">
-    <h2 class="section__title" id="tickets-title" tabindex="-1">공연 일정과 예매</h2>
-    <p class="section__caption">{show.period}</p>
-    <hr class="rule" />
-    <fieldset class="showtimes" data-showtimes>
-      <legend class="visually-hidden">회차</legend>
-      {[...days.entries()].map(([k, list]) => (
-        <div class="showtimes__day">
-          <p class="showtimes__date">{fmtDay(list[0].startAt)}</p>
-          <div class="showtimes__cells">
-            {list.map((s) => (
-              <label class="cell" data-cell={s.id} data-sold-out={s.soldOut ? '' : undefined}>
-                <input class="cell__input visually-hidden" type="radio" name="showtime" value={s.id} data-start={s.startAt} data-url={s.url || ''} />
-                <span class="cell__time">{fmtTime(s.startAt)}</span>
-                <span class="cell__status" data-cell-status>{s.soldOut ? '매진' : ''}</span>
-                {s.url && <noscript><a class="cell__link" href={s.url} target="_blank" rel="noopener">예매하기</a></noscript>}
-              </label>
-            ))}
+  <div class="wrap grid">
+    <hr class="rule rule--section" />
+    <header class="section__head">
+      <h2 class="section__title" id="tickets-title" tabindex="-1">공연 일정과 예매</h2>
+      <p class="section__caption">{show.period}</p>
+    </header>
+    <div class="section__body">
+      <fieldset class="showtimes" data-showtimes>
+        <legend class="visually-hidden">회차</legend>
+        {[...days.entries()].map(([, list]) => (
+          <div class="day">
+            <p class="day__date"><span class="num">{fmtDate(list[0].startAt)}</span><span class="day__wd">{fmtWeekday(list[0].startAt)}</span></p>
+            <div class="day__cells">
+              {list.map((s) => (
+                <label class="cell" data-cell={s.id} data-sold-out={s.soldOut ? '' : undefined}>
+                  <input class="cell__input visually-hidden" type="radio" name="showtime" value={s.id} data-start={s.startAt} data-url={s.url || ''} />
+                  <span class="cell__time">{fmtTime(s.startAt)}</span>
+                  <span class="cell__status" data-cell-status>{s.soldOut ? '매진' : ''}</span>
+                  {s.url && <noscript><a class="cell__link" href={s.url} target="_blank" rel="noopener">예매하기</a></noscript>}
+                </label>
+              ))}
+            </div>
+            <div class="cast" aria-live="polite">
+              {list.map((s) => (
+                <dl class="cast__list" data-cast-for={s.id} hidden>
+                  <div class="cast__head"><dt class="visually-hidden">회차</dt><dd>{fmtTime(s.startAt)} 출연</dd></div>
+                  {castOf(s).map((c) => <div class="cast__row"><dt>{c.role}</dt><dd>{c.actor || '추후 공개'}</dd></div>)}
+                </dl>
+              ))}
+            </div>
           </div>
-          <div class="cast" aria-live="polite">
-            {list.map((s) => (
-              <dl class="cast__list" data-cast-for={s.id} hidden>
-                <div class="cast__head"><dt class="visually-hidden">회차</dt><dd>{fmtTime(s.startAt)} 출연</dd></div>
-                {castOf(s).map((c) => <div class="cast__row"><dt>{c.role}</dt><dd>{c.actor || '추후 공개'}</dd></div>)}
-              </dl>
-            ))}
-          </div>
-          <hr class="rule" />
-        </div>
-      ))}
-    </fieldset>
-    <p class="action-row"><a class="action" href={`${base}/book/`} data-book-link>좌석 고르고 예매하기</a></p>
-    <hr class="rule" />
-    <dl class="info">
-      {(show.runningMinutes || show.intermission) && (
-        <div class="info__row"><dt>러닝타임</dt><dd>{show.runningMinutes ? `${show.runningMinutes}분` : ''}{show.runningMinutes && show.intermission ? ', ' : ''}{show.intermission}</dd></div>
-      )}
-      {show.ageLimit && <div class="info__row"><dt>관람 연령</dt><dd>{show.ageLimit}</dd></div>}
-      <div class="info__row"><dt>가격과 좌석</dt><dd>{show.pricing || '추후 공개'}</dd></div>
-      <div class="info__row"><dt>예매 오픈</dt><dd>{openText}{show.booking.vendorName && show.booking.openAt ? `, ${show.booking.vendorName}` : ''}</dd></div>
-      {show.tumblbug.url && (
-        <div class="info__row" data-tumblbug data-start={show.tumblbug.startAt} data-end={show.tumblbug.endAt} hidden={!tumblbugOn}><dt>텀블벅</dt><dd><a class="action" href={show.tumblbug.url} target="_blank" rel="noopener">텀블벅 열기</a></dd></div>
-      )}
-    </dl>
-    <hr class="rule" />
+        ))}
+      </fieldset>
+      <p class="book-link"><a href={bookHref} data-book-link target={bookExternal ? '_blank' : undefined} rel={bookExternal ? 'noopener' : undefined}>좌석 고르고 예매하기</a></p>
+      <dl class="facts">
+        {(show.runningMinutes || show.intermission) && (
+          <div class="facts__row"><dt>러닝타임</dt><dd>{show.runningMinutes ? `${show.runningMinutes}분` : ''}{show.runningMinutes && show.intermission ? ', ' : ''}{show.intermission}</dd></div>
+        )}
+        {show.ageLimit && <div class="facts__row"><dt>관람 연령</dt><dd>{show.ageLimit}</dd></div>}
+        <div class="facts__row"><dt>가격과 좌석</dt><dd>{show.pricing || '추후 공개'}</dd></div>
+        <div class="facts__row"><dt>예매 오픈</dt><dd>{openText}{show.booking.vendorName && show.booking.openAt ? `, ${show.booking.vendorName}` : ''}</dd></div>
+        {show.tumblbug.url && (
+          <div class="facts__row" data-tumblbug data-start={show.tumblbug.startAt} data-end={show.tumblbug.endAt} hidden={!tumblbugOn}><dt>텀블벅</dt><dd><a class="action" href={show.tumblbug.url} target="_blank" rel="noopener">텀블벅 열기</a></dd></div>
+        )}
+      </dl>
+    </div>
+  </div>
 
-    <h2 class="section__title section__title--sub" id="directions" tabindex="-1">오시는 길</h2>
-    <p class="venue__name">{show.venue.name}</p>
-    <p class="venue__address" data-address>{show.venue.address}</p>
-    <ul class="action-list action-list--ruled" role="list">
-      <li><span class="action-row__label">지도 열기</span><a class="action" href={naver} target="_blank" rel="noopener">네이버 지도</a><a class="action" href={kakao} target="_blank" rel="noopener">카카오맵</a></li>
-      <li class="js-only"><button class="action" type="button" data-copy-address>주소 복사</button><span class="action__done" data-copy-done aria-live="polite"></span></li>
-      <li class="js-only"><button class="action" type="button" data-share>공유하기</button><span class="action__done" data-share-done aria-live="polite"></span></li>
-    </ul>
+  <div class="wrap grid">
+    <hr class="rule rule--section" />
+    <header class="section__head">
+      <h2 class="section__title" id="directions" tabindex="-1">오시는 길</h2>
+    </header>
+    <div class="section__body">
+      <div class="venue">
+        <p class="venue__name">{show.venue.name}</p>
+        <p class="venue__address" data-address>{show.venue.address}</p>
+      </div>
+      <ul class="action-list" role="list">
+        <li><span class="action-list__label">지도</span><span class="action-list__value"><a class="action" href={naver} target="_blank" rel="noopener">네이버 지도 열기</a><a class="action" href={kakao} target="_blank" rel="noopener">카카오맵 열기</a></span></li>
+        <li class="js-only"><span class="action-list__label">주소</span><span class="action-list__value"><button class="action" type="button" data-copy-address>주소 복사</button><span class="action__done" data-copy-done aria-live="polite"></span></span></li>
+        <li class="js-only"><span class="action-list__label">공유</span><span class="action-list__value"><button class="action" type="button" data-share>공유하기</button><span class="action__done" data-share-done aria-live="polite"></span></span></li>
+      </ul>
+    </div>
   </div>
 </section>

@@ -41,7 +41,7 @@ for (const key of only) {
   for (const [i, id] of sections.entries()) { await goTo(page, id); await shot(page, tag(`${String(i + 10)}-${id}`)); }
   // 회차 고르기, 창 열기
   await goTo(page, 'tickets'); await page.click('[data-cell="1113-1930"]'); await page.waitForTimeout(700); await shot(page, tag('20-tickets-picked'));
-  await goTo(page, 'people'); await page.click('.window__summary'); await page.waitForTimeout(600); await shot(page, tag('21-people-open'));
+  await goTo(page, 'people'); await page.click('.role__summary'); await page.waitForTimeout(600); await shot(page, tag('21-people-open'));
   await goTo(page, 'directions'); await page.click('[data-copy-address]'); await page.waitForTimeout(400); await shot(page, tag('22-copied'));
   console.log(key, JSON.stringify(w));
   await ctx.close();

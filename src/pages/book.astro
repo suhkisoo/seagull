@@ -9,8 +9,9 @@ const won = (n: number | null) => (n == null ? '추후 공개' : `${n.toLocaleSt
 const balconyPrice = show.booking.balconyPrice ?? show.booking.seatPrice;
 ---
 <Base title={`예매. ${show.meta.title}`} description={`〈${show.title}〉 예매. 회차와 좌석을 고르고 계좌로 입금합니다.`} noindex>
-  <main class="book" data-book data-api={show.booking.apiUrl} data-seat-price={show.booking.seatPrice ?? ''} data-balcony-price={balconyPrice ?? ''} data-hold-hours={show.booking.holdHours}>
-    <header class="book__head">
+  <main class="book page" data-book data-api={show.booking.apiUrl} data-seat-price={show.booking.seatPrice ?? ''} data-balcony-price={balconyPrice ?? ''} data-hold-hours={show.booking.holdHours}>
+    <div class="wrap">
+    <header class="book__head grid">
       <p class="book__eyebrow"><a href={`${base}/`}>〈{show.title}〉 {show.company}</a></p>
       <h1 class="book__title">예매</h1>
       <p class="book__lead">회차와 좌석을 고르고 계좌로 입금하면 기획팀이 확인한 뒤 예매가 완료됩니다. 입금 전에는 자리가 {show.booking.holdHours}시간 동안만 잡혀 있습니다.</p>
@@ -18,7 +19,7 @@ const balconyPrice = show.booking.balconyPrice ?? show.booking.seatPrice;
     </header>
 
     <ol class="steps" data-steps>
-      <li class="step is-open" data-step="show">
+      <li class="step grid is-open" data-step="show">
         <h2 class="step__title"><span class="step__num">1</span> 회차</h2>
         <p class="step__summary" data-summary></p>
         <div class="step__body">
@@ -36,7 +37,7 @@ const balconyPrice = show.booking.balconyPrice ?? show.booking.seatPrice;
         </div>
       </li>
 
-      <li class="step" data-step="seats">
+      <li class="step grid" data-step="seats">
         <h2 class="step__title"><span class="step__num">2</span> 좌석</h2>
         <p class="step__summary" data-summary></p>
         <div class="step__body">
@@ -76,7 +77,7 @@ const balconyPrice = show.booking.balconyPrice ?? show.booking.seatPrice;
         </div>
       </li>
 
-      <li class="step" data-step="goods">
+      <li class="step grid" data-step="goods">
         <h2 class="step__title"><span class="step__num">3</span> 굿즈</h2>
         <p class="step__summary" data-summary></p>
         <div class="step__body">
@@ -95,7 +96,7 @@ const balconyPrice = show.booking.balconyPrice ?? show.booking.seatPrice;
         </div>
       </li>
 
-      <li class="step" data-step="who">
+      <li class="step grid" data-step="who">
         <h2 class="step__title"><span class="step__num">4</span> 예매자</h2>
         <p class="step__summary" data-summary></p>
         <div class="step__body">
@@ -107,18 +108,17 @@ const balconyPrice = show.booking.balconyPrice ?? show.booking.seatPrice;
         </div>
       </li>
 
-      <li class="step" data-step="confirm">
+      <li class="step grid" data-step="confirm">
         <h2 class="step__title"><span class="step__num">5</span> 확인</h2>
         <p class="step__summary" data-summary></p>
         <div class="step__body">
           <dl class="bill" data-bill></dl>
           <div class="pay">
-            <p class="pay__total">합계 <strong data-total>0원</strong></p>
-            <p class="pay__account">
-              입금 계좌
+            <p class="pay__total"><span class="pay__label">합계</span><span class="pay__amount num" data-total>0원</span></p>
+            <p class="pay__account"><span class="pay__label">입금 계좌</span>
               {show.booking.account.number
-                ? <strong data-account>{show.booking.account.bank} {show.booking.account.number} {show.booking.account.holder}</strong>
-                : <strong>추후 공개</strong>}
+                ? <span class="pay__value num" data-account>{show.booking.account.bank} {show.booking.account.number} {show.booking.account.holder}</span>
+                : <span class="pay__value">추후 공개</span>}
             </p>
             <p class="pay__note">예매 신청 뒤 {show.booking.holdHours}시간 안에 입금해 주세요. 기획팀이 입금을 확인하면 연락처로 예매 완료를 알립니다. 시간이 지나면 자리가 풀립니다.</p>
             {show.booking.contact && <p class="pay__note">문의 {show.booking.contact}</p>}
@@ -128,14 +128,15 @@ const balconyPrice = show.booking.balconyPrice ?? show.booking.seatPrice;
       </li>
     </ol>
 
-    <section class="done" data-done hidden aria-live="polite">
+    <section class="done grid" data-done hidden aria-live="polite">
       <h2 class="step__title">예매 신청을 받았습니다</h2>
       <dl class="bill" data-done-bill></dl>
-      <p class="pay__total">입금할 금액 <strong data-done-total></strong></p>
-      <p class="pay__account">입금 계좌 <strong data-done-account></strong> <button class="action" type="button" data-copy-account>계좌 복사</button><span class="action__done" data-copy-account-done></span></p>
-      <p class="pay__note">예매 번호 <strong data-done-id></strong>. 입금자명이 다르면 기획팀이 찾기 어렵습니다. 입금 확인 뒤 연락처로 안내합니다.</p>
+      <p class="pay__total"><span class="pay__label">입금할 금액</span><span class="pay__amount num" data-done-total></span></p>
+      <p class="pay__account"><span class="pay__label">입금 계좌</span><span class="pay__value num" data-done-account></span><span><button class="action" type="button" data-copy-account>계좌 복사</button><span class="action__done" data-copy-account-done></span></span></p>
+      <p class="pay__note">예매 번호 <span class="num" data-done-id></span>. 입금자명이 다르면 기획팀이 찾기 어렵습니다. 입금 확인 뒤 연락처로 안내합니다.</p>
       <p class="action-row"><a class="action" href={`${base}/#tickets`}>공연 페이지로 돌아가기</a></p>
     </section>
+    </div>
 
     <div class="after-water" aria-hidden="true"></div>
   </main>

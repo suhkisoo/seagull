@@ -6,3 +6,4 @@ export function fmtDay(iso: string): string { const d = kst(iso); return `${d.ge
 export function fmtDate(iso: string): string { const d = kst(iso); return `${d.getUTCMonth() + 1}월 ${d.getUTCDate()}일`; }
 export function fmtTime(iso: string): string { const d = kst(iso); return `${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}`; }
 export function dayKey(iso: string): string { const d = kst(iso); return `${d.getUTCFullYear()}-${d.getUTCMonth() + 1}-${d.getUTCDate()}`; }
+export function fmtWeekday(iso: string): string { return `${DAY[kst(iso).getUTCDay()]}요일`; }
