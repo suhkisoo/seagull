@@ -25,6 +25,7 @@ const titleHtml = `<span class="title title--a">${charHtml}</span>`;
       <p>{show.credits.author}</p>
       <p>{show.credits.directing}</p>
     </div>
+    <button class="sound-toggle js-only" type="button" data-sound aria-pressed="false">소리 켜기</button>
     <h1 class="hero__title" data-title set:html={titleHtml}></h1>
     {show.originalTitle && <p class="hero__original" aria-label={show.originalTitle}>{show.originalTitle}</p>}
     <p class="hero__when"><span class="hero__when-short">{show.periodShort}</span><span class="hero__when-full">{show.period}</span><span class="hero__when-venue">{show.venue.name}</span></p>

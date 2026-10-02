@@ -150,6 +150,9 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
       water.state.gladeCol = [0, 1, 2].map((i) => MOON[i] * a + IVORY[i] * b + DOOR[i] * c) as RGB;
       water.state.storm = actW;
     }
+    // 지금 머무는 막. 멈춤 대사와 소리가 쓴다
+    const act = actW > 0.5 ? 'act4' : '';
+    if (root.dataset.act !== act) { if (act) root.dataset.act = act; else delete root.dataset.act; }
     if (water) { water.state.light.surface = L.skyTop; water.state.light.deep = L.skyBot; water.state.light.sparkle = L.sparkle; water.state.light.wind = L.wind; water.state.lightDir = [0, -0.4 + 0.3 * duskT]; }
     if (people) { const pr = people.getBoundingClientRect(); if (pr.bottom > 0 && pr.top < svh) root.style.setProperty('--shadow-shift', `${Math.max(-16, Math.min(16, -pr.top * 0.025)).toFixed(1)}px`); }
     const roomCss = css(room.c);

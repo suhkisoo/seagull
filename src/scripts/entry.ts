@@ -11,14 +11,19 @@ initTickets();
 // 고정 주소로 들어오면 그 구간 제목에 포커스를 둔다
 if (location.hash) { const h = document.getElementById(location.hash.slice(1)); const t = h?.matches('[tabindex]') ? h : h?.querySelector<HTMLElement>('[tabindex="-1"]'); t?.focus({ preventScroll: true }); }
 
-// 멈춤 대사 줄 고르기. 첫 줄은 대표 대사, 그 뒤는 받은 줄을 섞어서
-const lines = [show.texts.mainLine.text, ...show.texts.waterLines.filter(Boolean)];
-let order = lines.slice(1).map((_, i) => i + 1); for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
-let idx = -1;
+// 멈춤 대사 줄 고르기. 첫 줄은 대표 대사, 그 뒤는 받은 줄을 섞어서. 막이 정해진 줄은 그 막의 구간(scroll.ts의 data-act)에서만
+const pool = (act: string) => {
+  const own = show.texts.waterLines.filter((l) => l.text && l.act === act).map((l) => l.text);
+  return own.length ? own : [show.texts.mainLine.text, ...show.texts.waterLines.filter((l) => l.text && !l.act).map((l) => l.text)];
+};
+let first = true; const seen = new Map<string, number>();
 function nextLine(band: boolean) {
   const el = document.querySelector<HTMLElement>('.water__line'); if (!el) return;
-  idx = idx < 0 ? 0 : (order.length ? order[(idx) % order.length] : 0);
-  let text = lines[idx] ?? lines[0];
+  const act = root.dataset.act || '';
+  const lines = pool(act);
+  let text = lines[0];
+  if (first && !act) first = false;
+  else { const i = ((seen.get(act) ?? Math.floor(Math.random() * lines.length)) + 1) % lines.length; seen.set(act, i); text = lines[i]; }
   if (band) { // 띠에서는 세 줄에 들어가는 줄만
     const colW = (document.querySelector('.water')!.clientWidth - 24 - 16) - (document.querySelector<HTMLElement>('[data-ticket-button]')?.offsetWidth ?? 140) - 24;
     const perLine = Math.floor(colW / (14 * 0.966));
@@ -44,6 +49,8 @@ function cssRipple() {
 
 async function start() {
   const { createScroll } = await import('./scroll');
+  const { initSound } = await import('./sound');
+  initSound(root);
   const { paintLeaves } = await import('./leaves');
   paintLeaves(root);
   let water = null;
@@ -61,6 +68,8 @@ async function start() {
   let wasCalm = false;
   const obs = new MutationObserver(() => { const c = wrapper.classList.contains('is-calm'); if (c && !wasCalm) nextLine(band); wasCalm = c; });
   obs.observe(wrapper, { attributes: true, attributeFilter: ['class'] });
+  // 막이 바뀌면 떠 있던 줄도 그 막의 줄로
+  new MutationObserver(() => { if (wrapper.classList.contains('is-calm')) nextLine(band); }).observe(root, { attributes: true, attributeFilter: ['data-act'] });
   if (!water) { nextLine(false); wrapper.classList.add('is-calm'); }
 }
 if (off) start();

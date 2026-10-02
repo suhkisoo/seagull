@@ -31,6 +31,11 @@ html.js .page { color: var(--ink); }
 /* 4막은 날짜 아래에 첫 지문의 시각, 빛, 소리. 암전 속에서 읽힌다 */
 .stage-time--long { top: calc(var(--section-pad) * 0.2); }
 .stage-time__direction { margin-top: 10px; max-width: 24em; line-height: 1.85; color: color-mix(in srgb, currentColor 82%, transparent); }
+/* 소리 켜기. 첫 화면 오른쪽 위의 작은 글자 버튼. 누르면 물결과 소리로 답한다 */
+.sound-toggle { position: absolute; right: calc(var(--gutter) - 12px); top: calc(var(--gutter) - 12px); min-height: 44px; padding: 0 12px; border: 0; background: transparent; color: var(--ivory); font: inherit; font-size: var(--fs-micro); letter-spacing: 0.08em; cursor: pointer; opacity: 0.86; }
+.sound-toggle:hover, .sound-toggle[aria-pressed="true"] { opacity: 1; }
+.sound-toggle:focus-visible { outline: 1px solid var(--ivory); outline-offset: -6px; }
+@media (min-width: 1024px) { .sound-toggle { top: 12px; } }
 /* 첫 화면의 날짜는 막 위에. 막이 오르면 함께 오르며 사라진다 */
 .curtain__time { position: absolute; right: var(--gutter); top: 30svh; max-width: 11em; text-align: right; text-wrap: balance; font-size: var(--fs-micro); letter-spacing: 0.12em; color: var(--ivory); opacity: 0.9; pointer-events: none; will-change: transform, opacity; }
 @media (min-width: 1024px) { .curtain__time { left: 0; right: 0; max-width: none; text-align: center; top: 31svh; } }
