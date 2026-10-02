@@ -52,6 +52,18 @@ export function initTickets() {
   setInterval(applyState, 60000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) applyState(); });
 
+  // 지도에 닿으면 그 자리에서 물결이 두 번 번지고 공연장의 램프가 잠깐 넓게 비춘다
+  const mapFrame = document.querySelector<HTMLElement>('[data-map] .map__frame');
+  let lampT = 0;
+  mapFrame?.addEventListener('pointerdown', (e) => {
+    const r = mapFrame.getBoundingClientRect();
+    for (let i = 0; i < 2; i++) {
+      const sp = document.createElement('span'); sp.className = 'map__ripple';
+      sp.style.left = `${e.clientX - r.left}px`; sp.style.top = `${e.clientY - r.top}px`;
+      mapFrame.appendChild(sp); setTimeout(() => sp.remove(), 2000);
+    }
+    mapFrame.classList.add('is-lit'); clearTimeout(lampT); lampT = window.setTimeout(() => mapFrame.classList.remove('is-lit'), 650);
+  });
   // 주소 복사. 안 되면 주소 글자를 선택해 준다
   const copyBtn = document.querySelector<HTMLButtonElement>('[data-copy-address]');
   const copyDone = document.querySelector<HTMLElement>('[data-copy-done]');

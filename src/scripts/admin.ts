@@ -31,7 +31,8 @@ function render() {
   rowsEl.replaceChildren(...list.map((r) => {
     const tr = document.createElement('tr'); tr.dataset.status = r.status;
     const expired = r.status === '입금대기' && Date.now() - Date.parse(r.createdAt) > holdHours * 3600000;
-    const cells = [r.id, when(r.createdAt), showLabel(r.show), [r.seats.join(' '), r.balcony ? `발코니 ${r.balcony}` : ''].filter(Boolean).join(', '),
+    const bal = hall.balcony.sides.filter((x) => r.balcony[x.id] > 0).map((x) => `발코니 ${x.label} ${r.balcony[x.id]}`).join(', ');
+    const cells = [r.id, when(r.createdAt), showLabel(r.show), [r.seats.join(' '), bal].filter(Boolean).join(', '),
       Object.entries(r.goods).map(([k, n]) => `${show.goods.find((g) => g.id === k)?.name ?? k} ${n}`).join(', ') || '',
       `${r.name} ${r.phone}${r.payer && r.payer !== r.name ? ` (입금 ${r.payer})` : ''}`, won(r.amount), r.status + (expired ? ' (기한 지남)' : '')];
     for (const c of cells) { const td = document.createElement('td'); td.textContent = c; tr.appendChild(td); }
@@ -46,9 +47,10 @@ function render() {
   const counts = document.querySelector<HTMLElement>('[data-counts]')!;
   counts.replaceChildren(...show.shows.flatMap((s) => {
     const rs = rows.filter((r) => r.show === s.id && r.status !== '취소');
-    const seatsN = rs.reduce((a, r) => a + r.seats.length, 0), bal = rs.reduce((a, r) => a + r.balcony, 0), paid = rs.filter((r) => r.status === '입금확인').length;
+    const seatsN = rs.reduce((a, r) => a + r.seats.length, 0), paid = rs.filter((r) => r.status === '입금확인').length;
+    const bal = hall.balcony.sides.map((x) => `발코니 ${x.label} ${rs.reduce((a, r) => a + r.balcony[x.id], 0)}/${x.max}`).join(', ');
     const dt = document.createElement('dt'); dt.textContent = showLabel(s.id);
-    const dd = document.createElement('dd'); dd.textContent = `지정석 ${seatsN}/${hall.rows.reduce((a, r) => a + r.seats.length, 0)}, 발코니 ${bal}/${hall.balcony.max}, 입금 확인 ${paid}건, 대기 ${rs.length - paid}건`;
+    const dd = document.createElement('dd'); dd.textContent = `지정석 ${seatsN}/${hall.rows.reduce((a, r) => a + r.seats.length, 0)}, ${bal}, 입금 확인 ${paid}건, 대기 ${rs.length - paid}건`;
     return [dt, dd];
   }));
 }

@@ -1,6 +1,6 @@
 // 예매 흐름. 다섯 단계가 차례로 열린다. 고른 자리에는 호박빛이 켜진다. 저장은 store.ts.
 import { show } from '../content/show';
-import { hall } from '../content/hall';
+import { hall, noBalcony, balconySum, type BalconySide } from '../content/hall';
 import { fmtDay, fmtTime, epoch } from './format';
 import { now } from './state';
 import { createStore, type ShowStatus } from './store';
@@ -26,9 +26,9 @@ let current: StepId = 'show';
 // ----- 상태 -----
 let showId = '';
 let seats = new Set<string>();
-let balcony = 0;
+const balcony = noBalcony();
 const goods: Record<string, number> = {};
-let status: ShowStatus = { taken: [], balconyTaken: 0, goodsSold: {} };
+let status: ShowStatus = { taken: [], balconyTaken: noBalcony(), goodsSold: {} };
 
 // ----- 단계 열기와 닫기 -----
 function open(id: StepId) {
@@ -45,7 +45,7 @@ function open(id: StepId) {
 function summary(k: StepId): string {
   const s = show.shows.find((x) => x.id === showId);
   if (k === 'show') return s ? `${fmtDay(s.startAt)} ${fmtTime(s.startAt)}` : '';
-  if (k === 'seats') return [seats.size ? `지정석 ${[...seats].sort(seatSort).join(', ')}` : '', balcony ? `발코니 ${balcony}명` : ''].filter(Boolean).join(' · ');
+  if (k === 'seats') return [seats.size ? `지정석 ${[...seats].sort(seatSort).join(', ')}` : '', balconyText()].filter(Boolean).join(' · ');
   if (k === 'goods') { const g = Object.entries(goods).filter(([, n]) => n > 0).map(([id, n]) => `${show.goods.find((x) => x.id === id)?.name} ${n}`); return g.length ? g.join(', ') : '없음'; }
   if (k === 'who') return `${name()} ${phone()}`;
   return '';
@@ -53,7 +53,7 @@ function summary(k: StepId): string {
 function validate() {
   let ok = false, msg = '';
   if (current === 'show') ok = !!showId;
-  else if (current === 'seats') { ok = seats.size + balcony > 0; if (!ok) msg = '좌석을 고르거나 발코니 인원을 정해 주세요'; }
+  else if (current === 'seats') { ok = seats.size + balconySum(balcony) > 0; if (!ok) msg = '좌석을 고르거나 발코니 인원을 정해 주세요'; }
   else if (current === 'goods') ok = true;
   else if (current === 'who') { ok = name().length >= 2 && /\d{3}-?\d{3,4}-?\d{4}/.test(phone()); }
   else if (current === 'confirm') ok = true;
@@ -73,7 +73,7 @@ for (const input of document.querySelectorAll<HTMLInputElement>('input[name="boo
   input.addEventListener('change', async () => { showId = input.value; await loadStatus(); validate(); });
 }
 async function loadStatus() {
-  try { status = await store.status(showId); } catch { status = { taken: [], balconyTaken: 0, goodsSold: {} }; }
+  try { status = await store.status(showId); } catch { status = { taken: [], balconyTaken: noBalcony(), goodsSold: {} }; }
   for (const s of [...seats]) if (status.taken.includes(s)) seats.delete(s);
   renderSeats();
 }
@@ -88,20 +88,31 @@ function renderSeats() {
     btn.classList.toggle('is-taken', taken); btn.disabled = taken || (seatPrice == null && !store.demo);
     btn.classList.toggle('is-picked', seats.has(id)); btn.setAttribute('aria-pressed', String(seats.has(id)));
   }
-  const left = Math.max(0, hall.balcony.max - status.balconyTaken);
-  if (balcony > left) balcony = left;
-  document.querySelector<HTMLElement>('[data-balcony-count]')!.textContent = String(balcony);
-  document.querySelector<HTMLElement>('[data-balcony-left]')!.textContent = left === 0 ? '남은 자리 없음' : `${left}명 남음`;
-  (document.querySelector('[data-balcony-plus]') as HTMLButtonElement).disabled = balcony >= left || (balconyPrice == null && !store.demo);
-  (document.querySelector('[data-balcony-minus]') as HTMLButtonElement).disabled = balcony <= 0;
+  for (const side of hall.balcony.sides) {
+    const box = document.querySelector<HTMLElement>(`[data-balcony="${side.id}"]`)!;
+    const left = Math.max(0, side.max - status.balconyTaken[side.id]);
+    if (balcony[side.id] > left) balcony[side.id] = left;
+    box.querySelector<HTMLElement>('[data-balcony-count]')!.textContent = String(balcony[side.id]);
+    box.querySelector<HTMLElement>('[data-balcony-left]')!.textContent = left === 0 ? '남은 자리 없음' : `${left}명 남음`;
+    box.classList.toggle('is-lit', balcony[side.id] > 0);
+    (box.querySelector('[data-balcony-plus]') as HTMLButtonElement).disabled = balcony[side.id] >= left || (balconyPrice == null && !store.demo);
+    (box.querySelector('[data-balcony-minus]') as HTMLButtonElement).disabled = balcony[side.id] <= 0;
+  }
 }
 document.querySelector('[data-hall]')!.addEventListener('click', (e) => {
   const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-seat]'); if (!btn || btn.disabled) return;
   const id = btn.dataset.seat!; if (seats.has(id)) seats.delete(id); else seats.add(id);
   renderSeats(); validate();
 });
-document.querySelector('[data-balcony-plus]')!.addEventListener('click', () => { balcony++; renderSeats(); validate(); });
-document.querySelector('[data-balcony-minus]')!.addEventListener('click', () => { balcony = Math.max(0, balcony - 1); renderSeats(); validate(); });
+for (const side of hall.balcony.sides) {
+  const box = document.querySelector<HTMLElement>(`[data-balcony="${side.id}"]`)!;
+  box.querySelector('[data-balcony-plus]')!.addEventListener('click', () => { balcony[side.id]++; renderSeats(); validate(); });
+  box.querySelector('[data-balcony-minus]')!.addEventListener('click', () => { balcony[side.id] = Math.max(0, balcony[side.id] - 1); renderSeats(); validate(); });
+}
+function balconyText(): string {
+  const parts = hall.balcony.sides.filter((s) => balcony[s.id] > 0).map((s) => `${s.label} ${balcony[s.id]}명`);
+  return parts.length ? `발코니 ${parts.join(', ')}` : '';
+}
 
 // ----- 3. 굿즈 -----
 for (const row of document.querySelectorAll<HTMLElement>('[data-goods]')) {
@@ -125,8 +136,9 @@ for (const id of ['bk-name', 'bk-phone', 'bk-payer']) document.getElementById(id
 // ----- 5. 확인 -----
 function total(): number | null {
   if (seats.size && seatPrice == null) return null;
-  if (balcony && balconyPrice == null) return null;
-  let sum = seats.size * (seatPrice ?? 0) + balcony * (balconyPrice ?? 0);
+  const bn = balconySum(balcony);
+  if (bn && balconyPrice == null) return null;
+  let sum = seats.size * (seatPrice ?? 0) + bn * (balconyPrice ?? 0);
   for (const [id, n] of Object.entries(goods)) { const pr = goodsPrice(id); if (n > 0) { if (pr == null) return null; sum += n * pr; } }
   return sum;
 }
@@ -134,7 +146,8 @@ function bill(): [string, string][] {
   const s = show.shows.find((x) => x.id === showId)!;
   const rows: [string, string][] = [['회차', `${fmtDay(s.startAt)} ${fmtTime(s.startAt)}`]];
   if (seats.size) rows.push(['지정석', `${[...seats].sort(seatSort).join(', ')} (${seats.size}석${seatPrice != null ? `, ${won(seats.size * seatPrice)}` : ''})`]);
-  if (balcony) rows.push(['발코니', `${balcony}명${balconyPrice != null ? `, ${won(balcony * balconyPrice)}` : ''}`]);
+  const bn = balconySum(balcony);
+  if (bn) rows.push(['발코니', `${balconyText().replace('발코니 ', '')}${balconyPrice != null ? `, ${won(bn * balconyPrice)}` : ''}`]);
   for (const [id, n] of Object.entries(goods)) if (n > 0) { const g = show.goods.find((x) => x.id === id)!; const pr = goodsPrice(id); rows.push([g.name, `${n}개${pr != null ? `, ${won(n * pr)}` : ''}`]); }
   rows.push(['예매자', `${name()} ${phone()}`]); if (payer() !== name()) rows.push(['입금자명', payer()]);
   return rows;
@@ -157,12 +170,12 @@ nextBtn.addEventListener('click', async () => {
 async function submit() {
   const err = document.querySelector<HTMLElement>('[data-confirm-error]')!; err.textContent = '';
   nextBtn.disabled = true; nextBtn.textContent = '보내는 중';
-  const r = await store.reserve({ show: showId, seats: [...seats].sort(seatSort), balcony, goods: Object.fromEntries(Object.entries(goods).filter(([, n]) => n > 0)), name: name(), phone: phone(), payer: payer(), amount: total() });
+  const r = await store.reserve({ show: showId, seats: [...seats].sort(seatSort), balcony: { ...balcony }, goods: Object.fromEntries(Object.entries(goods).filter(([, n]) => n > 0)), name: name(), phone: phone(), payer: payer(), amount: total() });
   nextBtn.textContent = '예매 신청';
   if (!r.ok) {
     nextBtn.disabled = false;
     if (r.reason === 'conflict') { err.textContent = `${r.conflict!.join(', ')} 자리가 방금 예매되었습니다. 좌석을 다시 골라 주세요.`; await loadStatus(); open('seats'); }
-    else if (r.reason === 'balcony') { err.textContent = '발코니 자리가 모자랍니다. 인원을 줄여 주세요.'; await loadStatus(); open('seats'); }
+    else if (r.reason === 'balcony') { const sd = hall.balcony.sides.find((x) => x.id === r.side); err.textContent = `발코니${sd ? ` ${sd.label}` : ''} 자리가 모자랍니다. 인원을 줄여 주세요.`; await loadStatus(); open('seats'); }
     else err.textContent = '보내지 못했습니다. 잠시 뒤 다시 눌러 주세요.';
     return;
   }

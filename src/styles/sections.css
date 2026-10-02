@@ -127,7 +127,29 @@ html:not(.js) .js-only { display: none; }
 .facts__row dd { font-size: var(--fs-small); }
 .venue__name { font-size: var(--fs-h3); line-height: 1.45; letter-spacing: -0.01em; }
 .venue__address { color: var(--soft); margin-top: 4px; }
-.venue + .action-list { margin-top: 40px; }
+.venue + .action-list, .map + .action-list { margin-top: 40px; }
+
+/* 지도. 공연장이 늘 가운데. 램프 하나가 공연장을 비추고 가장자리는 밤으로 풀린다. 틀도 괘선도 없다 */
+@property --lamp { syntax: '<percentage>'; inherits: true; initial-value: 16%; }
+.map { margin: 36px 0 0; }
+.map__frame { position: relative; aspect-ratio: 4 / 5; overflow: hidden; container-type: size; --s: max(100cqw, 100cqh); --lamp: 16%; transition: --lamp 2400ms var(--ease); touch-action: manipulation; }
+.map__frame.is-lit { --lamp: 34%; transition-duration: 500ms; }
+@media (min-width: 600px) { .map__frame { aspect-ratio: 16 / 11; } }
+.map__ground { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; -webkit-mask-image: radial-gradient(closest-side at 50% 50%, #000 var(--lamp), rgb(0 0 0 / 0.55) calc(var(--lamp) + 24%), rgb(0 0 0 / 0.2) 78%, transparent 100%); mask-image: radial-gradient(closest-side at 50% 50%, #000 var(--lamp), rgb(0 0 0 / 0.55) calc(var(--lamp) + 24%), rgb(0 0 0 / 0.2) 78%, transparent 100%); }
+.map__station, .map__venue { position: absolute; left: calc(50% + var(--dx) * var(--s)); top: calc(50% + var(--dy) * var(--s)); }
+.map__station, .map__venue-name { paint-order: stroke fill; -webkit-text-stroke: 4px var(--room); }
+.map__station { font-size: var(--fs-micro); letter-spacing: 0.04em; line-height: 1; white-space: nowrap; color: color-mix(in srgb, var(--ivory) 72%, transparent); padding-left: 10px; transform: translateY(-50%); }
+.map__station::before { content: ''; position: absolute; left: -2.5px; top: 50%; width: 5px; height: 5px; margin-top: -2.5px; background: currentColor; }
+.map__venue { width: 0; height: 0; }
+.map__venue::before { content: ''; position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%; background: var(--ivory); }
+.map__venue::after { content: ''; position: absolute; left: -17px; top: -17px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ivory) 38%, transparent); }
+.map__venue-name { position: absolute; left: 24px; top: 0; transform: translateY(-50%); white-space: nowrap; font-size: var(--fs-small); letter-spacing: 0.02em; color: var(--ivory); }
+.map__scale { position: absolute; left: 0; bottom: 6px; width: calc(var(--len) * var(--s)); padding-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, var(--ivory) 55%, transparent); font-size: 11px; letter-spacing: 0.06em; color: var(--soft); line-height: 1; }
+.map__ripple { position: absolute; width: 0; height: 0; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ivory) 60%, transparent); transform: translate(-50%, -50%); pointer-events: none; animation: map-ripple 1700ms cubic-bezier(.2, .6, .3, 1) forwards; }
+.map__ripple + .map__ripple { animation-delay: 160ms; opacity: 0; }
+@keyframes map-ripple { 0% { width: 10px; height: 10px; opacity: 0.85; } 100% { width: 240px; height: 240px; opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .map__frame { transition: none; } .map__ripple { display: none; } }
+.map__credit { margin-top: 10px; font-size: 11px; letter-spacing: 0.04em; color: var(--soft); }
 
 /* ---- 끝. 가장 어두운 초록 ---- */
 .section--credits { padding-bottom: calc(var(--section-pad) * 0.7); }

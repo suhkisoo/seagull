@@ -14,8 +14,9 @@
  */
 var ADMIN_TOKEN = '여기에-기획팀만-아는-긴-암호';
 var SHEET = '예매';
-var BALCONY_MAX = 8;
-var HEAD = ['예매번호', '신청시각', '회차', '좌석', '발코니', '굿즈', '이름', '연락처', '입금자명', '금액', '상태', '확인시각', '메모'];
+var BALCONY_MAX = { L: 4, R: 4 }; // 발코니 왼쪽, 오른쪽의 회차당 최대 인원. src/content/hall.ts와 같게
+var HEAD = ['예매번호', '신청시각', '회차', '좌석', '발코니 왼쪽', '발코니 오른쪽', '굿즈', '이름', '연락처', '입금자명', '금액', '상태', '확인시각', '메모'];
+var COL_STATUS = 12, COL_CONFIRMED = 13, COL_NOTE = 14; // 1부터 센 열 번호
 
 function sheet_() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -28,19 +29,19 @@ function rows_() {
   for (var i = 1; i < v.length; i++) {
     var r = v[i]; if (!r[0]) continue;
     out.push({ row: i + 1, id: String(r[0]), createdAt: r[1] instanceof Date ? r[1].toISOString() : String(r[1]), show: String(r[2]),
-      seats: String(r[3] || '').split(/[ ,]+/).filter(Boolean), balcony: Number(r[4] || 0), goods: parseGoods_(String(r[5] || '')),
-      name: String(r[6] || ''), phone: String(r[7] || ''), payer: String(r[8] || ''), amount: r[9] === '' || r[9] === null ? null : Number(r[9]),
-      status: String(r[10] || '입금대기'), confirmedAt: r[11] ? (r[11] instanceof Date ? r[11].toISOString() : String(r[11])) : '', note: String(r[12] || '') });
+      seats: String(r[3] || '').split(/[ ,]+/).filter(Boolean), balcony: { L: Number(r[4] || 0), R: Number(r[5] || 0) }, goods: parseGoods_(String(r[6] || '')),
+      name: String(r[7] || ''), phone: String(r[8] || ''), payer: String(r[9] || ''), amount: r[10] === '' || r[10] === null ? null : Number(r[10]),
+      status: String(r[11] || '입금대기'), confirmedAt: r[12] ? (r[12] instanceof Date ? r[12].toISOString() : String(r[12])) : '', note: String(r[13] || '') });
   }
   return out;
 }
 function parseGoods_(s) { var o = {}; s.split(',').forEach(function (p) { var m = p.trim().match(/^(.+?)\s+(\d+)$/); if (m) o[m[1]] = Number(m[2]); }); return o; }
 function goodsText_(g) { return Object.keys(g || {}).filter(function (k) { return g[k] > 0; }).map(function (k) { return k + ' ' + g[k]; }).join(', '); }
 function status_(showId) {
-  var taken = [], bal = 0, sold = {};
+  var taken = [], bal = { L: 0, R: 0 }, sold = {};
   rows_().forEach(function (r) {
     if (r.show !== showId || r.status === '취소') return;
-    taken = taken.concat(r.seats); bal += r.balcony;
+    taken = taken.concat(r.seats); bal.L += r.balcony.L; bal.R += r.balcony.R;
     Object.keys(r.goods).forEach(function (k) { sold[k] = (sold[k] || 0) + r.goods[k]; });
   });
   return { taken: taken, balconyTaken: bal, goodsSold: sold };
@@ -69,15 +70,17 @@ function doPost(e) {
 function reserve_(b) {
   var lock = LockService.getScriptLock(); lock.waitLock(10000); // 같은 자리를 둘이 동시에 잡지 않게
   try {
-    var showId = String(b.show || ''); var seats = (b.seats || []).map(String); var balcony = Number(b.balcony || 0);
-    if (!showId || (seats.length === 0 && balcony === 0)) return { ok: false, reason: 'error', message: 'empty' };
+    var showId = String(b.show || ''); var seats = (b.seats || []).map(String);
+    var balcony = { L: Math.max(0, Number((b.balcony || {}).L || 0)), R: Math.max(0, Number((b.balcony || {}).R || 0)) };
+    if (!showId || (seats.length === 0 && balcony.L + balcony.R === 0)) return { ok: false, reason: 'error', message: 'empty' };
     if (!b.name || !b.phone) return { ok: false, reason: 'error', message: 'who' };
     var st = status_(showId);
     var conflict = seats.filter(function (s) { return st.taken.indexOf(s) >= 0; });
     if (conflict.length) return { ok: false, reason: 'conflict', conflict: conflict };
-    if (st.balconyTaken + balcony > BALCONY_MAX) return { ok: false, reason: 'balcony' };
+    if (st.balconyTaken.L + balcony.L > BALCONY_MAX.L) return { ok: false, reason: 'balcony', side: 'L' };
+    if (st.balconyTaken.R + balcony.R > BALCONY_MAX.R) return { ok: false, reason: 'balcony', side: 'R' };
     var id = newId_();
-    sheet_().appendRow([id, new Date(), showId, seats.join(' '), balcony, goodsText_(b.goods), String(b.name), String(b.phone), String(b.payer || b.name), b.amount === null || b.amount === undefined ? '' : Number(b.amount), '입금대기', '', '']);
+    sheet_().appendRow([id, new Date(), showId, seats.join(' '), balcony.L, balcony.R, goodsText_(b.goods), String(b.name), String(b.phone), String(b.payer || b.name), b.amount === null || b.amount === undefined ? '' : Number(b.amount), '입금대기', '', '']);
     return { ok: true, id: id };
   } finally { lock.releaseLock(); }
 }
@@ -88,12 +91,12 @@ function admin_(b) {
   if (b.op === 'set') {
     var r = rows_().filter(function (x) { return x.id === String(b.id); })[0]; if (!r) return { ok: false };
     var st = String(b.status); if (['입금대기', '입금확인', '취소'].indexOf(st) < 0) return { ok: false };
-    sh.getRange(r.row, 11).setValue(st); sh.getRange(r.row, 12).setValue(st === '입금확인' ? new Date() : '');
+    sh.getRange(r.row, COL_STATUS).setValue(st); sh.getRange(r.row, COL_CONFIRMED).setValue(st === '입금확인' ? new Date() : '');
     return { ok: true };
   }
   if (b.op === 'release') {
     var hours = Number(b.hours || 24), limit = Date.now() - hours * 3600000, n = 0;
-    rows_().forEach(function (r) { if (r.status === '입금대기' && Date.parse(r.createdAt) < limit) { sh.getRange(r.row, 11).setValue('취소'); sh.getRange(r.row, 13).setValue('기한 지나 자리 풀림'); n++; } });
+    rows_().forEach(function (r) { if (r.status === '입금대기' && Date.parse(r.createdAt) < limit) { sh.getRange(r.row, COL_STATUS).setValue('취소'); sh.getRange(r.row, COL_NOTE).setValue('기한 지나 자리 풀림'); n++; } });
     return { ok: true, count: n };
   }
   return { ok: false };

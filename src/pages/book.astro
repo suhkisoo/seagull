@@ -41,17 +41,20 @@ const balconyPrice = show.booking.balconyPrice ?? show.booking.seatPrice;
         <h2 class="step__title"><span class="step__num">2</span> 좌석</h2>
         <p class="step__summary" data-summary></p>
         <div class="step__body">
-          <p class="step__hint">지정석 {won(show.booking.seatPrice)}. 발코니 {won(balconyPrice)}, 자리 지정 없이 한 회차에 {hall.balcony.max}명까지. 좌석을 누르면 불이 켜집니다.</p>
+          <p class="step__hint">지정석 {won(show.booking.seatPrice)}. 발코니 {won(balconyPrice)}, 자리 지정 없이 {hall.balcony.sides.map((x) => `${x.label} ${x.max}명`).join(', ')}까지. 좌석을 누르면 불이 켜집니다.</p>
           <div class="hall" data-hall>
             <div class="hall__balcony">
-              <span class="hall__balcony-side">{hall.balcony.label} 왼쪽</span>
-              <div class="balcony" data-balcony>
-                <button class="balcony__btn" type="button" data-balcony-minus aria-label="발코니 인원 줄이기">−</button>
-                <span class="balcony__count"><output data-balcony-count>0</output>명</span>
-                <button class="balcony__btn" type="button" data-balcony-plus aria-label="발코니 인원 늘리기">+</button>
-                <span class="balcony__left" data-balcony-left></span>
-              </div>
-              <span class="hall__balcony-side">{hall.balcony.label} 오른쪽</span>
+              {hall.balcony.sides.map((side) => (
+                <div class={`balcony balcony--${side.id}`} data-balcony={side.id}>
+                  <p class="balcony__name">{hall.balcony.label} {side.label}</p>
+                  <div class="balcony__ctrl">
+                    <button class="balcony__btn" type="button" data-balcony-minus aria-label={`발코니 ${side.label} 인원 줄이기`}>−</button>
+                    <span class="balcony__count"><output data-balcony-count>0</output>명</span>
+                    <button class="balcony__btn" type="button" data-balcony-plus aria-label={`발코니 ${side.label} 인원 늘리기`}>+</button>
+                  </div>
+                  <p class="balcony__left" data-balcony-left></p>
+                </div>
+              ))}
             </div>
             <div class="seats" role="group" aria-label="지정석">
               {hall.rows.map((r) => (

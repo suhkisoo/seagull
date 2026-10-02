@@ -33,8 +33,10 @@ export const show = {
   venue: {
     name: '서강대학교 메리홀 소극장',
     address: '서울특별시 마포구 백범로 35',
-    naverMap: '',                                 // 비면 검색 링크로 만든다
-    kakaoMap: '',
+    mapLabel: '메리홀',                            // 지도 위 공연장 이름
+    mapQuery: '서강대학교 메리홀',                  // 지도 앱에서 찾을 말
+    naverMap: '',                                 // 비면 mapQuery로 찾는 링크를 만든다
+    kakaoMap: '',                                 // 비면 지도 자료의 좌표로 만든다
   },
   shows: [
     { id: '1112-1500', startAt: '2026-11-12T15:00:00+09:00', url: '', soldOut: false, cast: {} },

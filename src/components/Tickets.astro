@@ -1,15 +1,22 @@
 ---
 // 공연 일정과 예매, 오시는 길. 늦가을 밤. 회차를 고르면 그 칸에만 호박빛. docs/plan.md 2.1 "일정과 예매", 3.1의 13~17, 9.5.3.
 import { show } from '../content/show';
+import mapData from '../content/map.json';
+import VenueMap from './Map.astro';
 import { fmtDate, fmtTime, fmtWeekday, dayKey, epoch } from '../scripts/format';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const days = new Map<string, typeof show.shows>();
 for (const s of show.shows) { const k = dayKey(s.startAt); if (!days.has(k)) days.set(k, []); days.get(k)!.push(s); }
 const buildNow = Date.now();
 const tumblbugOn = !!show.tumblbug.url && (!show.tumblbug.startAt || buildNow >= epoch(show.tumblbug.startAt)) && (!show.tumblbug.endAt || buildNow < epoch(show.tumblbug.endAt) + 24 * 3600 * 1000);
-const q = encodeURIComponent(`${show.venue.name} ${show.venue.address}`);
+// 지도 앱 링크. 지도 자료(map.json)에 좌표가 있으면 카카오맵은 그 자리를 바로 열고 길찾기도 건다
+const q = encodeURIComponent(show.venue.mapQuery || show.venue.name);
+const mapVenue = (mapData as { ready: boolean; venue?: { lat: number; lon: number; source: string } }).venue;
+const geo = mapVenue && mapVenue.source === 'osm' ? mapVenue : null; // 자료에서 공연장을 찾았을 때만
+const pin = geo ? `${encodeURIComponent(show.venue.mapQuery || show.venue.name)},${geo.lat},${geo.lon}` : '';
 const naver = show.venue.naverMap || `https://map.naver.com/p/search/${q}`;
-const kakao = show.venue.kakaoMap || `https://map.kakao.com/?q=${q}`;
+const kakao = show.venue.kakaoMap || (geo ? `https://map.kakao.com/link/map/${pin}` : `https://map.kakao.com/?q=${q}`);
+const kakaoTo = geo ? `https://map.kakao.com/link/to/${pin}` : '';
 const openText = show.booking.openAt ? `${fmtDate(show.booking.openAt)} ${fmtTime(show.booking.openAt)}` : '추후 공개';
 const castOf = (s: (typeof show.shows)[number]) => show.roles.map((r) => ({ role: r.name, actor: s.cast[r.id] || '' }));
 const bookHref = show.booking.commonUrl || `${base}/book/`;
@@ -74,8 +81,10 @@ const bookExternal = !!show.booking.commonUrl;
         <p class="venue__name">{show.venue.name}</p>
         <p class="venue__address" data-address>{show.venue.address}</p>
       </div>
+      <VenueMap />
       <ul class="action-list" role="list">
         <li><span class="action-list__label">지도</span><span class="action-list__value"><a class="action" href={naver} target="_blank" rel="noopener">네이버 지도 열기</a><a class="action" href={kakao} target="_blank" rel="noopener">카카오맵 열기</a></span></li>
+        {kakaoTo && <li><span class="action-list__label">길찾기</span><span class="action-list__value"><a class="action" href={kakaoTo} target="_blank" rel="noopener">카카오맵 길찾기 열기</a></span></li>}
         <li class="js-only"><span class="action-list__label">주소</span><span class="action-list__value"><button class="action" type="button" data-copy-address>주소 복사</button><span class="action__done" data-copy-done aria-live="polite"></span></span></li>
         <li class="js-only"><span class="action-list__label">공유</span><span class="action-list__value"><button class="action" type="button" data-share>공유하기</button><span class="action__done" data-share-done aria-live="polite"></span></span></li>
       </ul>
