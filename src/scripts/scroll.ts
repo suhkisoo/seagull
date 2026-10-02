@@ -15,6 +15,7 @@ const byId = (id: string) => toL(lights.find((l) => l.id === id) ?? lights[0]);
 export type ScrollHooks = { onProgress?: (p: number) => void };
 
 export function createScroll(root: HTMLElement, water: { state: WaterState; updateBand: () => void; bakeTitle: () => void } | null, hooks: ScrollHooks = {}) {
+  if (water) water.state.baseMix = 1;
   const wrapper = root.querySelector<HTMLElement>('.water')!;
   const curtain = root.querySelector<HTMLElement>('.curtain');
   const probe = document.createElement('div'); probe.style.cssText = 'position:fixed;top:0;left:0;height:100svh;width:0;pointer-events:none;visibility:hidden;padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:content-box';
@@ -60,7 +61,9 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
     if (p !== lastP) {
       wrapper.style.setProperty('--water-h', `${h.toFixed(1)}px`);
       root.style.setProperty('--curtain', p.toFixed(4));
-      if (curtain) { curtain.style.transform = `translate3d(0, ${(-p * 100).toFixed(2)}%, 0) skewX(${(Math.max(-1, Math.min(1, vel)) * 1.5 * (1 - p)).toFixed(2)}deg)`; }
+      // 막은 위로 걷히며 모인다. 올라가는 동안 천이 가볍게 흔들린다
+      if (curtain) { const e = p * p * (3 - 2 * p); curtain.style.transform = `translate3d(0, ${(-e * 62).toFixed(2)}%, 0) scaleY(${(1 - 0.5 * e).toFixed(3)}) skewX(${(Math.max(-1, Math.min(1, vel)) * 2 * (1 - p)).toFixed(2)}deg)`; curtain.style.opacity = String(1 - Math.max(0, (p - 0.85) / 0.15)); }
+      if (water) water.state.baseMix = 1 - p;
       wrapper.classList.toggle('is-band', p > 0.98);
       wrapper.classList.toggle('is-hero', p < 0.02);
       water?.updateBand();
@@ -78,7 +81,11 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
     if (now - cssTick > 100) { cssTick = now; root.style.setProperty('--bg-top', css(L1.bgTop)); root.style.setProperty('--bg-bot', css(L1.bgBot)); root.style.setProperty('--sky-top', css(L.skyTop)); root.style.setProperty('--sky-bot', css(L.skyBot)); root.style.setProperty('--dusk', (0.25 + 0.55 * duskT).toFixed(3)); }
   }
   requestAnimationFrame(tick);
-  const onResize = () => { measure(); lastP = -1; water?.bakeTitle(); };
+  // 그림의 반영 텍스처를 그림과 같은 자리에 놓는다
+  const painting = root.querySelector<HTMLElement>('[data-painting]');
+  const placeBase = () => { if (!water || !painting) return; const r = painting.getBoundingClientRect(); water.state.baseRect = [r.left, r.width, r.width / 872 * 816]; };
+  placeBase();
+  const onResize = () => { measure(); lastP = -1; water?.bakeTitle(); placeBase(); };
   window.addEventListener('resize', onResize);
   // 창이 열리거나 영상이 들어오면 구간의 높이가 바뀐다
   const ro = 'ResizeObserver' in window ? new ResizeObserver(() => { measure(); }) : null;

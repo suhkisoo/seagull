@@ -15,14 +15,21 @@ a { color: inherit; }
 /* ---- 첫 화면 ---- */
 .hero { position: relative; min-height: 100vh; min-height: 100svh; overflow: clip;
   background: linear-gradient(to bottom, var(--bg-top, var(--sun)) 0%, var(--bg-bot, var(--olive)) 22%, var(--bg-bot, var(--olive)) 100%); color: var(--ivory); }
-.hero__sky { position: absolute; inset: 0 0 var(--water-hero) 0; overflow: clip; }
-.hero__painting { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; display: block; }
-.hero__painting-veil { position: absolute; inset: 0; background: linear-gradient(to bottom, var(--bg-bot, var(--olive)) 0%, var(--bg-bot, var(--olive)) 100%); transition: opacity 400ms; }
-.curtain { position: absolute; left: 0; right: 0; top: 0; height: calc(100% + 2px); pointer-events: none; transform-origin: 50% 0;
+.hero__sky { position: absolute; inset: 0; overflow: clip; }
+/* 그림(872×1246)의 수면선(위에서 430px, 34.5%)을 페이지의 수평선(62svh)에 맞춘다. 폭이 모자라면 폭에 맞추고 위를 자른다.
+   그림의 물 부분은 첫 화면의 살아 있는 물 뒤에 있다가, 물이 띠로 물러나면 그대로 드러난다 */
+.hero__painting { --pw: max(100vw, calc(62svh / 0.345 * 0.6998)); position: absolute; left: 50%; top: calc(62svh - 0.4931 * var(--pw)); width: var(--pw); height: auto; transform: translateX(-50%); display: block; max-width: none; }
+/* 위쪽은 안개 낀 아이보리 빛으로 밝아지고, 저물수록 초록의 어둠이 올라온다 */
+.hero__haze { position: absolute; inset: 0; background: linear-gradient(to bottom, color-mix(in srgb, var(--ivory) 55%, transparent) 0, color-mix(in srgb, var(--ivory) 18%, transparent) 30%, transparent 58%); mix-blend-mode: screen; opacity: calc(1 - var(--dusk, 0.25) * 0.9); transition: opacity 400ms; }
+.hero__painting-veil { position: absolute; inset: 0; background: linear-gradient(to bottom, var(--deep) 0, var(--deep) 45%, color-mix(in srgb, var(--deep) 60%, transparent) 62%, transparent 75%); opacity: calc(var(--dusk, 0.25) * 0.85); transition: opacity 400ms; }
+/* 막. 아이보리 거즈 한 장. 주름은 부드러운 명암의 세로 결이고 아랫단은 수평선 바로 위에 걸린다 */
+.curtain { position: absolute; left: -2%; right: -2%; top: 0; height: calc(62svh + 6px); pointer-events: none; transform-origin: 50% 0;
+  --c1: color-mix(in srgb, var(--ivory) 42%, transparent); --c2: color-mix(in srgb, var(--ivory) 16%, transparent); --c3: color-mix(in srgb, var(--deep) 14%, transparent);
   background:
-    linear-gradient(to bottom, color-mix(in srgb, var(--ivory) 10%, transparent), transparent 30%),
-    repeating-linear-gradient(90deg, color-mix(in srgb, var(--ivory) 30%, transparent) 0 22px, color-mix(in srgb, var(--ivory) 22%, transparent) 22px 61px, color-mix(in srgb, var(--ivory) 27%, transparent) 61px 97px);
-  mask-image: linear-gradient(to bottom, black 92%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 92%, transparent 100%); will-change: transform; }
+    linear-gradient(to bottom, color-mix(in srgb, var(--ivory) 22%, transparent), transparent 35%, transparent 86%, color-mix(in srgb, var(--ivory) 30%, transparent) 97%, color-mix(in srgb, var(--ivory) 55%, transparent) 100%),
+    repeating-linear-gradient(90deg, var(--c1) 0, var(--c2) 34px, var(--c3) 58px, var(--c2) 84px, var(--c1) 118px),
+    repeating-linear-gradient(90deg, transparent 0, color-mix(in srgb, var(--ivory) 10%, transparent) 147px, transparent 311px);
+  mask-image: linear-gradient(to bottom, black 94%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 94%, transparent 100%); will-change: transform; }
 .curtain { display: none; }
 html.js .curtain { display: block; }
 .water-still .curtain, .reduced .curtain { display: none; }
@@ -33,6 +40,7 @@ html.js .curtain { display: block; }
 .hero__title { font-weight: 700; line-height: 1; letter-spacing: 0.01em; position: absolute; }
 .hero__original { font-size: var(--fs-original); letter-spacing: 0.08em; font-weight: 400; color: transparent; -webkit-text-stroke: 1px color-mix(in srgb, var(--ivory) 70%, transparent); position: absolute; }
 .hero__when { position: absolute; font-size: var(--fs-caption); line-height: 1.6; text-align: right; white-space: nowrap; }
+@media (min-width: 1024px) { .hero__when { font-size: var(--fs-h3); line-height: 1.5; } }
 
 /* ---- 호수 띠 ---- */
 .water { position: fixed; inset: auto 0 0 0; height: var(--water-h); overflow: clip; z-index: 5; --water-top-line: 1px;
@@ -41,10 +49,11 @@ html.js .curtain { display: block; }
 .water__mirror { position: absolute; left: 0; right: 0; top: 0; transform-origin: 50% 50%; transform: scaleY(-1); opacity: 0.55; filter: blur(1.2px);
   mask-image: linear-gradient(to bottom, black 0, transparent 85%); -webkit-mask-image: linear-gradient(to bottom, black 0, transparent 85%); color: var(--ivory); }
 .water canvas { position: absolute; left: 0; bottom: 0; width: 100%; height: var(--water-hero); pointer-events: none; opacity: 0; transition: opacity 600ms; display: block; }
-.water::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: color-mix(in srgb, var(--ivory) 20%, transparent); z-index: 2; }
+.water::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: color-mix(in srgb, var(--ivory) 12%, transparent); z-index: 2; }
 .water__line { position: absolute; left: var(--gutter); bottom: calc(var(--safe-bottom) + 24px); max-width: 70%; font-size: var(--fs-water-line); line-height: 1.5; color: var(--ivory);
-  opacity: 0; transition: opacity 1200ms; pointer-events: none; z-index: 3; text-wrap: balance; }
-.water.is-calm .water__line { opacity: 0.9; }
+  opacity: 0; filter: blur(5px); transition: opacity 1200ms, filter 1600ms; pointer-events: none; z-index: 3; text-wrap: balance; }
+.water.is-calm .water__line { opacity: 0.92; filter: blur(0); }
+.water:not(.is-calm) .water__line { filter: blur(4px); }
 /* 첫 화면에서는 제목의 비친 상(왼쪽 기둥)을 피해 오른쪽 열에 놓는다. docs/plan.md 2.1 */
 .water.is-hero .water__line { left: calc(var(--gutter) + var(--fs-title-a) + 28px); max-width: calc(100% - var(--gutter) * 2 - var(--fs-title-a) - 28px); }
 @media (min-width: 1024px) { .water.is-hero .water__line { left: calc(var(--gutter) + var(--fs-title-a) + 120px); max-width: 600px; } }

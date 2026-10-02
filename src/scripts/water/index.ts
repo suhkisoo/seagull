@@ -21,6 +21,9 @@ export type WaterOptions = {
 export type WaterState = {
   light: { surface: [number, number, number]; deep: [number, number, number]; sparkle: [number, number, number]; wind: number };
   video: [number, number, number, number];
+  lamp: [number, number, number, number];   // 고른 회차의 불빛(캔버스 좌표 x, y, 반지름, 세기)
+  baseMix: number;                          // 바탕 텍스처(그림의 반영) 섞기 0~1. 스크롤 모듈이 막의 진행으로 정한다
+  baseRect: [number, number, number];       // 그림의 left, width, 반영 높이(CSS px)
   lightDir: [number, number];
   sparkleDir: [number, number];
 };
@@ -54,16 +57,16 @@ export function createWater(opts: WaterOptions) {
   const fixedCalm = qnum('calm');
   const fixedWind = qnum('wind');
   const refract = qnum('refract') ?? 4;
-  const baseMixOpt = qnum('reflection') ?? 0;
+  const baseMixOpt = qnum('reflection') ?? 0.9; // P15. 기본으로 그림의 반영을 쓴다. ?reflection=0 이면 색만
   let lossCount = 0, lossTimes: number[] = [], lost = false, raf = 0, running = false, frameCount = 0;
   const samples: number[] = []; let slowWindows = 0, goodWindows = 0, lastChange = 0, debugEl: HTMLElement | null = null;
-  const state: WaterState = { light: { surface: hex('#5B6041'), deep: hex('#262E27'), sparkle: hex('#ABAB76'), wind: 0.15 }, video: [0, 0, 0, 0], lightDir: [0, -0.4], sparkleDir: [0, 0] };
+  const state: WaterState = { light: { surface: hex('#5B6041'), deep: hex('#262E27'), sparkle: hex('#ABAB76'), wind: 0.15 }, video: [0, 0, 0, 0], lamp: [0, 0, 1, 0], baseMix: 1, baseRect: [0, 1, 1], lightDir: [0, -0.4], sparkleDir: [0, 0] };
 
   // ----- GL 객체 -----
   let prog: WebGLProgram | null = null, progTier: Tier | -1 = -1;
   let buf: WebGLBuffer | null = null, titleTex: WebGLTexture | null = null, baseTex: WebGLTexture | null = null;
   const U: Record<string, WebGLUniformLocation | null> = {};
-  const uniformNames = ['u_size', 'u_ripple', 'u_params', 'u_gains', 'u_light', 'u_glow', 'u_titleRect', 'u_video', 'u_colSurface', 'u_colDeep', 'u_colSparkle', 'u_title', 'u_base', 'u_baseMix', 'u_titleOn', 'u_refract'];
+  const uniformNames = ['u_size', 'u_ripple', 'u_params', 'u_gains', 'u_light', 'u_glow', 'u_titleRect', 'u_video', 'u_colSurface', 'u_colDeep', 'u_colSparkle', 'u_title', 'u_base', 'u_baseMix', 'u_titleOn', 'u_refract', 'u_lamp', 'u_baseRect'];
   const rippleBuf = new Float32Array(8 * 4);
   let titleRect = [0, 0, 1, 1], titleReady = false, bakedScroll = 0;
 
@@ -277,7 +280,9 @@ export function createWater(opts: WaterOptions) {
     gl!.uniform1f(U.u_titleOn, titleReady && ty + titleRect[3] > -600 ? 1 : 0);
     gl!.uniform4f(U.u_video, state.video[0], state.video[1], state.video[2], state.video[3]);
     gl!.uniform3fv(U.u_colSurface, state.light.surface); gl!.uniform3fv(U.u_colDeep, state.light.deep); gl!.uniform3fv(U.u_colSparkle, state.light.sparkle);
-    gl!.uniform1f(U.u_baseMix, baseMixOpt * (1 - Math.min(1, waterTop / Math.max(1, cssH * 0.5))));
+    gl!.uniform1f(U.u_baseMix, opts.baseImage ? baseMixOpt * state.baseMix : 0);
+    gl!.uniform3f(U.u_baseRect, state.baseRect[0], state.baseRect[1], state.baseRect[2]);
+    gl!.uniform4f(U.u_lamp, state.lamp[0], state.lamp[1], state.lamp[2], state.lamp[3]);
     gl!.uniform1f(U.u_refract, refract);
     gl!.drawArrays(gl!.TRIANGLES, 0, 3);
     if (debugEl && (frameCount % 30) === 0) {

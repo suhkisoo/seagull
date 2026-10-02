@@ -22,6 +22,8 @@ uniform vec4 u_params;            // 캔버스 높이, 화소비, waterTop, 살�
 uniform highp vec4 u_gains;       // 잔물결 세기, 반짝임 세기, 제목 반사 세기(=calm), 시간(60초 감음)
 uniform vec4 u_light;             // 빛 방향 xy, 반짝임 방향 xy
 uniform vec4 u_glow;              // 버튼 불빛 중심 x, y, 반지름, 세기
+uniform vec4 u_lamp;              // 고른 회차의 불빛 x, y, 반지름, 세기
+uniform vec3 u_baseRect;          // 바탕 텍스처가 놓인 그림의 left, width, 반영 높이(CSS px)
 uniform vec4 u_titleRect;         // x, y, w, h (캔버스 좌표)
 uniform vec4 u_video;             // 영상 빛 rgb, 세기
 uniform vec3 u_colSurface, u_colDeep, u_colSparkle;
@@ -86,17 +88,24 @@ void main() {
   vec2 gd = (p + n.xy * disp * 0.5) - u_glow.xy;
   float gr = max(u_glow.z, 1.0);
   float glow = u_glow.w * exp(-gd.x * gd.x / (gr * gr) - gd.y * gd.y / (4.0 * gr * gr));
+  vec2 ld = (p + n.xy * disp * 0.5) - u_lamp.xy;
+  float lr = max(u_lamp.z, 1.0);
+  glow += u_lamp.w * exp(-ld.x * ld.x / (lr * lr) - ld.y * ld.y / (5.0 * lr * lr));
 
   // 물빛. 값으로 받은 색. 바탕 텍스처가 있으면 섞는다
   vec3 col = mix(u_colSurface, u_colDeep, pow(dn, 0.65));
   if (u_baseMix > 0.0) {
-    vec2 buv = vec2(clamp((p.x + n.x * disp) / u_size.x, 0.0, 1.0), clamp(dn + n.y * 0.02, 0.0, 1.0));
-    col = mix(col, texture2D(u_base, buv).rgb, u_baseMix);
+    // 그림의 반영 부분을 그림과 같은 자리, 같은 배율로 잇는다. 변위는 물결을 따른다
+    vec2 bp = p + n.xy * disp * 1.5;
+    vec2 buv = vec2((bp.x - u_baseRect.x) / max(u_baseRect.y, 1.0), (bp.y - waterTop) / max(u_baseRect.z, 1.0));
+    float bin = step(0.0, buv.x) * step(buv.x, 1.0) * step(buv.y, 1.0);
+    vec3 bcol = texture2D(u_base, clamp(buv, 0.0, 1.0)).rgb;
+    col = mix(col, mix(bcol, u_colDeep, 0.22 + 0.5 * dn), u_baseMix * bin);
   }
 #if ${SPEC ? 1 : 0}
   vec3 L = normalize(vec3(u_light.xy + u_light.zw * 0.6, 0.7));
   float spec = pow(max(dot(n, normalize(L + vec3(0.0, 0.0, 1.0))), 0.0), 40.0) * u_gains.y;
-  col += spec * u_colSparkle * 0.35;
+  col += spec * u_colSparkle * 0.22;
 #endif
   col = mix(col, vec3(0.973, 0.973, 0.925), title * (1.0 - 0.55 * dn) * 0.75);
   col += glow * GLOW_COL;

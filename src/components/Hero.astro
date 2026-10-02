@@ -1,7 +1,7 @@
 ---
 // 첫 화면. 2단계에서 고른 A안, 포스터를 잇는 세로 제목. docs/plan.md 2.1.
 import { Picture } from 'astro:assets';
-import lakeHouse from '../assets/lake-house.webp';
+import lake from '../assets/lake.webp';
 import lakeReflection from '../assets/lake-reflection.webp';
 import { show } from '../content/show';
 import WaterBand from './WaterBand.astro';
@@ -12,8 +12,9 @@ const titleHtml = `<span class="title title--a">${charHtml}</span>`;
 ---
 <header class={`hero hero--${variant}`} id="top">
   <div class="hero__sky">
-    <Picture src={lakeHouse} widths={[780]} formats={["avif", "webp"]} fallbackFormat="webp" sizes="100vw" alt="" class="hero__painting" loading="eager" fetchpriority="high" decoding="async" />
-    <div class="hero__painting-veil" style="opacity: var(--dusk, 0.3)"></div>
+    <Picture src={lake} widths={[872]} formats={["avif", "webp"]} fallbackFormat="webp" sizes="100vw" alt="" class="hero__painting" data-painting loading="eager" fetchpriority="high" decoding="async" />
+    <div class="hero__haze" aria-hidden="true"></div>
+    <div class="hero__painting-veil" aria-hidden="true"></div>
     <div class="curtain" aria-hidden="true"></div>
     <img src={lakeReflection.src} alt="" data-reflection hidden decoding="async" />
   </div>

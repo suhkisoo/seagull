@@ -1,6 +1,6 @@
 // 진입 모듈. 첫 페인트 뒤 유휴 시간에 수면과 스크롤을 시작한다. docs/plan.md 5.2.
 import { show } from '../content/show';
-import { initTickets } from './tickets';
+import { initTickets, setWater } from './tickets';
 
 const root = document.documentElement;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -53,6 +53,7 @@ async function start() {
   if (!water) { wrapper.dataset.water = 'still'; if (canvas) canvas.remove(); root.classList.add('water-still'); cssRipple(); }
   let band = false;
   createScroll(root, water, { onProgress: (p) => { band = p > 0.98; } });
+  setWater(water);
   if (document.querySelector('[data-video]')) { const { initVideo } = await import('./video'); initVideo(water); }
   // 잔잔해지면 대사가 떠오른다
   let wasCalm = false;

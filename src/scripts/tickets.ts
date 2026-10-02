@@ -2,6 +2,23 @@
 import { show, type ShowTime } from '../content/show';
 import { ticketState, applyTicketState, now } from './state';
 import { epoch } from './format';
+import type { WaterState } from './water/index';
+
+let water: { state: WaterState } | null = null;
+export function setWater(w: { state: WaterState } | null) { water = w; trackLamp(); }
+// 고른 칸의 자리를 수면 모듈에 넘긴다. 띠 위쪽의 불빛이 같은 x의 물에 비친다
+function trackLamp() {
+  if (!water) return;
+  const cell = document.querySelector<HTMLElement>('.cell:has(.cell__input:checked)');
+  const band = document.querySelector<HTMLElement>('.water');
+  if (!cell || !band) { water.state.lamp[3] = 0; return; }
+  const r = cell.getBoundingClientRect(), b = band.getBoundingClientRect();
+  const dist = b.top - r.bottom; // 칸이 띠보다 얼마나 위에 있나
+  const vis = dist > -r.height && r.top < innerHeight ? 0.45 + 0.55 * Math.max(0, 1 - Math.max(0, dist) / innerHeight) : 0;
+  water.state.lamp = [r.left + r.width / 2, b.top + Math.min(60, Math.max(0, dist) * 0.2), r.width * 0.6, 0.4 * vis];
+}
+window.addEventListener('scroll', trackLamp, { passive: true });
+window.addEventListener('resize', trackLamp, { passive: true });
 
 let picked: ShowTime | null = null;
 const btn = () => document.querySelector<HTMLAnchorElement>('[data-ticket-button]');
@@ -28,7 +45,7 @@ export function initTickets() {
     const input = e.target as HTMLInputElement; if (input.name !== 'showtime') return;
     picked = show.shows.find((s) => s.id === input.value) ?? null;
     for (const list of document.querySelectorAll<HTMLElement>('[data-cast-for]')) list.hidden = list.dataset.castFor !== input.value;
-    applyState();
+    applyState(); trackLamp();
   });
   applyState();
   setInterval(applyState, 60000);
