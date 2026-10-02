@@ -10,7 +10,7 @@
 
 ## 미리보기
 
-작업 브랜치나 `main`에 올릴 때마다 GitHub Actions가 빌드해 GitHub Pages에 둔다. 주소는 `https://suhkisoo.github.io/seagull/`이고 실험실은 `/seagull/lab/a/`, `/seagull/lab/b/`다. 처음 한 번은 저장소 Settings → Pages에서 Source가 "GitHub Actions"인지 확인한다(워크플로가 스스로 켜지만 막혀 있으면 여기서 켠다). 공개본은 이 주소가 아니라 연출의 서버에 올린다.
+작업 브랜치나 `main`에 올릴 때마다 GitHub Actions가 빌드해 GitHub Pages에 둔다. 주소는 `https://suhkisoo.github.io/seagull/`이고 실험실은 `/seagull/lab/a/`, `/seagull/lab/b/`다. 처음 한 번은 저장소 Settings → Pages에서 Source를 "GitHub Actions"로 바꿔야 한다. 워크플로가 스스로 켜려 하지만 권한이 없어 실패한다. 바꾼 뒤 Actions 탭에서 실패한 preview 실행을 "Re-run all jobs"로 다시 돌리면 주소가 열린다. 공개본은 이 주소가 아니라 연출의 서버에 올린다.
 
 ## 빌드
 
