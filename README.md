@@ -32,6 +32,12 @@
 
 `/book/`에서 회차, 좌석, 굿즈를 고르고 계좌로 입금하면 `/admin/`에서 기획팀이 입금을 확인하거나 자리를 푼다. 장부는 구글 시트이고 그 앞에 Apps Script 웹 앱이 있다. 설치는 `backend/Code.gs` 맨 위의 여섯 줄을 따른다(기획팀 구글 계정, 10분). 나온 웹 앱 주소를 `src/content/show.ts`의 `booking.apiUrl`에 넣고 다시 빌드한다. 주소가 비어 있으면 예매 흐름은 미리보기(이 브라우저에만 저장)로 돌고, `?seat=15000&balcony=10000&goods=3000`처럼 가격을 넣어 볼 수 있다.
 
+발코니는 자리 지정 없이 왼쪽과 오른쪽으로 나눠 받는다. 쪽마다 최대 인원은 `src/content/hall.ts`의 `balcony.sides`와 `backend/Code.gs`의 `BALCONY_MAX`에 같은 값으로 적는다. 장부에는 "발코니 왼쪽", "발코니 오른쪽" 두 칸이 있다. 예전 장부(발코니 한 칸)를 쓰던 시트라면 새 탭에서 다시 시작한다.
+
+## 오시는 길 지도
+
+지도는 OpenStreetMap 자료로 그린다. 자료는 GitHub Actions의 **map-data** 워크플로가 받아 `src/content/map.json`으로 커밋하고, 미리보기를 다시 올린다. 다시 받고 싶으면 Actions 탭에서 map-data를 고르고 Run workflow를 누른다. 공연장(메리홀)을 가운데 두고 사방 1.1km를 그린다. 지도 위 공연장 이름과 지도 앱에서 찾을 말은 `show.ts`의 `venue.mapLabel`, `venue.mapQuery`다.
+
 * 가격은 `booking.seatPrice`, `booking.balconyPrice`(비면 지정석과 같다), `goods[].price`. 계좌는 `booking.account`. 입금 대기 시간은 `booking.holdHours`. 문의처는 `booking.contact`.
 * 관리 암호는 `Code.gs`의 `ADMIN_TOKEN`이다. 기획팀만 알고 있으면 된다. `/admin/`은 검색에 걸리지 않게 `noindex`다.
 * 시트에서 상태 칸을 직접 "취소"나 "입금확인"으로 바꿔도 사이트에 그대로 반영된다.
@@ -41,6 +47,7 @@
 전부 `src/content/show.ts` 한 파일이다. 고친 뒤 `npm run build`를 돌리면 빌드가 내용을 검사해 경고를 찍는다. 화면 코드에는 날짜나 이름이 없다.
 
 * **회차별 출연진.** `shows[]`의 각 회차에 `cast: { arkadina: '박세은', treplev: '이영종', nina: '김시연', trigorin: '조민석' }`처럼 배역 id에 배우 이름 하나를 적는다. 배역 id는 `roles[]`의 `id`다. 비어 있는 배역은 "추후 공개"로 보인다. 한 배우만 맡는 배역(소린, 마샤, 도른)도 적어야 이름이 보인다. A, B 같은 조 표기는 쓰지 않는다.
+* **극 안의 날짜.** `texts.stageTimes`의 넷(1막~4막). 구간 사이 어두운 곳에 하나씩 나온다. 비우면 그 자리는 숨는다.
 * **매진.** 그 회차의 `soldOut: true`. 칸에 "매진"이 적히고 그 회차를 고르면 예매 버튼이 "매진"으로 눌리지 않는다.
 * **예매 오픈과 링크.** `booking.openAt`에 `'2026-10-12T14:00:00+09:00'`처럼 한국 시간 오프셋을 붙여 적고, `booking.commonUrl`에 예매처 링크, `booking.vendorName`에 예매처 이름을 적는다. 회차마다 링크가 다르면 `shows[]`의 `url`에 적는다(없는 회차는 공통 링크로 간다). 오픈 전에는 버튼이 "10월 12일 예매 오픈", 오픈 뒤에는 "예매하기"가 된다. 둘 중 하나라도 비면 "예매 일정 보기"다.
 * **러닝타임, 관람 연령, 가격.** `runningMinutes`(인터미션 포함 분), `intermission`, `ageLimit`, `pricing`. 비어 있으면 숨기거나 "추후 공개"다. 러닝타임이 비는 동안 공연 끝은 마지막 회차 3시간 뒤로 본다.

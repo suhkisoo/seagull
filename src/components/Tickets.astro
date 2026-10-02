@@ -23,6 +23,7 @@ const bookHref = show.booking.commonUrl || `${base}/book/`;
 const bookExternal = !!show.booking.commonUrl;
 ---
 <section class="section section--tickets" id="tickets" data-light="tickets" aria-labelledby="tickets-title">
+  {show.texts.stageTimes.act4 && <p class="stage-time">{show.texts.stageTimes.act4}</p>}
   <div class="wrap grid">
     <hr class="rule rule--section" />
     <header class="section__head">

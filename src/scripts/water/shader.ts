@@ -23,6 +23,8 @@ uniform highp vec4 u_gains;       // 잔물결 세기, 반짝임 세기, 제목 
 uniform vec4 u_light;             // 빛 방향 xy, 반짝임 방향 xy
 uniform vec4 u_glow;              // 버튼 불빛 중심 x, y, 반지름, 세기
 uniform vec4 u_lamp;              // 고른 회차의 불빛 x, y, 반지름, 세기
+uniform vec4 u_glade;             // 수평선 위 빛이 물에 비친 길. x, 세기, 수평선에서의 반폭(CSS px), 한낮의 아지랑이 0~1
+uniform vec3 u_gladeCol;
 uniform vec3 u_baseRect;          // 바탕 텍스처가 놓인 그림의 left, width, 반영 높이(CSS px)
 uniform vec4 u_titleRect;         // x, y, w, h (캔버스 좌표)
 uniform vec4 u_video;             // 영상 빛 rgb, 세기
@@ -78,6 +80,8 @@ void main() {
   float k6 = 0.221;
   g += amb * sqrt(persp) * d6 * k6 * 0.10 * cos(dot(d6, q) * k6 - t * 3.41 + 5.2) * 1.15;
 #endif
+  // 한낮(2막 정오, 덥다). 수평선 가까이에서 공기가 일렁인다
+  g.x += u_glade.w * 0.05 * sin(p.y * 1.7 + p.x * 0.021 + t * 7.0) * pow(1.0 - dn, 2.0);
   vec3 n = normalize(vec3(-g, 1.0));
 
   // 제목의 거울점. 잔잔할수록 변위가 작아 상이 또렷하다
@@ -117,6 +121,17 @@ void main() {
   col += spec * u_colSparkle * 0.28 * (1.0 - 0.5 * dn);
 #endif
   col = mix(col, vec3(0.973, 0.973, 0.925), title * pow(1.0 - dn, 1.4) * 0.62);
+  // 빛의 길. 1막은 막 뜬 달, 2막은 왼편 호수에 비친 해. 원반은 그리지 않고 물에 비친 길만 그린다.
+  // 수평선에서는 가늘고 가까울수록 넓어진다. 잔물결의 줄과 기울기가 맞는 곳에서 부서져 반짝이고, 닿으면 흩어진다
+  if (u_glade.y > 0.001) {
+    float gw = u_glade.z * mix(1.0, 3.4, dn);
+    float gx = (p.x + n.x * disp * 2.5 - u_glade.x) / max(gw, 1.0);
+    // 반짝임은 물결의 기울기에서만 나온다. 수평선 쪽으로 알맞게 기운 면이 빛을 눈으로 돌려보낸다. 잔잔하면 가는 기둥만 남는다
+    float s0 = 0.010 + 0.022 * dn;
+    float tilt = (-n.y - s0) / (0.005 + 0.006 * dn);
+    float glint = exp(-tilt * tilt) * exp(-n.x * n.x / 0.0006);
+    col += u_glade.y * exp(-gx * gx) * (0.22 + 1.6 * glint) * pow(1.0 - dn, 0.8) * u_gladeCol;
+  }
   col += glow * GLOW_COL;
   col += u_video.rgb * u_video.a * (1.0 - dn) * 0.6;
   gl_FragColor = vec4(col, 1.0);

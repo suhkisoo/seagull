@@ -18,7 +18,6 @@ import { show } from '../content/show';
         ))}
       </dl>
       <div class="colophon">
-        <p class="colophon__title">〈{show.title}〉</p>
         <p>{show.company}</p>
         <p>{show.credits.author}. {show.credits.directing}</p>
         <p>{show.period}. {show.venue.name}</p>
@@ -29,6 +28,7 @@ import { show } from '../content/show';
           </ul>
         )}
         {show.sponsors && <p>{show.sponsors}</p>}
+        <p class="colophon__title" data-end-title>〈{show.title}〉</p>
       </div>
     </div>
   </div>

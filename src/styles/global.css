@@ -18,10 +18,20 @@ a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.28e
 
 /* 방. 페이지 전체의 빛 한 겹. 스크롤 모듈이 --room과 --ink를 바꾼다. 구간 사이의 암전도 이 빛이 어두워졌다 밝아지는 것이다 */
 .room { position: fixed; inset: 0; z-index: -1; background: var(--room); pointer-events: none; }
+/* 빛이 오는 쪽. 반대쪽이 조금 어둡다. 한낮은 위, 아침은 왼쪽 창, 저녁과 밤은 아래 물(scroll.ts) */
+.room::before { content: ''; position: absolute; inset: 0; background: linear-gradient(var(--shade-angle, 180deg), transparent 28%, rgb(14 20 15 / var(--shade, 0)) 100%); }
+/* 2막 정오의 늙은 보리수 그늘. 나무는 무대의 상수 다운, 물 가까운 오른쪽이라 그 가지가 방문자 머리 위 오른쪽에서 드리운다. 세기는 scroll.ts가 정한다 */
+.room__tree { position: absolute; right: -6vw; top: 8svh; width: min(64vw, 720px); height: min(64vw, 720px); opacity: 0; background: var(--leaves, none) right top / contain no-repeat; filter: blur(2.5px); transform-origin: 100% 0; animation: leaves-sway 9s ease-in-out infinite alternate; }
 /* 물에서 올라오는 낮은 빛. 저녁과 밤의 구간에서만 */
 .room::after { content: ''; position: absolute; inset: 0; opacity: var(--glow, 0);
   background: radial-gradient(140% 62% at 50% 100%, color-mix(in srgb, var(--sun) 55%, var(--ivory)) 0, color-mix(in srgb, var(--sun) 40%, transparent) 30%, transparent 72%); }
 html.js .page { color: var(--ink); }
+/* 장면의 날짜. 구간 사이 암전 속에 하나씩 놓인다(content/show.ts texts.stageTimes) */
+.stage-time { position: absolute; left: 0; right: 0; max-width: 1480px; margin-inline: auto; padding-inline: var(--gutter); top: calc(var(--section-pad) * 0.38); font-size: var(--fs-small); letter-spacing: 0.04em; font-variant-numeric: tabular-nums lining-nums; color: color-mix(in srgb, currentColor 72%, transparent); }
+/* 첫 화면의 날짜는 막 위에. 막이 오르면 함께 오르며 사라진다 */
+.curtain__time { position: absolute; right: var(--gutter); top: 30svh; max-width: 11em; text-align: right; text-wrap: balance; font-size: var(--fs-micro); letter-spacing: 0.12em; color: var(--ivory); opacity: 0.9; pointer-events: none; will-change: transform, opacity; }
+.water-still .curtain__time, .reduced .curtain__time { display: none; }
+@media (min-width: 1024px) { .curtain__time { left: 0; right: 0; max-width: none; text-align: center; top: 31svh; } }
 
 /* ---- 첫 화면 ---- */
 .hero { position: relative; min-height: 100vh; min-height: 100svh; overflow: clip; background: var(--olive); color: var(--ivory); }
@@ -77,6 +87,8 @@ html.js .curtain { display: block; }
 .water.is-hero .water__line { left: calc(var(--gutter) + var(--fs-title-a) + 32px); max-width: calc(100% - var(--gutter) * 2 - var(--fs-title-a) - 32px); }
 @media (min-width: 1024px) { .water.is-hero .water__line { left: calc(var(--gutter) + var(--fs-title-a) + 120px); max-width: 560px; } }
 .water.is-band .water__line { bottom: auto; top: 12px; right: calc(var(--gutter) + var(--ticket-w, 160px) + 16px); max-width: none; font-size: 13.5px; line-height: 20px; max-height: 60px; overflow: hidden; display: flex; align-items: center; min-height: var(--button-h); }
+/* 끝에서 물이 올라와 맺음의 제목을 비출 때는 대사를 거둔다 */
+.water.is-end .water__line { opacity: 0; filter: blur(6px); }
 
 /* 예매 버튼. 호박빛 면 하나. 그림자 대신 바로 아래 물에 불빛이 비친다 */
 .ticket { position: absolute; right: var(--gutter); top: 12px; z-index: 4; display: inline-flex; align-items: center; justify-content: center; min-width: 136px; height: var(--button-h); padding: 0 26px;
@@ -94,8 +106,9 @@ html:not(.js) .water { height: var(--water-band); }
 html:not(.js) .water__mirror { display: none; }
 html:not(.js) .water.is-hero .ticket { top: 12px; }
 
-/* 띠 뒤에 가려질 자리 */
+/* 띠 뒤에 가려질 자리. 본 페이지의 끝에서는 물이 올라오므로(scroll.ts의 endPx) 그만큼 비운다 */
 .after-water { height: var(--water-band); }
+html.js .after-water--end { height: calc(max(30svh, var(--water-band)) + var(--safe-bottom, 0px) + 18px); }
 
 @media (prefers-reduced-motion: reduce) {
   .water canvas { display: none; }

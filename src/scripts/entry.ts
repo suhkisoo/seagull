@@ -44,6 +44,8 @@ function cssRipple() {
 
 async function start() {
   const { createScroll } = await import('./scroll');
+  const { paintLeaves } = await import('./leaves');
+  paintLeaves(root);
   let water = null;
   if (!off && canvas) {
     const { createWater } = await import('./water/index');

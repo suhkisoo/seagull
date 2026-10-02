@@ -55,12 +55,22 @@ html:not(.js) .js-only { display: none; }
 /* ---- 나오는 사람들. 아침의 실내. 창으로 든 빛이 반듯하게 떨어진다 ---- */
 .window-light { position: absolute; inset: 0; pointer-events: none; overflow: clip;
   mask-image: linear-gradient(to bottom, transparent 0, black 22%, black 70%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 22%, black 70%, transparent 100%); }
-.window-light::before, .window-light::after { content: ''; position: absolute; top: -8%; bottom: -8%; transform: translate3d(0, var(--shadow-shift, 0px), 0); filter: blur(22px); opacity: 0.9;
-  background: linear-gradient(90deg, transparent 0, color-mix(in srgb, var(--ivory) 62%, transparent) 12%, color-mix(in srgb, var(--ivory) 62%, transparent) 46%,
-    color-mix(in srgb, var(--morning-shadow) 55%, transparent) 50%, color-mix(in srgb, var(--ivory) 62%, transparent) 54%, color-mix(in srgb, var(--ivory) 62%, transparent) 88%, transparent 100%); }
-.window-light::before { left: -6vw; width: 44vw; }
-.window-light::after { left: 58vw; width: 34vw; opacity: 0.6; }
-@media (min-width: 1024px) { .window-light::before { left: 4vw; width: 26vw; } .window-light::after { left: 52vw; width: 22vw; } }
+/* 창 둘. 왼쪽(하수)의 긴 창은 복도를 보여 주는 창, 오른쪽(상수)의 꺾인 창은 마당이 보이는 창이고 그 너머에 나무가 있다.
+   빛만 바닥에 떨어진다. 창살은 흐린 줄로, 가장자리는 아침의 푸른 기운 */
+.window-light__long, .window-light__bent { position: absolute; filter: blur(14px); }
+.window-light__long { left: 2vw; width: 22vw; top: -6%; bottom: -6%; opacity: 0.85; transform: translate3d(0, var(--shadow-shift, 0px), 0);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--morning-shadow) 60%, transparent) 0, transparent 14%, transparent 47%, color-mix(in srgb, var(--morning-shadow) 70%, transparent) 47% 53%, transparent 53%, transparent 86%, color-mix(in srgb, var(--morning-shadow) 60%, transparent) 100%),
+    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--ivory) 66%, transparent) 0 23%, color-mix(in srgb, var(--morning-shadow) 55%, transparent) 23% 25%); }
+.window-light__bent { left: 60vw; width: 34vw; top: 6%; bottom: 18%; opacity: 0.7; transform: translate3d(0, var(--shadow-shift, 0px), 0) skewY(-11deg); overflow: hidden;
+  background:
+    linear-gradient(90deg, transparent 0 48%, color-mix(in srgb, var(--morning-shadow) 70%, transparent) 48% 52%, transparent 52%),
+    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--ivory) 60%, transparent) 0 31%, color-mix(in srgb, var(--morning-shadow) 55%, transparent) 31% 33.5%); }
+.window-light__tree { position: absolute; inset: -12%; background: var(--leaves, none) 70% 10% / 130% auto no-repeat; opacity: 0.95; animation: leaves-sway 11s ease-in-out infinite alternate; }
+@media (min-width: 1024px) { .window-light__long { left: 3vw; width: 13vw; } .window-light__bent { left: 54vw; width: 22vw; } }
+/* 나무 그늘은 바람에 아주 조금 흔들린다 */
+@keyframes leaves-sway { from { transform: translate3d(-0.6%, 0, 0) rotate(-0.5deg); } to { transform: translate3d(0.8%, 0.5%, 0) rotate(0.6deg); } }
+@media (prefers-reduced-motion: reduce) { .window-light__tree, .room__tree { animation: none; } }
 .section--people .wrap { position: relative; }
 /* 등장인물표. 일곱 배역이 같은 크기의 줄로 선다 */
 .dramatis { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
@@ -141,8 +151,7 @@ html:not(.js) .js-only { display: none; }
 .map__station { font-size: var(--fs-micro); letter-spacing: 0.04em; line-height: 1; white-space: nowrap; color: color-mix(in srgb, var(--ivory) 72%, transparent); padding-left: 10px; transform: translateY(-50%); }
 .map__station::before { content: ''; position: absolute; left: -2.5px; top: 50%; width: 5px; height: 5px; margin-top: -2.5px; background: currentColor; }
 .map__venue { width: 0; height: 0; }
-.map__venue::before { content: ''; position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%; background: var(--ivory); }
-.map__venue::after { content: ''; position: absolute; left: -17px; top: -17px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ivory) 38%, transparent); }
+.map__venue::after { content: ''; position: absolute; left: -19px; top: -19px; width: 38px; height: 38px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ivory) 38%, transparent); }
 .map__venue-name { position: absolute; left: 24px; top: 0; transform: translateY(-50%); white-space: nowrap; font-size: var(--fs-small); letter-spacing: 0.02em; color: var(--ivory); }
 .map__scale { position: absolute; left: 0; bottom: 6px; width: calc(var(--len) * var(--s)); padding-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, var(--ivory) 55%, transparent); font-size: 11px; letter-spacing: 0.06em; color: var(--soft); line-height: 1; }
 .map__ripple { position: absolute; width: 0; height: 0; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ivory) 60%, transparent); transform: translate(-50%, -50%); pointer-events: none; animation: map-ripple 1700ms cubic-bezier(.2, .6, .3, 1) forwards; }
@@ -159,7 +168,9 @@ html:not(.js) .js-only { display: none; }
 .crew__title { color: var(--soft); }
 @media (min-width: 1024px) { .crew { columns: 2; column-gap: 48px; } }
 .colophon { margin-top: 18svh; font-size: var(--fs-micro); letter-spacing: 0.06em; line-height: 1.9; color: var(--soft); }
-.colophon__title { font-size: var(--fs-quote); letter-spacing: -0.02em; color: var(--ink, currentColor); line-height: 1.3; margin-bottom: 18px; }
+/* 맺음의 제목. 페이지의 맨 끝, 올라온 물 바로 위에 놓여 물에 비친다. 첫 화면과 짝 */
+.colophon__title { margin-top: 16svh; font-size: var(--fs-display); letter-spacing: -0.02em; color: var(--ink, currentColor); line-height: 1.1; }
+html.js .section--credits { padding-bottom: 0; }
 .colophon .action-list { margin-top: 32px; font-size: var(--fs-small); letter-spacing: 0; }
 
 /* 자바스크립트가 없으면 방의 빛 대신 구간마다 고정된 빛 */

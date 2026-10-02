@@ -4,6 +4,7 @@ import { show } from '../content/show';
 import Video from './Video.astro';
 ---
 <section class="section section--about" id="about" data-light="about" aria-labelledby="about-title">
+  {show.texts.stageTimes.act2 && <p class="stage-time">{show.texts.stageTimes.act2}</p>}
   <div class="wrap grid">
     <hr class="rule rule--section" />
     <header class="section__head">

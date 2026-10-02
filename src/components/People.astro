@@ -1,10 +1,12 @@
 ---
+// 나오는 사람들. 아침의 실내. 창 둘로 빛이 든다. 하수의 긴 창, 상수의 꺾인 창(그 너머 마당의 나무). 연출부 영지 지도 7/8.
 // 나오는 사람들. 아침의 실내. 일곱 배역이 같은 크기의 줄로 서는 등장인물표. 누르면 그 줄에 빛이 든다(창 열기). docs/plan.md 2.1 "사람들", 3.1의 10, 9.5.3.
 import { show } from '../content/show';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 <section class="section section--people" id="people" data-light="people" aria-labelledby="people-title">
-  <div class="window-light" aria-hidden="true"></div>
+  {show.texts.stageTimes.act3 && <p class="stage-time">{show.texts.stageTimes.act3}</p>}
+  <div class="window-light" aria-hidden="true"><span class="window-light__long"></span><span class="window-light__bent"><span class="window-light__tree"></span></span></div>
   <div class="wrap grid">
     <hr class="rule rule--section" />
     <header class="section__head">

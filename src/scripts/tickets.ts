@@ -15,7 +15,15 @@ function trackLamp() {
   const r = cell.getBoundingClientRect(), b = band.getBoundingClientRect();
   const dist = b.top - r.bottom; // 칸이 띠보다 얼마나 위에 있나
   const vis = dist > -r.height && r.top < innerHeight ? 0.45 + 0.55 * Math.max(0, 1 - Math.max(0, dist) / innerHeight) : 0;
-  water.state.lamp = [r.left + r.width / 2, b.top + Math.min(60, Math.max(0, dist) * 0.2), r.width * 0.9, 1.6 * vis];
+  water.state.lamp = [r.left + r.width / 2, b.top + Math.min(60, Math.max(0, dist) * 0.2), r.width * (0.9 + 0.25 * boost), 1.6 * vis * (1 + boost)];
+}
+// 회차를 고르면 램프의 불을 돋운다(4막 지문, 마샤가 램프의 불을 돋운다). 한 번 밝게 올랐다가 조금 낮춰 둔다
+let boost = 0;
+function raiseLamp() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const t0 = performance.now();
+  const step = (t: number) => { const k = Math.min(1, (t - t0) / 1600); boost = Math.sin(Math.PI * k) * 0.7 * (1 - 0.4 * k); trackLamp(); if (k < 1) requestAnimationFrame(step); else { boost = 0; trackLamp(); } };
+  requestAnimationFrame(step);
 }
 window.addEventListener('scroll', trackLamp, { passive: true });
 window.addEventListener('resize', trackLamp, { passive: true });
@@ -45,7 +53,7 @@ export function initTickets() {
     const input = e.target as HTMLInputElement; if (input.name !== 'showtime') return;
     picked = show.shows.find((s) => s.id === input.value) ?? null;
     for (const list of document.querySelectorAll<HTMLElement>('[data-cast-for]')) list.hidden = list.dataset.castFor !== input.value;
-    applyState(); trackLamp();
+    applyState(); trackLamp(); raiseLamp();
     const link = document.querySelector<HTMLAnchorElement>('[data-book-link]'); if (link && !link.target) link.search = `?show=${input.value}`;
   });
   applyState();

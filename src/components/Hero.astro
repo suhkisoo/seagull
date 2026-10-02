@@ -16,6 +16,7 @@ const titleHtml = `<span class="title title--a">${charHtml}</span>`;
     <div class="hero__shade" aria-hidden="true"></div>
     <div class="hero__dusk" aria-hidden="true"></div>
     <div class="curtain" aria-hidden="true"></div>
+    {show.texts.stageTimes.act1 && <p class="curtain__time" data-curtain-time>{show.texts.stageTimes.act1}</p>}
     <img src={lakeReflection.src} alt="" data-reflection hidden decoding="async" />
   </div>
   <div class="hero__content">
