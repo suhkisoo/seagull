@@ -8,5 +8,4 @@ export function ticketState(picked: ShowTime | null = null, t = Date.now()) {
   if (show.booking.openAt && t < KST(show.booking.openAt)) return { id: 'before-open', label: '예매 오픈 전', href: '#tickets' } as const;
   if (show.booking.commonUrl) return { id: 'open', label: '예매하기', href: show.booking.commonUrl, external: true } as const;
   return { id: 'open', label: '예매하기', href: `${import.meta.env.BASE_URL.replace(/\/$/, '')}/book/` } as const;
-  return { id: 'see-schedule', label: '예매하기', href: '#tickets' } as const;
 }

@@ -15,6 +15,7 @@ const titleHtml = `<span class="title title--a">${charHtml}</span>`;
     <Picture src={lake} widths={[872]} formats={["avif", "webp"]} fallbackFormat="webp" sizes="100vw" alt="" class="hero__painting" data-painting loading="eager" fetchpriority="high" decoding="async" />
     <div class="hero__shade" aria-hidden="true"></div>
     <div class="hero__dusk" aria-hidden="true"></div>
+    <div class="hero__night" aria-hidden="true"></div>
     <div class="curtain" aria-hidden="true"></div>
     {show.texts.stageTimes.act1 && <p class="curtain__time" data-curtain-time>{show.texts.stageTimes.act1}</p>}
     <img src={lakeReflection.src} alt="" data-reflection hidden decoding="async" />
@@ -31,6 +32,15 @@ const titleHtml = `<span class="title title--a">${charHtml}</span>`;
     <p class="hero__when"><span class="hero__when-short">{show.periodShort}</span><span class="hero__when-full">{show.period}</span><span class="hero__when-venue">{show.venue.name}</span></p>
   </div>
   <WaterBand titleHtml={titleHtml} variant={variant} />
+  <!-- 1막 극중극의 불빛. 수평선 바로 위에 선다(scroll.ts가 켜고 끈다). 늪의 불빛 넷, 붉은 점 둘 -->
+  <div class="stage-lights" aria-hidden="true">
+    <span class="stage-lights__marsh" style="--x:0.13;--h:9px"></span>
+    <span class="stage-lights__marsh" style="--x:0.33;--h:16px"></span>
+    <span class="stage-lights__marsh" style="--x:0.74;--h:7px"></span>
+    <span class="stage-lights__marsh" style="--x:0.9;--h:13px"></span>
+    <span class="stage-lights__eye" style="--x:0.655;--h:22px"></span>
+    <span class="stage-lights__eye" style="--x:0.685;--h:22px"></span>
+  </div>
 </header>
 
 <style is:global>

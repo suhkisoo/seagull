@@ -34,6 +34,10 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
   const curtainTime = root.querySelector<HTMLElement>('[data-curtain-time]');
   const treeLeaves = root.querySelector<HTMLElement>('.room__tree');
   let lastTree = -1;
+  // 1막 극중극. 막을 올리기 시작하면 무대가 켜진다(어두워짐, 달의 길, 늪의 불빛, 붉은 점 둘). 첫 화면을 벗어나면 꺼진다
+  const lights = root.querySelector<HTMLElement>('.stage-lights');
+  const PTS = [[0.13, 0], [0.33, 0], [0.74, 0], [0.9, 0], [0.655, 1], [0.685, 1]] as const;
+  let stage = false, stageT = 0, eyesSaid = false, actH = 0, stageK = 0; const ptsI = new Float32Array(6);
   const probe = document.createElement('div'); probe.style.cssText = 'position:fixed;top:0;left:0;height:100svh;width:0;pointer-events:none;visibility:hidden;padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:content-box';
   document.body.appendChild(probe);
   let svh = 0, safe = 0, heroPx = 0, bandPx = 0, endPx = 0, maxY = 0, aboutTop = 0, aboutBot = 0, actTop = 0, actBot = 0, duskStart = performance.now();
@@ -104,8 +108,10 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
     const p = Math.max(0, Math.min(1, y / (0.6 * svh)));
     // 끝: 마지막 화면 반 높이 동안 물이 올라온다
     const e = maxY > svh ? smooth((y - (maxY - 0.55 * svh)) / (0.55 * svh)) : 0;
-    const h = heroPx + (bandPx - heroPx) * p + (endPx - bandPx) * e;
-    if (Math.abs(h - lastH) > 0.05) { wrapper.style.setProperty('--water-h', `${h.toFixed(1)}px`); if (p === lastP) water?.updateBand(); lastH = h; }
+    let h = heroPx + (bandPx - heroPx) * p + (endPx - bandPx) * e;
+    // 4막. 집채만 한 파도. 물이 화면 위로 부풀었다 가라앉는다. 예매 버튼도 그 위에 떠서 오르내린다. 멈추면 너울이 낮아진다
+    if (actH > 0.001) { const s1 = now / 1000; const heave = (0.5 + 0.5 * Math.sin(s1 * 0.9)) * (0.6 + 0.4 * Math.sin(s1 * 0.31 + 1)); const calmK = wrapper.classList.contains('is-calm') ? 0.45 : 1; h += actH * (0.07 * svh + 0.06 * svh * heave * calmK); }
+    if (Math.abs(h - lastH) > 0.05) { wrapper.style.setProperty('--water-h', `${h.toFixed(1)}px`); root.style.setProperty('--water-live', `${h.toFixed(1)}px`); if (p === lastP) water?.updateBand(); lastH = h; }
     wrapper.classList.toggle('is-end', e > 0.35);
     // 물에 비칠 제목. 끝에 가까우면 맺음의 제목으로
     if (water?.setTitle) { const want = e > 0.01 && endTitle ? endTitle : heroTitle; if (want && want !== reflectEl) { reflectEl = want; water.setTitle(want); } }
@@ -143,16 +149,37 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
     if (treeLeaves && Math.abs(aboutW - lastTree) > 0.004) { lastTree = aboutW; treeLeaves.style.opacity = (aboutW * 0.95).toFixed(3); }
     // 4막(일정과 예매, 오시는 길). 폭풍 이틀째. 정면 유리문으로 나간 램프 빛이 거친 물에 부서진다.
     // 끝(만든 사람들)에 들어서면 바람이 잦아들어 맺음의 제목이 비친다
-    const actW = actBot > actTop ? smooth((ry - actTop) / (0.6 * svh)) * (1 - smooth((ry - actBot + 0.2 * svh) / (0.5 * svh))) : 0;
+    const actW = actH = actBot > actTop ? smooth((ry - actTop) / (0.6 * svh)) * (1 - smooth((ry - actBot + 0.2 * svh) / (0.5 * svh))) : 0;
     if (water) {
       const sum = moonW + aboutW + actW + 1e-3, a = moonW / sum, b = aboutW / sum, c = actW / sum, vw = window.innerWidth;
       water.state.glade = [vw * (0.54 * a + 0.2 * b + 0.47 * c), moonW * 0.8 + aboutW * 0.45 + actW * 0.42, 9 * a + 39 * b + 24 * c, aboutW];
       water.state.gladeCol = [0, 1, 2].map((i) => MOON[i] * a + IVORY[i] * b + DOOR[i] * c) as RGB;
       water.state.storm = actW;
     }
+    // 1막 무대 켜기와 끄기
+    const pastAct1 = aboutTop > 0 && y + 0.58 * svh > aboutTop + 0.12 * svh; // 2막 정오의 빛이 들기 시작하면 무대는 끝난다
+    if (!stage && p > 0.12 && !pastAct1) { stage = true; stageT = now; root.classList.add('is-stage'); window.dispatchEvent(new CustomEvent('seagull:cue', { detail: 'stage' })); }
+    else if (stage && (p < 0.04 || pastAct1)) { stage = false; root.classList.remove('is-stage'); }
+    const since = stage ? now - stageT : -1;
+    lights?.classList.toggle('is-marsh', since > 700);
+    lights?.classList.toggle('is-eyes', since > 1900);
+    if (since > 1900 && !eyesSaid) { eyesSaid = true; window.dispatchEvent(new CustomEvent('seagull:cue', { detail: 'eyes' })); }
+    if (water) {
+      const vw = window.innerWidth;
+      PTS.forEach(([fx, kind], i) => {
+        const target = kind ? (since > 1900 ? 0.95 : 0) : (since > 700 ? 0.5 * (0.6 + 0.4 * Math.sin(now / 900 + i * 1.7)) : 0);
+        ptsI[i] += (target - ptsI[i]) * (target === 0 ? 0.09 : kind ? 0.03 : 0.05);
+        water.state.pts.set([fx * vw + (kind && i === 5 && vw < 600 ? 6 : 0), ptsI[i], kind ? 3.2 : 2.6, kind], i * 4);
+      });
+      // 막이 오르면 달의 길이 타오른다
+      if (stage) { water.state.glade[1] *= 1.6; water.state.glade[2] += 6; }
+    }
     // 지금 머무는 막. 멈춤 대사와 소리가 쓴다
-    const act = actW > 0.5 ? 'act4' : '';
+    const act = actW > 0.5 ? 'act4' : stage ? 'act1' : '';
     if (root.dataset.act !== act) { if (act) root.dataset.act = act; else delete root.dataset.act; }
+    // 무대가 켜지면 물도 밤이 된다. 달의 길과 늪의 불빛, 붉은 점만 남게
+    stageK += ((stage ? 1 : 0) - stageK) * 0.04;
+    if (stageK > 0.001) { L.skyTop = mix(L.skyTop, FLOOR, 0.55 * stageK); L.skyBot = mix(L.skyBot, hex('#151A16'), 0.6 * stageK); L.sparkle = mix(L.sparkle, FLOOR, 0.6 * stageK); }
     if (water) { water.state.light.surface = L.skyTop; water.state.light.deep = L.skyBot; water.state.light.sparkle = L.sparkle; water.state.light.wind = L.wind; water.state.lightDir = [0, -0.4 + 0.3 * duskT]; }
     if (people) { const pr = people.getBoundingClientRect(); if (pr.bottom > 0 && pr.top < svh) root.style.setProperty('--shadow-shift', `${Math.max(-16, Math.min(16, -pr.top * 0.025)).toFixed(1)}px`); }
     const roomCss = css(room.c);

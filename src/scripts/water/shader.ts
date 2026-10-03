@@ -25,6 +25,7 @@ uniform vec4 u_glow;              // 버튼 불빛 중심 x, y, 반지름, 세�
 uniform vec4 u_lamp;              // 고른 회차의 불빛 x, y, 반지름, 세기
 uniform vec4 u_glade;             // 수평선 위 빛이 물에 비친 길. x, 세기, 수평선에서의 반폭(CSS px), 한낮의 아지랑이 0~1
 uniform vec3 u_gladeCol;
+uniform vec4 u_pts[6];            // 수평선 위 작은 불빛들의 반영. x, 세기, 반폭, 종류(0 늪의 불빛, 1 붉은 점). 1막 극중극
 uniform float u_storm;            // 4막의 폭풍 0~1. 덩어리진 바람, 너울, 마루의 물거품
 uniform vec3 u_baseRect;          // 바탕 텍스처가 놓인 그림의 left, width, 반영 높이(CSS px)
 uniform vec4 u_titleRect;         // x, y, w, h (캔버스 좌표)
@@ -89,7 +90,7 @@ void main() {
   // 집채만 한 파도. 긴 너울 하나가 방문자 쪽으로 밀려온다. 멈추면 잦아들지만 다 가라앉지는 않는다
   vec2 d7 = vec2(0.28, 0.96);
   float k7 = 0.017, ph7 = dot(d7, q) * k7 - t * 1.25;
-  g += u_storm * (1.0 - 0.6 * u_gains.z) * sqrt(persp) * d7 * k7 * 1.9 * cos(ph7);
+  g += u_storm * (1.0 - 0.55 * u_gains.z) * sqrt(persp) * d7 * k7 * 2.7 * cos(ph7);
   vec3 n = normalize(vec3(-g, 1.0));
 
   // 제목의 거울점. 잔잔할수록 변위가 작아 상이 또렷하다
@@ -138,7 +139,17 @@ void main() {
     float crest = pow(max(0.0, sin(ph7)), 14.0);
     float br = 0.5 + 0.5 * sin(p.x * 0.045 + q.y * 0.01 + t * 0.7) * sin(p.x * 0.013 - t * 0.4);
     float foam = crest * smoothstep(0.45, 0.9, gust * br + 0.25) * u_storm * (1.0 - 0.7 * u_gains.z) * pow(1.0 - dn, 0.5);
-    col = mix(col, vec3(0.78, 0.80, 0.74), foam * 0.38);
+    col = mix(col, vec3(0.80, 0.82, 0.76), foam * 0.55);
+  }
+  // 1막 극중극. 늪의 불빛들과 호수를 배경으로 나타나는 붉은 점 두 개(지문 177, 192). 불빛은 물 위에 서고 물에는 세로로 부서진 상이 진다
+  for (int i = 0; i < 6; i++) {
+    vec4 pt = u_pts[i];
+    if (pt.y < 0.002) continue;
+    float px = (p.x + n.x * disp * 2.2 - pt.x) / max(pt.z * mix(1.0, 2.6, dn), 1.0);
+    float rowsP = 0.55 + 0.45 * sin(q.y * 0.23 + t * 2.1 + g.x * 34.0 + pt.x);
+    float len = mix(70.0, 150.0, pt.w);
+    vec3 pc = mix(vec3(0.80, 0.87, 0.74), vec3(0.66, 0.11, 0.07), pt.w);
+    col += pt.y * exp(-px * px) * exp(-depth / len) * rowsP * pc;
   }
   if (u_glade.y > 0.001) {
     float gw = u_glade.z * mix(1.0, 3.4, dn);

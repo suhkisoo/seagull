@@ -33,6 +33,15 @@ function nextLine(band: boolean) {
 }
 
 const wrapper = document.querySelector<HTMLElement>('.water')!;
+// 1막 극중극의 순간들. 막이 오르고 어두워질 때, 붉은 점 둘이 나타날 때 그 줄이 물 위에 뜬다(지문의 순서)
+let cueT = 0;
+window.addEventListener('seagull:cue', (e) => {
+  const cue = (e as CustomEvent<string>).detail;
+  const l = show.texts.waterLines.find((x) => x.cue === cue); const el = document.querySelector<HTMLElement>('.water__line');
+  if (!l || !el) return;
+  el.textContent = l.text; el.classList.add('is-cue');
+  clearTimeout(cueT); cueT = window.setTimeout(() => el.classList.remove('is-cue'), 7000);
+});
 const canvas = wrapper.querySelector<HTMLCanvasElement>('canvas');
 const title = document.querySelector<HTMLElement>('[data-title]')!;
 const button = document.querySelector<HTMLElement>('[data-ticket-button]')!;
