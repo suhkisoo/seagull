@@ -1,0 +1,39 @@
+---
+// 기획팀 관리. 예매 목록, 입금 확인, 자리 풀기. 관리 암호(Apps Script의 ADMIN_TOKEN)를 넣어야 열린다.
+import Base from '../layouts/Base.astro';
+import { show } from '../content/show';
+import { fmtDay, fmtTime } from '../scripts/format';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<Base title={`예매 관리. ${show.meta.title}`} description="기획팀 예매 관리" noindex>
+  <main class="book admin page" data-admin data-api={show.booking.apiUrl} data-hold-hours={show.booking.holdHours}>
+    <div class="wrap">
+    <header class="book__head grid">
+      <p class="book__eyebrow"><a href={`${base}/`}>〈{show.title}〉 {show.company}</a></p>
+      <h1 class="book__title">예매 관리</h1>
+      <p class="book__demo" data-demo hidden>지금은 미리보기입니다. 이 브라우저에서 신청한 예매만 보입니다.</p>
+    </header>
+    <form class="admin__login" data-login>
+      <div class="field"><label for="ad-token">관리 암호</label><input id="ad-token" type="password" autocomplete="current-password" /></div>
+      <p class="action-row"><button class="action" type="submit">열기</button><span class="field__error" data-login-error aria-live="polite"></span></p>
+    </form>
+    <section class="admin__body" data-body hidden>
+      <div class="admin__tools">
+        <label class="admin__filter">회차 <select data-filter-show><option value="">전체</option>{show.shows.map((s) => <option value={s.id}>{fmtDay(s.startAt)} {fmtTime(s.startAt)}</option>)}</select></label>
+        <label class="admin__filter">상태 <select data-filter-status><option value="">전체</option><option value="입금대기">입금대기</option><option value="입금확인">입금확인</option><option value="취소">취소</option></select></label>
+        <button class="action" type="button" data-refresh>새로 고침</button>
+        <button class="action" type="button" data-release>기한 지난 대기 자리 풀기</button>
+      </div>
+      <dl class="admin__counts" data-counts></dl>
+      <p class="admin__hint">입금을 확인하면 "입금 확인"을 누릅니다. 입금이 없으면 "자리 풀기"를 누르면 그 예매가 취소되고 자리가 다시 열립니다. 되돌리려면 "대기로"를 누릅니다.</p>
+      <table class="admin__table">
+        <thead><tr><th>예매 번호</th><th>신청</th><th>회차</th><th>자리</th><th>굿즈</th><th>예매자</th><th>금액</th><th>상태</th><th>처리</th></tr></thead>
+        <tbody data-rows></tbody>
+      </table>
+      <p class="field__error" data-admin-error aria-live="polite"></p>
+    </section>
+    </div>
+    <div class="after-water" aria-hidden="true"></div>
+  </main>
+  <script src="../scripts/admin.ts"></script>
+</Base>

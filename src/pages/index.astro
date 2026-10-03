@@ -1,0 +1,25 @@
+---
+// 한 페이지, 여섯 구간. 첫 화면은 2단계에서 고른 A안(세로 제목). docs/brief.md 4장, docs/plan.md 2.1.
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import About from '../components/About.astro';
+import People from '../components/People.astro';
+import TwoYears from '../components/TwoYears.astro';
+import Tickets from '../components/Tickets.astro';
+import Credits from '../components/Credits.astro';
+import { validateShow } from '../content/validate';
+validateShow();
+---
+<Base>
+  <div class="room" aria-hidden="true"><div class="room__tree"></div></div>
+  <Hero />
+  <main class="page">
+    <About />
+    <People />
+    <TwoYears />
+    <Tickets />
+    <Credits />
+    <div class="after-water after-water--end" aria-hidden="true"></div>
+  </main>
+  <script src="../scripts/entry.ts"></script>
+</Base>

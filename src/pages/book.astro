@@ -1,0 +1,151 @@
+---
+// 예매. 회차, 좌석, 굿즈, 예매자, 확인의 다섯 단계가 한 페이지에 차례로 열린다. 팝업 없음. docs/plan.md 9.9.
+import Base from '../layouts/Base.astro';
+import { show } from '../content/show';
+import { hall, seatId } from '../content/hall';
+import { fmtDay, fmtTime } from '../scripts/format';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const won = (n: number | null) => (n == null ? '추후 공개' : `${n.toLocaleString('ko-KR')}원`);
+const balconyPrice = show.booking.balconyPrice ?? show.booking.seatPrice;
+---
+<Base title={`예매. ${show.meta.title}`} description={`〈${show.title}〉 예매. 회차와 좌석을 고르고 계좌로 입금합니다.`} noindex>
+  <main class="book page" data-book data-api={show.booking.apiUrl} data-seat-price={show.booking.seatPrice ?? ''} data-balcony-price={balconyPrice ?? ''} data-hold-hours={show.booking.holdHours}>
+    <div class="wrap">
+    <header class="book__head grid">
+      <p class="book__eyebrow"><a href={`${base}/`}>〈{show.title}〉 {show.company}</a></p>
+      <h1 class="book__title">예매</h1>
+      <p class="book__lead">회차와 좌석을 고르고 계좌로 입금하면 기획팀이 확인한 뒤 예매가 완료됩니다. 입금 전에는 자리가 {show.booking.holdHours}시간 동안만 잡혀 있습니다.</p>
+      <p class="book__demo" data-demo hidden>지금은 미리보기입니다. 고른 자리는 이 브라우저에만 남고 실제로 예매되지 않습니다.</p>
+    </header>
+
+    <ol class="steps" data-steps>
+      <li class="step grid is-open" data-step="show">
+        <h2 class="step__title"><span class="step__num">1</span> 회차</h2>
+        <p class="step__summary" data-summary></p>
+        <div class="step__body">
+          <fieldset class="pick">
+            <legend class="visually-hidden">회차</legend>
+            {show.shows.map((s) => (
+              <label class="pick__row" data-pick-show={s.id}>
+                <input class="visually-hidden" type="radio" name="book-show" value={s.id} data-start={s.startAt} disabled={s.soldOut} />
+                <span class="pick__day">{fmtDay(s.startAt)}</span>
+                <span class="pick__time">{fmtTime(s.startAt)}</span>
+                <span class="pick__note" data-pick-note>{s.soldOut ? '매진' : ''}</span>
+              </label>
+            ))}
+          </fieldset>
+        </div>
+      </li>
+
+      <li class="step grid" data-step="seats">
+        <h2 class="step__title"><span class="step__num">2</span> 좌석</h2>
+        <p class="step__summary" data-summary></p>
+        <div class="step__body">
+          <p class="step__hint">지정석 {won(show.booking.seatPrice)}. 발코니 {won(balconyPrice)}, 자리 지정 없이 {hall.balcony.sides.map((x) => `${x.label} ${x.max}명`).join(', ')}까지. 좌석을 누르면 불이 켜집니다.</p>
+          <div class="hall" data-hall>
+            <div class="hall__balcony">
+              {hall.balcony.sides.map((side) => (
+                <div class={`balcony balcony--${side.id}`} data-balcony={side.id}>
+                  <p class="balcony__name">{hall.balcony.label} {side.label}</p>
+                  <div class="balcony__ctrl">
+                    <button class="balcony__btn" type="button" data-balcony-minus aria-label={`발코니 ${side.label} 인원 줄이기`}>−</button>
+                    <span class="balcony__count"><output data-balcony-count>0</output>명</span>
+                    <button class="balcony__btn" type="button" data-balcony-plus aria-label={`발코니 ${side.label} 인원 늘리기`}>+</button>
+                  </div>
+                  <p class="balcony__left" data-balcony-left></p>
+                </div>
+              ))}
+            </div>
+            <div class="seats" role="group" aria-label="지정석">
+              {hall.rows.map((r) => (
+                <div class="seats__row" data-row={r.row}>
+                  <span class="seats__label">{r.row}</span>
+                  <div class="seats__cells">
+                    {r.seats.map((n) => (
+                      <>
+                        <button class="seat" type="button" data-seat={seatId(r.row, n)} aria-pressed="false" aria-label={`${r.row}열 ${n}번`}>{n}</button>
+                        {r.gapAfter === n && <span class="seats__aisle" aria-hidden="true"></span>}
+                      </>
+                    ))}
+                  </div>
+                  <span class="seats__label">{r.row}</span>
+                </div>
+              ))}
+            </div>
+            <p class="hall__stage">무대</p>
+            <p class="hall__entrance">{hall.entrance}</p>
+          </div>
+          <p class="seats__legend"><span class="seat seat--legend" aria-hidden="true"></span> 빈자리 <span class="seat seat--legend is-picked" aria-hidden="true"></span> 고른 자리 <span class="seat seat--legend is-taken" aria-hidden="true"></span> 예매된 자리</p>
+          <p class="step__picked" data-seat-list></p>
+        </div>
+      </li>
+
+      <li class="step grid" data-step="goods">
+        <h2 class="step__title"><span class="step__num">3</span> 굿즈</h2>
+        <p class="step__summary" data-summary></p>
+        <div class="step__body">
+          <p class="step__hint">공연 당일 로비에서 받습니다. 굿즈만 따로 살 수는 없습니다.</p>
+          <ul class="goods" role="list">
+            {show.goods.map((g) => (
+              <li class="goods__row" data-goods={g.id} data-price={g.price ?? ''} data-stock={g.stock ?? ''}>
+                <span class="goods__name">{g.name}{g.note && <span class="goods__note">{g.note}</span>}</span>
+                <span class="goods__price">{won(g.price)}</span>
+                {g.price != null
+                  ? <span class="qty"><button class="qty__btn" type="button" data-qty-minus aria-label={`${g.name} 줄이기`}>−</button><output class="qty__n" data-qty>0</output><button class="qty__btn" type="button" data-qty-plus aria-label={`${g.name} 늘리기`}>+</button></span>
+                  : <span class="goods__soon">준비 중</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </li>
+
+      <li class="step grid" data-step="who">
+        <h2 class="step__title"><span class="step__num">4</span> 예매자</h2>
+        <p class="step__summary" data-summary></p>
+        <div class="step__body">
+          <div class="field"><label for="bk-name">이름</label><input id="bk-name" name="name" type="text" autocomplete="name" required maxlength="30" /></div>
+          <div class="field"><label for="bk-phone">연락처</label><input id="bk-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required maxlength="20" placeholder="010-0000-0000" /></div>
+          <div class="field"><label for="bk-payer">입금자명</label><input id="bk-payer" name="payer" type="text" maxlength="30" placeholder="이름과 다르면 적어 주세요" /></div>
+          <p class="field__note">이름과 연락처는 예매 확인과 공연 안내에만 쓰고 공연이 끝나면 지웁니다.</p>
+          <p class="field__error" data-who-error aria-live="polite"></p>
+        </div>
+      </li>
+
+      <li class="step grid" data-step="confirm">
+        <h2 class="step__title"><span class="step__num">5</span> 확인</h2>
+        <p class="step__summary" data-summary></p>
+        <div class="step__body">
+          <dl class="bill" data-bill></dl>
+          <div class="pay">
+            <p class="pay__total"><span class="pay__label">합계</span><span class="pay__amount num" data-total>0원</span></p>
+            <p class="pay__account"><span class="pay__label">입금 계좌</span>
+              {show.booking.account.number
+                ? <span class="pay__value num" data-account>{show.booking.account.bank} {show.booking.account.number} {show.booking.account.holder}</span>
+                : <span class="pay__value">추후 공개</span>}
+            </p>
+            <p class="pay__note">예매 신청 뒤 {show.booking.holdHours}시간 안에 입금해 주세요. 기획팀이 입금을 확인하면 연락처로 예매 완료를 알립니다. 시간이 지나면 자리가 풀립니다.</p>
+            {show.booking.contact && <p class="pay__note">문의 {show.booking.contact}</p>}
+          </div>
+          <p class="field__error" data-confirm-error aria-live="polite"></p>
+        </div>
+      </li>
+    </ol>
+
+    <section class="done grid" data-done hidden aria-live="polite">
+      <h2 class="step__title">예매 신청을 받았습니다</h2>
+      <dl class="bill" data-done-bill></dl>
+      <p class="pay__total"><span class="pay__label">입금할 금액</span><span class="pay__amount num" data-done-total></span></p>
+      <p class="pay__account"><span class="pay__label">입금 계좌</span><span class="pay__value num" data-done-account></span><span><button class="action" type="button" data-copy-account>계좌 복사</button><span class="action__done" data-copy-account-done></span></span></p>
+      <p class="pay__note">예매 번호 <span class="num" data-done-id></span>. 입금자명이 다르면 기획팀이 찾기 어렵습니다. 입금 확인 뒤 연락처로 안내합니다.</p>
+      <p class="action-row"><a class="action" href={`${base}/`}>공연 페이지로 돌아가기</a></p>
+    </section>
+    </div>
+
+    <div class="after-water" aria-hidden="true"></div>
+  </main>
+  <div class="water is-band water--static" data-water="still">
+    <div class="water__still" aria-hidden="true"></div>
+    <button class="ticket" type="button" data-step-next disabled>다음</button>
+  </div>
+  <script src="../scripts/booking.ts"></script>
+</Base>

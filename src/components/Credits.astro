@@ -1,0 +1,34 @@
+---
+// 끝. 만든 사람들, 단체와 표기, 링크. 가장 어두운 초록. docs/plan.md 2.1 "끝", 9.5.3.
+import { show } from '../content/show';
+---
+<section class="section section--credits" id="credits" data-light="credits" aria-labelledby="credits-title">
+  <div class="wrap grid">
+    <hr class="rule rule--section" />
+    <header class="section__head">
+      <h2 class="section__title" id="credits-title" tabindex="-1">만든 사람들</h2>
+    </header>
+    <div class="section__body">
+      <dl class="crew">
+        {show.crew.map((t) => (
+          <div class="crew__row">
+            <dt>{t.team}</dt>
+            <dd>{t.members.map((m, i) => <span>{i > 0 && ', '}{m.name}{m.title && m.title !== t.team && m.title !== `${t.team}팀원` ? <span class="crew__title">({m.title})</span> : ''}</span>)}</dd>
+          </div>
+        ))}
+      </dl>
+      <div class="colophon">
+        <p>{show.company}</p>
+        <p>{show.credits.author}. {show.credits.directing}</p>
+        <p>{show.period}. {show.venue.name}</p>
+        <ul class="action-list" role="list">
+            <li class="js-only"><span class="action-list__label">소리</span><span class="action-list__value"><button class="action" type="button" data-sound aria-pressed="false">소리 켜기</button></span></li>
+            {show.links.instagram && <li><span class="action-list__label">인스타그램</span><span class="action-list__value"><a class="action" href={show.links.instagram} target="_blank" rel="noopener">인스타그램 열기</a></span></li>}
+            {show.links.contact && <li><span class="action-list__label">문의</span><span class="action-list__value">{show.links.contact.includes('@') ? <a class="action" href={`mailto:${show.links.contact}`}>문의하기</a> : <span>{show.links.contact}</span>}</span></li>}
+        </ul>
+        {show.sponsors && <p>{show.sponsors}</p>}
+        <p class="colophon__title" data-end-title>〈{show.title}〉</p>
+      </div>
+    </div>
+  </div>
+</section>
