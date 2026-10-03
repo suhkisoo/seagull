@@ -21,7 +21,7 @@ a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.28e
 /* 빛이 오는 쪽. 반대쪽이 조금 어둡다. 한낮은 위, 아침은 왼쪽 창, 저녁과 밤은 아래 물(scroll.ts) */
 .room::before { content: ''; position: absolute; inset: 0; background: linear-gradient(var(--shade-angle, 180deg), transparent 28%, rgb(14 20 15 / var(--shade, 0)) 100%); }
 /* 2막 정오의 늙은 보리수 그늘. 나무는 무대의 상수 다운, 물 가까운 오른쪽이라 그 가지가 방문자 머리 위 오른쪽에서 드리운다. 세기는 scroll.ts가 정한다 */
-.room__tree { position: absolute; right: -6vw; top: 8svh; width: min(64vw, 720px); height: min(64vw, 720px); opacity: 0; background: var(--leaves, none) right top / contain no-repeat; filter: blur(2.5px); transform-origin: 100% 0; animation: leaves-sway 9s ease-in-out infinite alternate; }
+.room__tree { position: absolute; right: 0; top: 0; width: max(62vw, 300px); max-width: 760px; aspect-ratio: 1; opacity: 0; background: var(--leaves, none) right top / contain no-repeat; filter: blur(2.5px); -webkit-mask-image: radial-gradient(circle at 100% 0, #000 30%, transparent 78%); mask-image: radial-gradient(circle at 100% 0, #000 30%, transparent 78%); transform-origin: 100% 0; animation: leaves-sway 9s ease-in-out infinite alternate; }
 /* 물에서 올라오는 낮은 빛. 저녁과 밤의 구간에서만 */
 .room::after { content: ''; position: absolute; inset: 0; opacity: var(--glow, 0);
   background: radial-gradient(140% 62% at 50% 100%, color-mix(in srgb, var(--sun) 55%, var(--ivory)) 0, color-mix(in srgb, var(--sun) 40%, transparent) 30%, transparent 72%); }
@@ -32,13 +32,14 @@ html.js .page { color: var(--ink); }
 .stage-time--long { top: calc(var(--section-pad) * 0.2); }
 .stage-time__direction { margin-top: 10px; max-width: 24em; line-height: 1.85; color: color-mix(in srgb, currentColor 82%, transparent); }
 /* 소리 켜기. 첫 화면 오른쪽 위의 작은 글자 버튼. 누르면 물결과 소리로 답한다 */
-.sound-toggle { position: absolute; right: calc(var(--gutter) - 12px); top: calc(var(--gutter) - 12px); min-height: 44px; padding: 0 12px; border: 0; background: transparent; color: var(--ivory); font: inherit; font-size: var(--fs-micro); letter-spacing: 0.08em; cursor: pointer; opacity: 0.86; }
+.sound-toggle { position: absolute; right: calc(var(--gutter) - 12px); top: calc(var(--gutter) - 12px); min-height: 44px; padding: 0 12px; border: 0; background: transparent; color: var(--ivory); font: inherit; font-size: var(--fs-micro); letter-spacing: 0.08em; cursor: pointer; opacity: 0.66; }
 .sound-toggle:hover, .sound-toggle[aria-pressed="true"] { opacity: 1; }
 .sound-toggle:focus-visible { outline: 1px solid var(--ivory); outline-offset: -6px; }
 @media (min-width: 1024px) { .sound-toggle { top: 12px; } }
 /* 첫 화면의 날짜는 막 위에. 막이 오르면 함께 오르며 사라진다 */
-.curtain__time { position: absolute; right: var(--gutter); top: 30svh; max-width: 11em; text-align: right; text-wrap: balance; font-size: var(--fs-micro); letter-spacing: 0.12em; color: var(--ivory); opacity: 0.9; pointer-events: none; will-change: transform, opacity; }
-@media (min-width: 1024px) { .curtain__time { left: 0; right: 0; max-width: none; text-align: center; top: 31svh; } }
+/* 극 안의 시각은 공연 정보와 섞이지 않게 막 한가운데, 옅고 성기게. 공연 날짜(아래 오른쪽)와 극단 표기(위 왼쪽) 사이의 다른 층 */
+.curtain__time { position: absolute; left: 0; right: 0; top: 17svh; text-align: center; font-size: var(--fs-micro); letter-spacing: 0.16em; color: var(--ivory); opacity: 0.72; pointer-events: none; will-change: transform, opacity; }
+@media (min-width: 1024px) { .curtain__time { top: 31svh; } }
 
 /* ---- 첫 화면 ---- */
 .hero { position: relative; min-height: 100vh; min-height: 100svh; overflow: clip; background: var(--olive); color: var(--ivory); }
@@ -69,12 +70,14 @@ html.js .curtain { display: block; }
 
 .hero__content { position: absolute; inset: 0 0 var(--water-hero) 0; padding: var(--gutter); pointer-events: none; }
 .hero__content > * { pointer-events: auto; }
-.hero__meta { font-size: var(--fs-micro); line-height: 1.85; letter-spacing: 0.06em; max-width: 22em; }
+.hero__meta { font-size: var(--fs-micro); line-height: 1.85; letter-spacing: 0.06em; max-width: 22em; opacity: 0.9; }
 .hero__meta p:first-child { letter-spacing: 0.1em; }
 .hero__title { font-weight: 700; line-height: 1; position: absolute; text-shadow: none; }
 .hero__original { font-size: var(--fs-original); letter-spacing: 0.32em; font-weight: 400; color: transparent; -webkit-text-stroke: 0.8px color-mix(in srgb, var(--ivory) 80%, transparent); position: absolute; }
-.hero__when { position: absolute; font-size: var(--fs-small); line-height: 1.7; text-align: right; white-space: nowrap; letter-spacing: 0.02em; }
-.hero__when-venue { display: block; font-size: var(--fs-micro); letter-spacing: 0.08em; opacity: 0.88; margin-top: 2px; }
+/* 공연 정보. 첫 화면에서 가장 또렷한 글자. 위에 가는 선 하나로 묶는다 */
+.hero__when { position: absolute; font-size: 15px; line-height: 1.6; text-align: right; white-space: nowrap; letter-spacing: 0.01em; padding-top: 10px; border-top: 1px solid color-mix(in srgb, var(--ivory) 45%, transparent); }
+.hero__when-venue { display: block; font-size: var(--fs-micro); letter-spacing: 0.08em; opacity: 0.88; margin-top: 4px; }
+@media (min-width: 480px) { .hero__when { font-size: 16.5px; } }
 @media (min-width: 1024px) { .hero__when { font-size: 19px; } .hero__when-venue { font-size: 14px; } .hero__meta { font-size: 13.5px; } }
 
 /* ---- 호수 띠 ---- */

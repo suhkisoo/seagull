@@ -51,7 +51,8 @@ const jsonLd = JSON.stringify({
     <style set:html={fontCss}></style>
     <script is:inline>
       // 첫 페인트 전에 상태를 미리 정한다. 날짜별 판정은 진입 모듈이 다시 한다
-      (function(){var d=document.documentElement;d.classList.add('js');if(matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('reduced');if('scrollRestoration' in history)history.scrollRestoration='manual';if(!location.hash){scrollTo(0,0);addEventListener('load',function(){if(scrollY>0&&!location.hash)scrollTo(0,0);},{once:true});}})();
+      // 휴대폰 브라우저가 로드 뒤나 뒤로 가기 캐시에서 예전 자리(맨 아래)를 되살리면, 방문자가 움직이기 전까지 맨 위로 돌려놓는다
+      (function(){var d=document.documentElement;d.classList.add('js');if(matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('reduced');if('scrollRestoration' in history)history.scrollRestoration='manual';if(!location.hash){var moved=false;['touchstart','wheel','keydown'].forEach(function(e){addEventListener(e,function(){moved=true;},{once:true,passive:true});});var top=function(){if(!moved&&!location.hash&&scrollY>0)scrollTo(0,0);};scrollTo(0,0);addEventListener('load',function(){top();requestAnimationFrame(top);setTimeout(top,120);setTimeout(top,600);},{once:true});addEventListener('pageshow',function(e){if(e.persisted){moved=false;top();setTimeout(top,120);}});}})();
     </script>
     <slot name="head" />
   </head>
