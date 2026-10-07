@@ -127,7 +127,7 @@ for (const row of document.querySelectorAll<HTMLElement>('[data-goods]')) {
     const soon = row.querySelector('.goods__soon'); if (soon) { const span = document.createElement('span'); span.className = 'qty'; span.innerHTML = '<button class="qty__btn" type="button" data-qty-minus aria-label="줄이기">−</button><output class="qty__n" data-qty>0</output><button class="qty__btn" type="button" data-qty-plus aria-label="늘리기">+</button>'; soon.replaceWith(span); }
   }
   const out = row.querySelector<HTMLElement>('[data-qty]');
-  const upd = () => { if (out) out.textContent = String(goods[id]); };
+  const upd = () => { if (out) out.textContent = String(goods[id]); row.classList.toggle('is-lit', goods[id] > 0); };
   row.querySelector('[data-qty-plus]')?.addEventListener('click', () => { const stock = row.dataset.stock ? Number(row.dataset.stock) - (status.goodsSold[id] || 0) : 99; if (goods[id] < Math.min(10, stock)) goods[id]++; upd(); });
   row.querySelector('[data-qty-minus]')?.addEventListener('click', () => { goods[id] = Math.max(0, goods[id] - 1); upd(); });
 }

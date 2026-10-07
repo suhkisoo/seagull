@@ -60,13 +60,14 @@ export const show = {
     balconyPrice: 9000 as number | null,          // 발코니도 같은 값으로 둔다 【확인】
     // 티켓 구성. 티켓 한 장마다 하나를 고른다. 모든 구성에 티켓 책갈피가 함께 나간다. 연출이 10/7에 준 가격
     packages: [
-      { id: 'ticket', name: '티켓', note: '책갈피 증정', price: 9000 },
-      { id: 'pin', name: '티켓 + 핀배지', note: '', price: 13000 },
-      { id: 'stamp', name: '티켓 + 우표 스티커', note: '두 장', price: 11000 },
-      { id: 'book', name: '티켓 + 프로그램북', note: '', price: 20000 },
-      { id: 'book-stamp', name: '티켓 + 프로그램북 + 우표 스티커', note: '', price: 21000 },
-      { id: 'book-pin', name: '티켓 + 프로그램북 + 핀배지', note: '', price: 22000 },
-      { id: 'all', name: '티켓 + 굿즈 전체', note: '프로그램북, 핀배지, 우표 스티커', price: 30000 },
+      // items: 구성에 든 굿즈(goods의 id). 그림으로 묶음을 보여 준다
+      { id: 'ticket', name: '티켓', note: '책갈피 증정', price: 9000, items: [] as string[] },
+      { id: 'stamp', name: '티켓 + 우표 스티커', note: '우표 스티커 두 장', price: 11000, items: ['stamp-sticker'] },
+      { id: 'pin', name: '티켓 + 핀배지', note: '', price: 13000, items: ['pinbadge'] },
+      { id: 'book', name: '티켓 + 프로그램북', note: '', price: 20000, items: ['programbook'] },
+      { id: 'book-stamp', name: '티켓 + 프로그램북 + 우표 스티커', note: '', price: 21000, items: ['programbook', 'stamp-sticker'] },
+      { id: 'book-pin', name: '티켓 + 프로그램북 + 핀배지', note: '', price: 22000, items: ['programbook', 'pinbadge'] },
+      { id: 'all', name: '티켓 + 굿즈 전체', note: '프로그램북, 핀배지, 우표 스티커', price: 30000, items: ['programbook', 'pinbadge', 'stamp-sticker'] },
     ],
     account: { bank: '', number: '', holder: '' }, // 입금 계좌 【빈칸】
     holdHours: 24,                                // 입금 대기 시간. 지나면 기획팀이 관리 화면에서 자리를 풀 수 있다
@@ -75,11 +76,11 @@ export const show = {
   // 굿즈. 9/17 인스타 일정표와 9/21 기획 스탭회의 기준 【확인】. 가격과 재고는 【빈칸】. price가 비면 "추후 공개"로 보이고 고를 수 없다
   // 따로 더 사는 굿즈. 티켓과 함께만 예매한다. 연출이 10/7에 준 가격. 그림은 드라이브 굿즈 폴더(10/5)
   goods: [
-    { id: 'programbook', name: '프로그램북', price: 15000 as number | null, stock: null as number | null, note: '', image: '' },
-    { id: 'pinbadge', name: '핀배지', price: 4000 as number | null, stock: null as number | null, note: '', image: 'goods/pinbadge.webp' },
-    { id: 'stamp-sticker', name: '우표 스티커', price: 3000 as number | null, stock: null as number | null, note: '', image: 'goods/stamp-sticker.webp' },
+    { id: 'programbook', name: '프로그램북', price: 15000 as number | null, stock: null as number | null, note: '', images: [] as string[] },
+    { id: 'pinbadge', name: '핀배지', price: 4000 as number | null, stock: null as number | null, note: '', images: ['goods/pinbadge-1.webp', 'goods/pinbadge-2.webp'] },
+    { id: 'stamp-sticker', name: '우표 스티커', price: 3000 as number | null, stock: null as number | null, note: '두 장', images: ['goods/stamp-sticker-1.webp', 'goods/stamp-sticker-2.webp'] },
   ],
-  bookmarkImage: 'goods/bookmark.webp',           // 티켓 책갈피(증정) 그림
+  bookmarkImages: ['goods/bookmark-1.webp', 'goods/bookmark-2.webp'], // 티켓 책갈피(증정) 그림. scripts/make-goods.mjs
   tumblbug: { url: '', startAt: '', endAt: '' },  // 기간 안에서만 보인다
   roles: [
     { id: 'arkadina', name: '아르카지나', scriptName: '이리나 니콜라예브나 아르카지나 (남편 성으로는 트레플레바)', scriptNote: '배우', actors: ['박세은', '서채림'], photo: '', line: '' },

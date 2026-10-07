@@ -5,8 +5,9 @@ import { show } from '../content/show';
 import { hall, seatId } from '../content/hall';
 import { fmtDay, fmtTime } from '../scripts/format';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
-// 굿즈 그림의 크기(public/goods, 흰 여백을 잘라 낸 뒤)
-const DIM: Record<string, [number, number]> = { 'goods/pinbadge.webp': [800, 352], 'goods/stamp-sticker.webp': [800, 458], 'goods/bookmark.webp': [800, 635] };
+// 굿즈 그림의 크기(scripts/make-goods.mjs가 쓴다)
+import goodsDims from '../content/goods-images.json';
+const DIM = goodsDims as Record<string, [number, number]>;
 const won = (n: number | null) => (n == null ? '추후 공개' : `${n.toLocaleString('ko-KR')}원`);
 const balconyPrice = show.booking.balconyPrice ?? show.booking.seatPrice;
 ---
@@ -87,24 +88,25 @@ const balconyPrice = show.booking.balconyPrice ?? show.booking.seatPrice;
         <p class="step__summary" data-summary></p>
         <div class="step__body">
           <p class="step__hint">티켓 한 장마다 구성을 하나씩 고릅니다. 모든 구성에 티켓 책갈피가 함께 나갑니다. 공연 당일 로비에서 받습니다.</p>
-          {show.bookmarkImage && <figure class="goods__figure"><img src={`${base}/${show.bookmarkImage}`} alt="티켓 책갈피 두 가지" width={DIM[show.bookmarkImage]?.[0] ?? 800} height={DIM[show.bookmarkImage]?.[1] ?? 450} loading="lazy" decoding="async" /><figcaption>티켓 책갈피</figcaption></figure>}
           <p class="pkg__count" data-pkg-count></p>
-          <ul class="goods" role="list">
-            {show.booking.packages.map((g) => (
-              <li class="goods__row" data-pkg={g.id} data-price={g.price}>
-                <span class="goods__name">{g.name}{g.note && <span class="goods__note">{g.note}</span>}</span>
-                <span class="goods__price">{won(g.price)}</span>
-                <span class="qty"><button class="qty__btn" type="button" data-qty-minus aria-label={`${g.name} 줄이기`}>−</button><output class="qty__n" data-qty>0</output><button class="qty__btn" type="button" data-qty-plus aria-label={`${g.name} 늘리기`}>+</button></span>
-              </li>
-            ))}
+          <ul class="shelf" role="list">
+            {show.booking.packages.map((g) => {
+              const pics = [show.bookmarkImages[0], ...g.items.map((id) => show.goods.find((x) => x.id === id)?.images[0]).filter(Boolean)] as string[];
+              return (
+                <li class="shelf__row" data-pkg={g.id} data-price={g.price}>
+                  <span class="shelf__pics" aria-hidden="true">{pics.map((src) => <img src={`${base}/${src}`} alt="" width={DIM[src]?.[0]} height={DIM[src]?.[1]} loading="lazy" decoding="async" />)}</span>
+                  <span class="shelf__text"><span class="shelf__name">{g.name}</span>{g.note && <span class="shelf__note">{g.note}</span>}<span class="shelf__price num">{won(g.price)}</span></span>
+                  <span class="qty"><button class="qty__btn" type="button" data-qty-minus aria-label={`${g.name} 줄이기`}>−</button><output class="qty__n" data-qty>0</output><button class="qty__btn" type="button" data-qty-plus aria-label={`${g.name} 늘리기`}>+</button></span>
+                </li>
+              );
+            })}
           </ul>
-          <h3 class="goods__head">따로 더 고르는 굿즈</h3>
-          <ul class="goods" role="list">
+          <h3 class="shelf__head">따로 더 고르는 굿즈</h3>
+          <ul class="shelf" role="list">
             {show.goods.map((g) => (
-              <li class="goods__row" data-goods={g.id} data-price={g.price ?? ''} data-stock={g.stock ?? ''}>
-                {g.image && <img class="goods__img" src={`${base}/${g.image}`} alt="" width={DIM[g.image]?.[0] ?? 800} height={DIM[g.image]?.[1] ?? 450} loading="lazy" decoding="async" />}
-                <span class="goods__name">{g.name}{g.note && <span class="goods__note">{g.note}</span>}</span>
-                <span class="goods__price">{won(g.price)}</span>
+              <li class="shelf__row" data-goods={g.id} data-price={g.price ?? ''} data-stock={g.stock ?? ''}>
+                <span class="shelf__pics shelf__pics--pair" aria-hidden="true">{g.images.map((src) => <img src={`${base}/${src}`} alt="" width={DIM[src]?.[0]} height={DIM[src]?.[1]} loading="lazy" decoding="async" />)}</span>
+                <span class="shelf__text"><span class="shelf__name">{g.name}</span>{g.note && <span class="shelf__note">{g.note}</span>}<span class="shelf__price num">{won(g.price)}</span></span>
                 {g.price != null
                   ? <span class="qty"><button class="qty__btn" type="button" data-qty-minus aria-label={`${g.name} 줄이기`}>−</button><output class="qty__n" data-qty>0</output><button class="qty__btn" type="button" data-qty-plus aria-label={`${g.name} 늘리기`}>+</button></span>
                   : <span class="goods__soon">준비 중</span>}
