@@ -49,28 +49,37 @@ export const show = {
   runningMinutes: null as number | null,          // 인터미션 포함 총 시간. 비면 180분으로 본다 【확인】
   intermission: '',                               // 비면 숨김
   ageLimit: '',                                   // 비면 숨김
-  pricing: '',                                    // 비면 "추후 공개"
+  pricing: '티켓 9,000원, 책갈피 증정. 굿즈를 묶은 구성은 11,000원부터 30,000원까지', // 비면 "추후 공개". 연출이 10/7에 준 가격에서
   booking: {
     openAt: '',                                   // 예매 오픈 시각 ISO. 비면 "예매 일정 보기"
     commonUrl: '',                                // 외부 예매처 링크. 비면 이 페이지의 예매 흐름(/book/)을 쓴다
     vendorName: '',                               // 예매처 이름
     // 이 페이지의 예매 흐름(연출의 지시로 3단계 뒤에 추가). 좌석을 고르고 계좌로 입금하면 기획팀이 확인한다
     apiUrl: '',                                   // Apps Script 웹 앱 주소 【빈칸】. 비면 예매 흐름은 미리보기(저장되지 않음)
-    seatPrice: null as number | null,             // 지정석 가격(원) 【빈칸】
-    balconyPrice: null as number | null,          // 발코니 가격(원) 【빈칸】. 비면 지정석과 같다
+    seatPrice: 9000 as number | null,             // 티켓 한 장(책갈피 증정). 연출이 10/7에 준 가격
+    balconyPrice: 9000 as number | null,          // 발코니도 같은 값으로 둔다 【확인】
+    // 티켓 구성. 티켓 한 장마다 하나를 고른다. 모든 구성에 티켓 책갈피가 함께 나간다. 연출이 10/7에 준 가격
+    packages: [
+      { id: 'ticket', name: '티켓', note: '책갈피 증정', price: 9000 },
+      { id: 'pin', name: '티켓 + 핀배지', note: '', price: 13000 },
+      { id: 'stamp', name: '티켓 + 우표 스티커', note: '두 장', price: 11000 },
+      { id: 'book', name: '티켓 + 프로그램북', note: '', price: 20000 },
+      { id: 'book-stamp', name: '티켓 + 프로그램북 + 우표 스티커', note: '', price: 21000 },
+      { id: 'book-pin', name: '티켓 + 프로그램북 + 핀배지', note: '', price: 22000 },
+      { id: 'all', name: '티켓 + 굿즈 전체', note: '프로그램북, 핀배지, 우표 스티커', price: 30000 },
+    ],
     account: { bank: '', number: '', holder: '' }, // 입금 계좌 【빈칸】
     holdHours: 24,                                // 입금 대기 시간. 지나면 기획팀이 관리 화면에서 자리를 풀 수 있다
     contact: '',                                  // 예매 문의(카카오톡 채널, 전화 등) 【빈칸】
   },
   // 굿즈. 9/17 인스타 일정표와 9/21 기획 스탭회의 기준 【확인】. 가격과 재고는 【빈칸】. price가 비면 "추후 공개"로 보이고 고를 수 없다
+  // 따로 더 사는 굿즈. 티켓과 함께만 예매한다. 연출이 10/7에 준 가격. 그림은 드라이브 굿즈 폴더(10/5)
   goods: [
-    { id: 'programbook', name: '프로그램북', price: null as number | null, stock: null as number | null, note: '' },
-    { id: 'pinbadge', name: '핀배지', price: null as number | null, stock: null as number | null, note: '' },
-    { id: 'bookmark-ticket', name: '책갈피(티켓)', price: null as number | null, stock: null as number | null, note: '' },
-    { id: 'bookmark-poster', name: '책갈피(포스터)', price: null as number | null, stock: null as number | null, note: '' },
-    { id: 'stamp-sticker', name: '우표 스티커', price: null as number | null, stock: null as number | null, note: '' },
-    { id: 'actor-poster', name: '배우 포스터', price: null as number | null, stock: null as number | null, note: '11종 가운데 고른다' },
+    { id: 'programbook', name: '프로그램북', price: 15000 as number | null, stock: null as number | null, note: '', image: '' },
+    { id: 'pinbadge', name: '핀배지', price: 4000 as number | null, stock: null as number | null, note: '', image: 'goods/pinbadge.webp' },
+    { id: 'stamp-sticker', name: '우표 스티커', price: 3000 as number | null, stock: null as number | null, note: '', image: 'goods/stamp-sticker.webp' },
   ],
+  bookmarkImage: 'goods/bookmark.webp',           // 티켓 책갈피(증정) 그림
   tumblbug: { url: '', startAt: '', endAt: '' },  // 기간 안에서만 보인다
   roles: [
     { id: 'arkadina', name: '아르카지나', scriptName: '이리나 니콜라예브나 아르카지나 (남편 성으로는 트레플레바)', scriptNote: '배우', actors: ['박세은', '서채림'], photo: '', line: '' },
@@ -129,7 +138,7 @@ export const show = {
     title: '〈갈매기〉 서강연극회 118회 정기공연',   // 【확인】
     description: '안톤 체호프 작. 2026년 11월 12일(목)~14일(토), 서강대학교 메리홀 소극장.',
     siteUrl: '',                                  // 연출의 도메인. 비면 절대 주소를 비워 둔다
-    ogImage: 'og-2026-10.jpg',                    // 바꿀 때 파일 이름도 바꾼다
+    ogImage: 'og-2026-10b.jpg',                    // 바꿀 때 파일 이름도 바꾼다
   },
 };
 

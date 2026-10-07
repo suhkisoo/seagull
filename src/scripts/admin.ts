@@ -33,7 +33,7 @@ function render() {
     const expired = r.status === '입금대기' && Date.now() - Date.parse(r.createdAt) > holdHours * 3600000;
     const bal = hall.balcony.sides.filter((x) => r.balcony[x.id] > 0).map((x) => `발코니 ${x.label} ${r.balcony[x.id]}`).join(', ');
     const cells = [r.id, when(r.createdAt), showLabel(r.show), [r.seats.join(' '), bal].filter(Boolean).join(', '),
-      Object.entries(r.goods).map(([k, n]) => `${show.goods.find((g) => g.id === k)?.name ?? k} ${n}`).join(', ') || '',
+      Object.entries(r.goods).map(([k, n]) => `${k.startsWith('pkg:') ? show.booking.packages.find((p) => p.id === k.slice(4))?.name ?? k : show.goods.find((g) => g.id === k)?.name ?? k} ${n}`).join(', ') || '',
       `${r.name} ${r.phone}${r.payer && r.payer !== r.name ? ` (입금 ${r.payer})` : ''}`, won(r.amount), r.status + (expired ? ' (기한 지남)' : '')];
     for (const c of cells) { const td = document.createElement('td'); td.textContent = c; tr.appendChild(td); }
     const td = document.createElement('td');

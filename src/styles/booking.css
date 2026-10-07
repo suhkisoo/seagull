@@ -83,6 +83,13 @@
 .goods__name { min-width: 0; }
 .goods__note { display: block; font-size: var(--fs-micro); letter-spacing: 0.02em; color: var(--soft); }
 .goods__price { font-size: var(--fs-small); font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--soft); }
+.goods__head { font-size: var(--fs-small); font-weight: 400; letter-spacing: var(--track-micro); color: var(--soft); margin: 40px 0 12px; }
+.goods__img { grid-column: 1 / -1; display: block; width: min(420px, 100%); height: auto; margin: 10px 0 4px; }
+.goods__figure { margin: 0 0 24px; max-width: 360px; }
+.goods__figure img { display: block; width: 100%; height: auto; }
+.goods__figure figcaption { font-size: var(--fs-micro); letter-spacing: 0.04em; color: var(--soft); margin-top: 6px; }
+.pkg__count { font-size: var(--fs-small); margin-bottom: 10px; min-height: 1.6em; }
+.goods__row.is-lit .qty__n { color: var(--amber); }
 .goods__soon { font-size: var(--fs-micro); letter-spacing: var(--track-micro); color: var(--soft); white-space: nowrap; }
 .qty { display: inline-flex; align-items: center; gap: 0; }
 .qty__n { min-width: 1.8em; text-align: center; font-variant-numeric: tabular-nums; }

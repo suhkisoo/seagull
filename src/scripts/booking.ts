@@ -28,6 +28,11 @@ let showId = '';
 let seats = new Set<string>();
 const balcony = noBalcony();
 const goods: Record<string, number> = {};
+// 티켓 구성. 티켓 장수만큼, 나머지는 '티켓'(책갈피 증정)으로 채운다
+const pkgs: Record<string, number> = Object.fromEntries(show.booking.packages.map((p) => [p.id, 0]));
+const BASE_PKG = show.booking.packages[0].id;
+const ticketsN = () => seats.size + balconySum(balcony);
+const pkgName = (id: string) => show.booking.packages.find((p) => p.id === id)?.name ?? id;
 let status: ShowStatus = { taken: [], balconyTaken: noBalcony(), goodsSold: {} };
 
 // ----- 단계 열기와 닫기 -----
@@ -46,7 +51,7 @@ function summary(k: StepId): string {
   const s = show.shows.find((x) => x.id === showId);
   if (k === 'show') return s ? `${fmtDay(s.startAt)} ${fmtTime(s.startAt)}` : '';
   if (k === 'seats') return [seats.size ? `지정석 ${[...seats].sort(seatSort).join(', ')}` : '', balconyText()].filter(Boolean).join(' · ');
-  if (k === 'goods') { const g = Object.entries(goods).filter(([, n]) => n > 0).map(([id, n]) => `${show.goods.find((x) => x.id === id)?.name} ${n}`); return g.length ? g.join(', ') : '없음'; }
+  if (k === 'goods') { const p = Object.entries(pkgs).filter(([, n]) => n > 0).map(([id, n]) => `${pkgName(id)} ${n}`); const g = Object.entries(goods).filter(([, n]) => n > 0).map(([id, n]) => `${show.goods.find((x) => x.id === id)?.name} ${n}`); return [...p, ...g].join(', ') || '없음'; }
   if (k === 'who') return `${name()} ${phone()}`;
   return '';
 }
@@ -127,6 +132,28 @@ for (const row of document.querySelectorAll<HTMLElement>('[data-goods]')) {
   row.querySelector('[data-qty-minus]')?.addEventListener('click', () => { goods[id] = Math.max(0, goods[id] - 1); upd(); });
 }
 
+// 티켓 구성. 다른 구성을 늘리면 '티켓'이 줄고, 장수가 바뀌면 '티켓'이 나머지를 채운다
+const pkgRows = [...document.querySelectorAll<HTMLElement>('[data-pkg]')];
+function syncPkgs() {
+  const n = ticketsN();
+  let others = Object.entries(pkgs).filter(([id]) => id !== BASE_PKG).reduce((a, [, v]) => a + v, 0);
+  // 장수가 줄었으면 비싼 구성부터 덜어 낸다
+  for (const p of [...show.booking.packages].reverse()) { if (others <= n) break; if (p.id === BASE_PKG) continue; const cut = Math.min(pkgs[p.id], others - n); pkgs[p.id] -= cut; others -= cut; }
+  pkgs[BASE_PKG] = n - others;
+  for (const row of pkgRows) {
+    const id = row.dataset.pkg!; row.querySelector<HTMLElement>('[data-qty]')!.textContent = String(pkgs[id]);
+    (row.querySelector('[data-qty-plus]') as HTMLButtonElement).disabled = id === BASE_PKG ? true : pkgs[BASE_PKG] <= 0;
+    (row.querySelector('[data-qty-minus]') as HTMLButtonElement).disabled = id === BASE_PKG ? true : pkgs[id] <= 0;
+    row.classList.toggle('is-lit', pkgs[id] > 0);
+  }
+  const c = document.querySelector<HTMLElement>('[data-pkg-count]'); if (c) c.textContent = n ? `티켓 ${n}장` : '';
+}
+for (const row of pkgRows) {
+  const id = row.dataset.pkg!;
+  row.querySelector('[data-qty-plus]')?.addEventListener('click', () => { if (id !== BASE_PKG && pkgs[BASE_PKG] > 0) pkgs[id]++; syncPkgs(); });
+  row.querySelector('[data-qty-minus]')?.addEventListener('click', () => { if (id !== BASE_PKG && pkgs[id] > 0) pkgs[id]--; syncPkgs(); });
+}
+
 // ----- 4. 예매자 -----
 const name = () => (document.getElementById('bk-name') as HTMLInputElement).value.trim();
 const phone = () => (document.getElementById('bk-phone') as HTMLInputElement).value.trim();
@@ -135,19 +162,25 @@ for (const id of ['bk-name', 'bk-phone', 'bk-payer']) document.getElementById(id
 
 // ----- 5. 확인 -----
 function total(): number | null {
-  if (seats.size && seatPrice == null) return null;
-  const bn = balconySum(balcony);
-  if (bn && balconyPrice == null) return null;
-  let sum = seats.size * (seatPrice ?? 0) + bn * (balconyPrice ?? 0);
+  // 티켓 값은 고른 구성의 값이다(티켓 한 장 9,000원이 '티켓' 구성). 구성이 없으면 좌석 값으로
+  let sum = 0;
+  const pk = Object.entries(pkgs).reduce((a, [, v]) => a + v, 0);
+  if (pk === ticketsN() && pk > 0) { for (const [id, n] of Object.entries(pkgs)) sum += n * (show.booking.packages.find((p) => p.id === id)?.price ?? 0); }
+  else {
+    if (seats.size && seatPrice == null) return null;
+    const bn = balconySum(balcony); if (bn && balconyPrice == null) return null;
+    sum = seats.size * (seatPrice ?? 0) + bn * (balconyPrice ?? 0);
+  }
   for (const [id, n] of Object.entries(goods)) { const pr = goodsPrice(id); if (n > 0) { if (pr == null) return null; sum += n * pr; } }
   return sum;
 }
 function bill(): [string, string][] {
   const s = show.shows.find((x) => x.id === showId)!;
   const rows: [string, string][] = [['회차', `${fmtDay(s.startAt)} ${fmtTime(s.startAt)}`]];
-  if (seats.size) rows.push(['지정석', `${[...seats].sort(seatSort).join(', ')} (${seats.size}석${seatPrice != null ? `, ${won(seats.size * seatPrice)}` : ''})`]);
+  if (seats.size) rows.push(['지정석', `${[...seats].sort(seatSort).join(', ')} (${seats.size}석)`]);
   const bn = balconySum(balcony);
-  if (bn) rows.push(['발코니', `${balconyText().replace('발코니 ', '')}${balconyPrice != null ? `, ${won(bn * balconyPrice)}` : ''}`]);
+  if (bn) rows.push(['발코니', balconyText().replace('발코니 ', '')]);
+  for (const p of show.booking.packages) if (pkgs[p.id] > 0) rows.push([p.name, `${pkgs[p.id]}장, ${won(pkgs[p.id] * p.price)}`]);
   for (const [id, n] of Object.entries(goods)) if (n > 0) { const g = show.goods.find((x) => x.id === id)!; const pr = goodsPrice(id); rows.push([g.name, `${n}개${pr != null ? `, ${won(n * pr)}` : ''}`]); }
   rows.push(['예매자', `${name()} ${phone()}`]); if (payer() !== name()) rows.push(['입금자명', payer()]);
   return rows;
@@ -164,13 +197,14 @@ nextBtn.addEventListener('click', async () => {
   const i = ORDER.indexOf(current);
   if (current === 'confirm') { await submit(); return; }
   if (current === 'seats') { await loadStatus(); if (!validate()) return; }
+  if (ORDER[i + 1] === 'goods') syncPkgs();
   if (ORDER[i + 1] === 'confirm') renderConfirm();
   open(ORDER[i + 1]);
 });
 async function submit() {
   const err = document.querySelector<HTMLElement>('[data-confirm-error]')!; err.textContent = '';
   nextBtn.disabled = true; nextBtn.textContent = '보내는 중';
-  const r = await store.reserve({ show: showId, seats: [...seats].sort(seatSort), balcony: { ...balcony }, goods: Object.fromEntries(Object.entries(goods).filter(([, n]) => n > 0)), name: name(), phone: phone(), payer: payer(), amount: total() });
+  const r = await store.reserve({ show: showId, seats: [...seats].sort(seatSort), balcony: { ...balcony }, goods: Object.fromEntries([...Object.entries(pkgs).map(([id, n]) => [`pkg:${id}`, n] as [string, number]), ...Object.entries(goods)].filter(([, n]) => n > 0)), name: name(), phone: phone(), payer: payer(), amount: total() });
   nextBtn.textContent = '예매 신청';
   if (!r.ok) {
     nextBtn.disabled = false;
