@@ -37,4 +37,10 @@ for (const name of SRC) {
   }
   console.log(name, out.join(' '));
 }
+// 표지처럼 바탕이 그림인 것은 자르지 않고 줄여서만 쓴다(프로그램북 표지, 10/7에 받음)
+for (const name of ['programbook']) {
+  const r = await sharp(`assets-src/goods/${name}.webp`).resize({ height: 520, withoutEnlargement: true }).webp({ quality: 82 }).toBuffer({ resolveWithObject: true });
+  const file = `goods/${name}-1.webp`; writeFileSync(`public/${file}`, r.data); dims[file] = [r.info.width, r.info.height];
+  console.log(name, file);
+}
 writeFileSync('src/content/goods-images.json', JSON.stringify(dims, null, 1) + '\n');

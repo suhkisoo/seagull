@@ -93,6 +93,8 @@
 .shelf__pics img + img { margin-left: -22px; transform: rotate(5deg) translateY(2px); }
 .shelf__pics img + img + img { margin-left: -24px; transform: rotate(-2deg) translateY(-1px); }
 .shelf__pics--pair img { height: 50px; }
+/* 프로그램북 표지는 종이 한 장처럼 가는 테두리 없이, 아주 옅은 바탕 대비만 */
+.shelf__pics img[src*='programbook'] { outline: 1px solid color-mix(in srgb, var(--ivory) 20%, transparent); }
 .shelf__text { display: flex; flex-direction: column; min-width: 0; line-height: 1.45; }
 .shelf__name { font-size: var(--fs-small); }
 .shelf__note { font-size: var(--fs-micro); letter-spacing: 0.02em; color: var(--soft); }

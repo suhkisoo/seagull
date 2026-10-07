@@ -62,7 +62,7 @@ export const show = {
     packages: [
       // items: 구성에 든 굿즈(goods의 id). 그림으로 묶음을 보여 준다
       { id: 'ticket', name: '티켓', note: '책갈피 증정', price: 9000, items: [] as string[] },
-      { id: 'stamp', name: '티켓 + 우표 스티커', note: '우표 스티커 두 장', price: 11000, items: ['stamp-sticker'] },
+      { id: 'stamp', name: '티켓 + 우표 스티커', note: '우표 스티커 두 장 한 묶음', price: 11000, items: ['stamp-sticker'] },
       { id: 'pin', name: '티켓 + 핀배지', note: '', price: 13000, items: ['pinbadge'] },
       { id: 'book', name: '티켓 + 프로그램북', note: '', price: 20000, items: ['programbook'] },
       { id: 'book-stamp', name: '티켓 + 프로그램북 + 우표 스티커', note: '', price: 21000, items: ['programbook', 'stamp-sticker'] },
@@ -76,9 +76,9 @@ export const show = {
   // 굿즈. 9/17 인스타 일정표와 9/21 기획 스탭회의 기준 【확인】. 가격과 재고는 【빈칸】. price가 비면 "추후 공개"로 보이고 고를 수 없다
   // 따로 더 사는 굿즈. 티켓과 함께만 예매한다. 연출이 10/7에 준 가격. 그림은 드라이브 굿즈 폴더(10/5)
   goods: [
-    { id: 'programbook', name: '프로그램북', price: 15000 as number | null, stock: null as number | null, note: '', images: [] as string[] },
+    { id: 'programbook', name: '프로그램북', price: 15000 as number | null, stock: null as number | null, note: '', images: ['goods/programbook-1.webp'] as string[] },
     { id: 'pinbadge', name: '핀배지', price: 4000 as number | null, stock: null as number | null, note: '', images: ['goods/pinbadge-1.webp', 'goods/pinbadge-2.webp'] },
-    { id: 'stamp-sticker', name: '우표 스티커', price: 3000 as number | null, stock: null as number | null, note: '두 장', images: ['goods/stamp-sticker-1.webp', 'goods/stamp-sticker-2.webp'] },
+    { id: 'stamp-sticker', name: '우표 스티커', price: 3000 as number | null, stock: null as number | null, note: '두 장 한 묶음', images: ['goods/stamp-sticker-1.webp', 'goods/stamp-sticker-2.webp'] },
   ],
   bookmarkImages: ['goods/bookmark-1.webp', 'goods/bookmark-2.webp'], // 티켓 책갈피(증정) 그림. scripts/make-goods.mjs
   tumblbug: { url: '', startAt: '', endAt: '' },  // 기간 안에서만 보인다
