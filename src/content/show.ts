@@ -138,7 +138,7 @@ export const show = {
   meta: {
     title: '〈갈매기〉 서강연극회 118회 정기공연',   // 【확인】
     description: '안톤 체호프 작. 2026년 11월 12일(목)~14일(토), 서강대학교 메리홀 소극장.',
-    siteUrl: '',                                  // 연출의 도메인. 비면 절대 주소를 비워 둔다
+    siteUrl: 'https://seagull.sgtheatre.art',     // 연출의 도메인(10/8 연결). 비면 절대 주소를 비워 둔다
     ogImage: 'og-2026-10b.jpg',                    // 바꿀 때 파일 이름도 바꾼다
   },
 };
