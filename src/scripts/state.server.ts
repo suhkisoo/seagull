@@ -1,0 +1,11 @@
+// 빌드 시점(서버) 상태. 브라우저의 state.ts와 같은 규칙이되 location이 없다.
+import { show, type ShowTime } from '../content/show';
+const KST = (iso: string) => new Date(iso).getTime();
+export function ticketState(picked: ShowTime | null = null, t = Date.now()) {
+  const running = (show.runningMinutes ?? 180) * 60 * 1000;
+  const last = show.shows.reduce((a, b) => (KST(a.startAt) > KST(b.startAt) ? a : b));
+  if (t >= KST(last.startAt) + running) return { id: 'ended', label: '공연이 끝났습니다' } as const;
+  if (show.booking.openAt && t < KST(show.booking.openAt)) return { id: 'before-open', label: '예매 오픈 전', href: '#tickets' } as const;
+  if (show.booking.commonUrl) return { id: 'open', label: '예매하기', href: show.booking.commonUrl, external: true } as const;
+  return { id: 'open', label: '예매하기', href: `${import.meta.env.BASE_URL.replace(/\/$/, '')}/book/` } as const;
+}

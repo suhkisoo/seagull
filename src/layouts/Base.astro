@@ -1,0 +1,63 @@
+---
+// 머리. 메타, 폰트, 임계 CSS, 상태 인라인 스크립트. 제작 도구 표기는 넣지 않는다.
+import '../styles/global.css';
+import { show } from '../content/show';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+interface Props { title?: string; description?: string; noindex?: boolean }
+const { title = show.meta.title, description = show.meta.description, noindex = false } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+let manifest: { made: Record<string, { range: string }>; titleB64: string; titleRange: string } | null = null;
+try { manifest = JSON.parse(readFileSync(resolve(process.cwd(), 'public/fonts/manifest.json'), 'utf8')); } catch { manifest = null; }
+const face = (name: string, weight: number, display = 'swap') => manifest?.made[`seagull-${name}-${weight}.woff2`]
+  ? `@font-face{font-family:'Seagull Serif';font-weight:${weight};font-display:${display};src:url('${base}/fonts/seagull-${name}-${weight}.woff2') format('woff2');unicode-range:${manifest.made[`seagull-${name}-${weight}.woff2`].range}}`
+  : '';
+const titleFace = manifest ? `@font-face{font-family:'Seagull Title';font-weight:700;font-display:block;src:url(data:font/woff2;base64,${manifest.titleB64}) format('woff2');unicode-range:${manifest.titleRange}}` : '';
+const fontCss = [titleFace, face('hero', 400), face('hero', 700), face('rest', 400), face('rest', 700)].join('');
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? '';
+// 구조화 데이터. 러닝타임이 비면 끝 시각을 넣지 않는다(지시서 8장)
+const runMs = show.runningMinutes ? show.runningMinutes * 60000 : 0;
+const endIso = (iso: string) => new Date(new Date(iso).getTime() + runMs + 9 * 3600000).toISOString().replace(/\.\d{3}Z$/, '+09:00');
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org', '@type': 'TheaterEvent', name: show.meta.title, description: show.meta.description,
+  ...(siteUrl ? { url: `${siteUrl}${base}/`, image: `${siteUrl}${base}/${show.meta.ogImage}` } : {}),
+  startDate: show.shows[0].startAt, ...(runMs ? { endDate: endIso(show.shows[show.shows.length - 1].startAt) } : {}),
+  eventStatus: 'https://schema.org/EventScheduled', eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  location: { '@type': 'Place', name: show.venue.name, address: show.venue.address },
+  organizer: { '@type': 'Organization', name: '서강연극회' },
+  subEvent: show.shows.map((s) => ({ '@type': 'TheaterEvent', name: show.meta.title, startDate: s.startAt, ...(runMs ? { endDate: endIso(s.startAt) } : {}), location: { '@type': 'Place', name: show.venue.name, address: show.venue.address }, ...(s.url || show.booking.commonUrl ? { offers: { '@type': 'Offer', url: s.url || show.booking.commonUrl } } : {}) })),
+});
+---
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {siteUrl && <meta property="og:url" content={`${siteUrl}${base}/`} />}
+    {siteUrl && <meta property="og:image" content={`${siteUrl}${base}/${show.meta.ogImage}`} />}
+    {siteUrl && <meta property="og:image:width" content="1200" />}
+    {siteUrl && <meta property="og:image:height" content="630" />}
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ko_KR" />
+    <script type="application/ld+json" set:html={jsonLd}></script>
+    <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
+    {manifest && <link rel="preload" as="font" type="font/woff2" href={`${base}/fonts/seagull-hero-700.woff2`} crossorigin />}
+    {manifest && <link rel="preload" as="font" type="font/woff2" href={`${base}/fonts/seagull-hero-400.woff2`} crossorigin />}
+    <style set:html={fontCss}></style>
+    <script is:inline>
+      // 첫 페인트 전에 상태를 미리 정한다. 날짜별 판정은 진입 모듈이 다시 한다
+      // 휴대폰 브라우저가 로드 뒤나 뒤로 가기 캐시에서 예전 자리(맨 아래)를 되살리면, 방문자가 움직이기 전까지 맨 위로 돌려놓는다
+      // 다시 열기와 뒤로 가기에서는 주소에 남은 #tickets 같은 표시를 지우고 맨 위에서 연다. 처음 들어온 공유 주소의 #만 따른다
+      (function(){var d=document.documentElement;d.classList.add('js');if(matchMedia('(prefers-reduced-motion: reduce)').matches)d.classList.add('reduced');if('scrollRestoration' in history)history.scrollRestoration='manual';var nv=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0]||{}).type;if(location.hash&&(nv==='reload'||nv==='back_forward')){history.replaceState(null,'',location.pathname+location.search);}if(!location.hash){var moved=false;['touchstart','wheel','keydown'].forEach(function(e){addEventListener(e,function(){moved=true;},{once:true,passive:true});});var top=function(){if(!moved&&!location.hash&&scrollY>0)scrollTo(0,0);};scrollTo(0,0);addEventListener('load',function(){top();requestAnimationFrame(top);setTimeout(top,120);setTimeout(top,600);},{once:true});}addEventListener('pageshow',function(e){if(e.persisted){if(location.hash)history.replaceState(null,'',location.pathname+location.search);scrollTo(0,0);}});})();
+    </script>
+    <slot name="head" />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

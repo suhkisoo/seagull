@@ -1,0 +1,52 @@
+/* docs/plan.md 1장의 색, 서체, 글자 크기 단계. 3단계 뒤 디자인 손질(9.5.3)에서 크기와 간격을 다시 잡았다 */
+:root {
+  --floor: #262E27;
+  --deep: #3E4838;
+  --olive: #5B6041;
+  --sun: #ABAB76;
+  --ivory: #F8F8EC;
+  --amber: #CDA668;
+  --morning-shadow: #AEBFB7;
+  --morning-room: #DDE0D4;
+
+  /* 방의 빛. 스크롤 모듈이 구간마다 바꾼다. 자바스크립트가 없으면 구간마다 고정 */
+  --room: var(--floor);
+  --ink: var(--ivory);
+
+  --font: 'Seagull Serif', 'Noto Serif KR', 'Seagull Fallback', serif;
+
+  /* 글자 크기. 큰 글자는 400 굵기로 쓰고 700은 제목 그림과 배역 이름에만 */
+  --fs-title-a: min(clamp(72px, 21.5vw, 132px), 11.5svh);   /* 세로 글자 하나. 390에서 84 */
+  --fs-original: clamp(12px, 3.2vw, 14px);
+  --fs-display: clamp(30px, 7.8vw, 52px);     /* 구간 제목 */
+  --fs-quote: clamp(23px, 6vw, 38px);          /* 대표 대사, 지문 */
+  --fs-digits: clamp(46px, 12vw, 76px);        /* 회차 시각 */
+  --fs-h3: clamp(20px, 5.1vw, 24px);
+  --fs-body: clamp(16.5px, 4.3vw, 18px);
+  --fs-small: clamp(13.5px, 3.5vw, 15px);
+  --fs-micro: 12.5px;
+  --fs-water-line: 15px;
+  --fs-button: 15px;
+  --fs-caption: var(--fs-small);
+  --fs-h2: var(--fs-display);
+  --fs-line: var(--fs-quote);
+
+  --track-micro: 0.08em;
+  --gutter: 24px;
+  --section-pad: 22svh;
+  --button-h: 48px;
+  --measure: 31em;
+
+  /* 수면 띠. 초기값은 첫 화면의 물 높이. docs/plan.md 3.6과 4.2 */
+  --water-hero: calc(38svh + env(safe-area-inset-bottom, 0px));
+  --water-band: calc(max(12svh, 84px) + env(safe-area-inset-bottom, 0px));
+  --water-h: var(--water-hero);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  --calm: 0;
+  --curtain: 0;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+@media (min-width: 1024px) {
+  :root { --gutter: 6vw; --section-pad: 26svh; --button-h: 54px; --fs-water-line: 16px; --fs-button: 15.5px; }
+}
