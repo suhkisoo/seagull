@@ -39,7 +39,7 @@
 
   /* 수면 띠. 초기값은 첫 화면의 물 높이. docs/plan.md 3.6과 4.2 */
   --water-hero: calc(38svh + env(safe-area-inset-bottom, 0px));
-  --water-band: calc(max(15svh, 88px) + env(safe-area-inset-bottom, 0px));
+  --water-band: calc(max(12svh, 84px) + env(safe-area-inset-bottom, 0px));
   --water-h: var(--water-hero);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 

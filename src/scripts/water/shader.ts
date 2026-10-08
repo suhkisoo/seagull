@@ -44,7 +44,9 @@ void main() {
   float waterTop = u_params.z;
   vec2 p = v;
   float depth = p.y - waterTop;
-  if (depth < 0.0) discard;
+  // 4막의 너울로 띠 높이가 매 프레임 바뀌면 수면선이 한 프레임 늦는다. 그 몇 줄은 버리지 않고 수면의 색으로 칠한다(검은 줄이 생기지 않게)
+  if (depth < -32.0) discard;
+  depth = max(depth, 0.0);
   float waterH = max(u_params.x - waterTop, 1.0);
   float dn = clamp(depth / waterH, 0.0, 1.0);
 
@@ -122,7 +124,7 @@ void main() {
     vec2 buv = vec2((bp.x - u_baseRect.x) / max(u_baseRect.y, 1.0), (bp.y - waterTop) / max(u_baseRect.z, 1.0));
     float bin = step(0.0, buv.x) * step(buv.x, 1.0) * step(buv.y, 1.0);
     vec3 bcol = texture2D(u_base, clamp(buv, 0.0, 1.0)).rgb;
-    col = mix(col, mix(bcol, u_colDeep, 0.22 + 0.5 * dn), u_baseMix * bin);
+    col = mix(col, mix(bcol, u_colDeep, 0.1 + 0.4 * dn), u_baseMix * bin);
   }
 #if ${SPEC ? 1 : 0}
   vec3 L = normalize(vec3(u_light.xy + u_light.zw * 0.6, 0.7));

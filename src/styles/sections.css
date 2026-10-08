@@ -1,6 +1,6 @@
 /* 첫 화면 아래 다섯 구간. 바탕은 구간마다 칠하지 않는다. 고정된 방(.room)의 빛이 스크롤에 따라 바뀌고, 구간 사이에서 어두워졌다 밝아진다(docs/plan.md 3.3, 9.5.3).
    편집 그리드. 데스크톱은 12단, 구간 제목은 왼쪽 네 단에 머물고(sticky) 본문은 여섯째 단부터. 상자, 카드, 그림자 없음. 괘선은 얇은 가로선뿐 */
-:root { --rule: color-mix(in srgb, currentColor 17%, transparent); --soft: color-mix(in srgb, currentColor 64%, transparent); }
+:root { --rule: color-mix(in srgb, currentColor 17%, transparent); --soft: color-mix(in srgb, currentColor 70%, transparent); }
 
 .wrap { padding-inline: var(--gutter); max-width: 1480px; margin-inline: auto; }
 .grid { display: grid; grid-template-columns: minmax(0, 1fr); }
@@ -102,7 +102,7 @@ html:not(.js) .js-only { display: none; }
 .stage-direction { position: absolute; top: 52%; left: var(--gutter); right: var(--gutter); font-size: var(--fs-quote); line-height: 1.5; letter-spacing: -0.02em; max-width: 15em; }
 @media (min-width: 1024px) { .stage-direction { left: calc(var(--gutter) + (100vw - var(--gutter) * 2 + 24px) * 5 / 12); max-width: 18em; } }
 
-/* ---- 일정과 예매, 오시는 길. 늦가을 밤 ---- */
+/* ---- 일정과 예매, 오시는 길. 4막의 램프가 켜진 방 ---- */
 .showtimes { border: 0; padding: 0; margin: 0; min-width: 0; border-top: 1px solid var(--rule); }
 .day { border-bottom: 1px solid var(--rule); padding: 18px 0 20px; }
 .day__date { font-size: var(--fs-small); letter-spacing: 0.02em; display: flex; gap: 0.6em; align-items: baseline; }
@@ -122,7 +122,7 @@ html:not(.js) .js-only { display: none; }
 .cell:has(.cell__input:checked) { background: var(--amber); color: var(--floor); }
 .cell:has(.cell__input:focus-visible) { outline: 1px solid var(--amber); outline-offset: 4px; }
 .cell[data-sold-out], .cell.is-past { color: color-mix(in srgb, currentColor 42%, transparent); }
-.cell[data-sold-out]:has(.cell__input:checked), .cell.is-past:has(.cell__input:checked) { background: color-mix(in srgb, var(--amber) 30%, transparent); color: var(--ivory); }
+.cell[data-sold-out]:has(.cell__input:checked), .cell.is-past:has(.cell__input:checked) { background: color-mix(in srgb, var(--amber) 30%, transparent); color: inherit; }
 .cast__list { margin: 14px 0 4px; font-size: var(--fs-small); line-height: 1.65; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
 @media (min-width: 1024px) { .cast__list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .cast__list[hidden] { display: none; }
@@ -150,19 +150,19 @@ html:not(.js) .js-only { display: none; }
 .map__ground { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; -webkit-mask-image: radial-gradient(closest-side at 50% 50%, #000 var(--lamp), rgb(0 0 0 / 0.55) calc(var(--lamp) + 24%), rgb(0 0 0 / 0.2) 78%, transparent 100%); mask-image: radial-gradient(closest-side at 50% 50%, #000 var(--lamp), rgb(0 0 0 / 0.55) calc(var(--lamp) + 24%), rgb(0 0 0 / 0.2) 78%, transparent 100%); }
 .map__station, .map__venue { position: absolute; left: calc(50% + var(--dx) * var(--s)); top: calc(50% + var(--dy) * var(--s)); }
 .map__station, .map__venue-name { paint-order: stroke fill; -webkit-text-stroke: 4px var(--room); }
-.map__station { font-size: var(--fs-micro); letter-spacing: 0.04em; line-height: 1; white-space: nowrap; color: color-mix(in srgb, var(--ivory) 72%, transparent); padding-left: 10px; transform: translateY(-50%); }
+.map__station { font-size: var(--fs-micro); letter-spacing: 0.04em; line-height: 1; white-space: nowrap; color: color-mix(in srgb, currentColor 72%, transparent); padding-left: 10px; transform: translateY(-50%); }
 .map__station::before { content: ''; position: absolute; left: -2.5px; top: 50%; width: 5px; height: 5px; margin-top: -2.5px; background: currentColor; }
 .map__venue { width: 0; height: 0; }
-.map__venue::after { content: ''; position: absolute; left: -19px; top: -19px; width: 38px; height: 38px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ivory) 38%, transparent); }
-.map__venue-name { position: absolute; left: 24px; top: 0; transform: translateY(-50%); white-space: nowrap; font-size: var(--fs-small); letter-spacing: 0.02em; color: var(--ivory); }
-.map__scale { position: absolute; left: 0; bottom: 6px; width: calc(var(--len) * var(--s)); padding-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, var(--ivory) 55%, transparent); font-size: 11px; letter-spacing: 0.06em; color: var(--soft); line-height: 1; }
-.map__ripple { position: absolute; width: 0; height: 0; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--ivory) 60%, transparent); transform: translate(-50%, -50%); pointer-events: none; animation: map-ripple 1700ms cubic-bezier(.2, .6, .3, 1) forwards; }
+.map__venue::after { content: ''; position: absolute; left: -19px; top: -19px; width: 38px; height: 38px; border-radius: 50%; border: 1px solid color-mix(in srgb, currentColor 38%, transparent); }
+.map__venue-name { position: absolute; left: 24px; top: 0; transform: translateY(-50%); white-space: nowrap; font-size: var(--fs-small); letter-spacing: 0.02em; color: currentColor; }
+.map__scale { position: absolute; left: 0; bottom: 6px; width: calc(var(--len) * var(--s)); padding-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, currentColor 55%, transparent); font-size: 11px; letter-spacing: 0.06em; color: var(--soft); line-height: 1; }
+.map__ripple { position: absolute; width: 0; height: 0; border-radius: 50%; border: 1px solid color-mix(in srgb, currentColor 60%, transparent); transform: translate(-50%, -50%); pointer-events: none; animation: map-ripple 1700ms cubic-bezier(.2, .6, .3, 1) forwards; }
 .map__ripple + .map__ripple { animation-delay: 160ms; opacity: 0; }
 @keyframes map-ripple { 0% { width: 10px; height: 10px; opacity: 0.85; } 100% { width: 240px; height: 240px; opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .map__frame { transition: none; } .map__ripple { display: none; } }
 .map__credit { margin-top: 10px; font-size: 11px; letter-spacing: 0.04em; color: var(--soft); }
 
-/* ---- 끝. 가장 어두운 초록 ---- */
+/* ---- 끝. 포스터의 아랫단처럼 종이 위의 이름들 ---- */
 .section--credits { padding-bottom: calc(var(--section-pad) * 0.7); }
 .crew { font-size: var(--fs-small); line-height: 1.75; }
 .crew__row { display: grid; grid-template-columns: 5.6em 1fr; column-gap: 16px; padding: 9px 0; break-inside: avoid; }
@@ -178,9 +178,9 @@ html.js .section--credits { padding-bottom: 0; }
 /* 자바스크립트가 없으면 방의 빛 대신 구간마다 고정된 빛 */
 html:not(.js) .section--about { background: var(--ivory); color: var(--floor); }
 html:not(.js) .section--people { background: var(--morning-room); color: var(--floor); }
-html:not(.js) .section--two-years { background: linear-gradient(to bottom, var(--morning-room), var(--deep) 50%, var(--floor)); color: var(--ivory); }
-html:not(.js) .section--tickets { background: var(--deep); color: var(--ivory); }
-html:not(.js) .section--credits { background: var(--floor); color: var(--ivory); }
+html:not(.js) .section--two-years { background: linear-gradient(to bottom, var(--morning-room), #2A3328 50%); color: var(--ivory); }
+html:not(.js) .section--tickets { background: #F0EAD9; color: var(--floor); }
+html:not(.js) .section--credits { background: #F4F1E5; color: var(--floor); }
 
 @media (prefers-reduced-motion: reduce) {
   .section--about::after, .cell, .role__win::before, .role__actors { transition: none; }

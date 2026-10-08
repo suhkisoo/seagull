@@ -44,10 +44,10 @@ html.js .page { color: var(--ink); }
 /* 글자를 읽히게 하는 옅은 그늘. 위는 단체 표기 뒤, 오른쪽 아래는 날짜 뒤. 머물면 초록의 어둠이 위에서 내려온다 */
 .hero__shade { position: absolute; inset: 0; pointer-events: none;
   background:
-    linear-gradient(to bottom, color-mix(in srgb, var(--floor) 42%, transparent) 0, transparent 26%),
+    linear-gradient(to bottom, color-mix(in srgb, var(--floor) 34%, transparent) 0, transparent 22%),
     linear-gradient(to top, color-mix(in srgb, var(--floor) 30%, transparent) 0, transparent 22%) 0 0 / 100% 62svh no-repeat; }
 .hero__sky::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 38svh; pointer-events: none;
-  background: linear-gradient(to bottom, transparent 0, color-mix(in srgb, var(--floor) 35%, transparent) 40%, var(--floor) 100%); }
+  background: linear-gradient(to bottom, transparent 0, transparent 55%, color-mix(in srgb, var(--floor) 45%, transparent) 100%); }
 .hero__dusk { position: absolute; inset: 0 0 38svh 0; pointer-events: none; background: linear-gradient(to bottom, var(--floor) 0, color-mix(in srgb, var(--floor) 55%, transparent) 55%, transparent 100%); opacity: calc((var(--dusk, 0.25) - 0.25) * 1.1); }
 
 /* 막. 거즈 한 장. 균일하게 비치고 뒤의 그림을 조금 흐리게 한다. 주름은 넓고 아주 옅다. 아랫단에 가는 빛 */
@@ -55,9 +55,9 @@ html.js .page { color: var(--ink); }
   background:
     linear-gradient(to bottom, transparent calc(100% - 3px), color-mix(in srgb, var(--ivory) 55%, transparent) calc(100% - 3px), color-mix(in srgb, var(--ivory) 55%, transparent) calc(100% - 2px), transparent calc(100% - 2px)),
     repeating-linear-gradient(90deg, transparent 0, color-mix(in srgb, var(--ivory) 7%, transparent) 9vw, transparent 18vw, color-mix(in srgb, var(--floor) 5%, transparent) 26vw, transparent 34vw),
-    color-mix(in srgb, var(--ivory) 17%, transparent); }
+    color-mix(in srgb, var(--ivory) 9%, transparent); }
 @supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  .curtain { -webkit-backdrop-filter: blur(2.5px) saturate(0.85); backdrop-filter: blur(2.5px) saturate(0.85); }
+  .curtain { -webkit-backdrop-filter: blur(1.4px); backdrop-filter: blur(1.4px); }
 }
 .curtain { display: none; }
 html.js .curtain { display: block; }
@@ -77,7 +77,9 @@ html.js .curtain { display: block; }
 
 /* ---- 호수 띠 ---- */
 .water { position: fixed; inset: auto 0 0 0; height: var(--water-h); overflow: clip; z-index: 5;
-  background: linear-gradient(to bottom, var(--sky-top, var(--deep)) 0, var(--sky-bot, var(--floor)) 100%); }
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--sky-top, var(--deep)) 30%, transparent) 0, color-mix(in srgb, var(--sky-bot, var(--floor)) 70%, transparent) 100%), url('../assets/lake-reflection.webp') center top / 100% auto, var(--deep); }
+/* 첫 화면에서 셰이더가 뜨기 전(또는 못 뜰 때)은 그림 자신의 반영이 그대로 비친다(포스터의 아랫단) */
+.water.is-hero:not([data-water="live"]) { background: transparent; }
 .water__still { position: absolute; inset: 0; overflow: clip; pointer-events: none; }
 .water__mirror { position: absolute; left: 0; right: 0; top: 0; transform-origin: 50% 50%; transform: scaleY(-1); opacity: 0.4; filter: blur(1.6px);
   mask-image: linear-gradient(to bottom, black 0, transparent 80%); -webkit-mask-image: linear-gradient(to bottom, black 0, transparent 80%); color: var(--ivory); }

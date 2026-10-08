@@ -49,32 +49,37 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
   let stops: Stop[] = [];
   const measure = () => {
     svh = probe.offsetHeight; safe = parseFloat(getComputedStyle(probe).paddingBottom) || 0; svh -= safe;
-    heroPx = 0.38 * svh + safe; bandPx = Math.max(0.15 * svh, 88) + safe; endPx = Math.max(0.3 * svh, bandPx - safe) + safe;
+    heroPx = 0.38 * svh + safe; bandPx = Math.max(0.12 * svh, 84) + safe; endPx = Math.max(0.3 * svh, bandPx - safe) + safe;
     maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
     const ab = root.querySelector<HTMLElement>('[data-light="about"]')?.getBoundingClientRect();
     if (ab) { aboutTop = ab.top + window.scrollY; aboutBot = ab.bottom + window.scrollY; }
     const tk = root.querySelector<HTMLElement>('[data-light="tickets"]')?.getBoundingClientRect();
     if (tk) { actTop = tk.top + window.scrollY; actBot = tk.bottom + window.scrollY; }
     stops = [];
+    // 10/8 고침. 암전은 2년 한 곳에만 둔다. 다른 구간 사이는 빛이 곧바로 바뀐다(가운데가 흙빛으로 흐려지지 않게).
+    // 4막은 2년의 밤에서 시작해 첫 지문(램프 하나가 켜져 있다)을 지나면 램프의 방으로 밝아진다
     const secs = [...root.querySelectorAll<HTMLElement>('[data-light]')];
     secs.forEach((el, i) => {
       const r = el.getBoundingClientRect(); const top = r.top + window.scrollY, bot = top + r.height;
       const id = el.dataset.light!; const L = byId(id); const c = hex(L.room); const w = L.wind; const [a, sh] = L.shade ?? [180, 0];
       const T = Math.min(0.42 * svh, 0.3 * (bot - top));
       const next = secs[i + 1]?.dataset.light;
+      const g = L.glow ?? 0;
       if (id === 'two-years') {
-        // 아침의 실내에서 밤으로 기운다. 끝에서 암전
-        // 아침의 실내에서 저녁의 누런 빛을 지나 밤으로. 물에서 낮은 빛이 올라온다
-        // 빛은 왼쪽 창에서 낮게 기울어 물 쪽으로 내려간다
+        // 아침의 실내에서 저녁의 누런 빛을 지나 밤으로. 물에서 낮은 빛이 올라온다. 빛은 왼쪽 창에서 낮게 기울어 물 쪽으로 내려간다
         const pa = byId('people').shade ?? [90, 0.13];
-        stops.push({ y: top, c: hex(byId('people').room), w: 0.1, g: 0, a: pa[0], s: pa[1] }, { y: top + 0.3 * (bot - top), c: hex('#9B9D7E'), w: 0.2, g: 0.35, a: 40, s: 0.2 },
-          { y: top + 0.62 * (bot - top), c, w, g: 0.55, a, s: sh }, { y: bot - T * 0.6, c, w, g: 0.3, a, s: sh }, { y: bot, c: FLOOR, w, g: 0, a, s: 0 });
+        stops.push({ y: top, c: hex(byId('people').room), w: 0.1, g: 0, a: pa[0], s: pa[1] }, { y: top + 0.3 * (bot - top), c: hex('#D6CBA2'), w: 0.2, g: 0.35, a: 40, s: 0.12 },
+          { y: top + 0.62 * (bot - top), c, w, g: 0.55, a, s: sh }, { y: bot, c, w, g: 0.3, a, s: sh });
         return;
       }
-      const g = L.glow ?? 0;
-      stops.push({ y: top, c: FLOOR, w, g: 0, a, s: 0 }, { y: top + T, c, w, g, a, s: sh });
-      if (next === 'two-years') stops.push({ y: bot, c, w, g, a, s: sh });
-      else stops.push({ y: bot - T, c, w, g, a, s: sh }, { y: bot, c: FLOOR, w, g: 0, a, s: 0 });
+      if (id === 'tickets') {
+        const st = el.querySelector<HTMLElement>('.stage-time--long');
+        const D = st ? st.getBoundingClientRect().bottom + window.scrollY - top : 0.2 * svh;
+        const n = hex(byId('two-years').room);
+        stops.push({ y: top, c: n, w, g: 0.3, a, s: 0.32 }, { y: top + D, c: n, w, g: 0.2, a, s: 0.3 }, { y: top + D + 0.1 * svh, c: hex('#B39660'), w, g: 0.1, a, s: 0.12 }, { y: top + D + 0.24 * svh, c, w, g, a, s: sh });
+      } else if (i === 0) stops.push({ y: top, c: FLOOR, w, g: 0, a, s: 0 }, { y: top + T, c, w, g, a, s: sh });
+      else stops.push({ y: top + T / 2, c, w, g, a, s: sh });
+      stops.push({ y: next && next !== 'two-years' ? bot - T / 2 : bot, c, w, g, a, s: sh });
     });
   };
   measure();
@@ -120,7 +125,6 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
       // 막은 위로 걷히며 모인다. 올라가는 동안 천이 가볍게 흔들린다
       if (curtain) { const e = smooth(p); curtain.style.transform = `translate3d(0, ${(-e * 70).toFixed(2)}%, 0) scaleY(${(1 - 0.35 * e).toFixed(3)}) skewX(${(Math.max(-1, Math.min(1, vel)) * 1.2 * (1 - p)).toFixed(2)}deg)`; curtain.style.opacity = String(1 - smooth((p - 0.7) / 0.3)); }
       if (curtainTime) { const e = smooth(p); curtainTime.style.transform = `translate3d(0, ${(-e * 0.7 * 0.62 * svh).toFixed(1)}px, 0)`; curtainTime.style.opacity = String(1 - smooth(p / 0.45)); }
-      if (water) water.state.baseMix = 1 - p;
       wrapper.classList.toggle('is-band', p > 0.98);
       wrapper.classList.toggle('is-hero', p < 0.02);
       water?.updateBand();
@@ -133,10 +137,14 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
     // 방의 빛은 화면 높이 58% 자리의 색. 글자색은 방의 밝기를 따라 뒤집힌다
     const room = roomAt(y + 0.58 * svh);
     const ink = mix(IVORY, FLOOR, smooth((lum(room.c) - 0.15) / 0.08));
-    // 띠의 물은 늘 어두운 호수다. 방의 빛은 수평선 가까이에만 옅게 비친다
+    // 띠의 물은 포스터의 반영이다(10/8 고침, 전에는 늘 어두운 호수였다). 낮에는 그림의 초록 줄기가 비치고,
+    // 밤(2년)과 4막의 폭풍에서는 어두운 호수로 가라앉는다. 4막은 방이 램프로 밝아도 물은 밤이다
     const bandRoom = roomAt(y + svh - h);
+    const ry0 = y + 0.58 * svh;
+    const act0 = actBot > actTop ? smooth((ry0 - actTop) / (0.6 * svh)) * (1 - smooth((ry0 - actBot + 0.2 * svh) / (0.5 * svh))) : 0;
     // 밤의 물은 하늘빛의 윤기도 가라앉는다. 그래야 달의 길과 램프만 남는다
-    const night = 1 - smooth((lum(bandRoom.c) - 0.03) / 0.25);
+    const night = Math.max(1 - smooth((lum(bandRoom.c) - 0.03) / 0.25), act0);
+    if (water) water.state.baseMix = (1 - p) + p * 0.85 * (1 - night);
     // 밤의 물은 초록의 어둠이다(4막 정원은 캄캄, 끝은 가장 어두운 초록)
     const B: L = { skyTop: mix(mix(DEEP, bandRoom.c, 0.2), FLOOR, 0.45 * night), skyBot: mix(FLOOR, hex('#1C221D'), 0.5 * night), sparkle: mix(mix(IVORY, bandRoom.c, 0.25), FLOOR, 0.88 * night), wind: bandRoom.w };
     const L = p > 0 ? lerpL(L1, B, p) : L1;
@@ -149,7 +157,7 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
     if (treeLeaves && Math.abs(aboutW - lastTree) > 0.004) { lastTree = aboutW; treeLeaves.style.opacity = (aboutW * 0.95).toFixed(3); }
     // 4막(일정과 예매, 오시는 길). 폭풍 이틀째. 정면 유리문으로 나간 램프 빛이 거친 물에 부서진다.
     // 끝(만든 사람들)에 들어서면 바람이 잦아들어 맺음의 제목이 비친다
-    const actW = actH = actBot > actTop ? smooth((ry - actTop) / (0.6 * svh)) * (1 - smooth((ry - actBot + 0.2 * svh) / (0.5 * svh))) : 0;
+    const actW = actH = act0;
     if (water) {
       const sum = moonW + aboutW + actW + 1e-3, a = moonW / sum, b = aboutW / sum, c = actW / sum, vw = window.innerWidth;
       water.state.glade = [vw * (0.54 * a + 0.2 * b + 0.47 * c), moonW * 0.8 + aboutW * 0.45 + actW * 0.42, 9 * a + 39 * b + 24 * c, aboutW];

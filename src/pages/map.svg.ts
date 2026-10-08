@@ -1,5 +1,5 @@
 // 오시는 길 지도의 바탕. src/content/map.json(OpenStreetMap 자료)을 빌드 때 SVG 한 장으로 그린다. docs/plan.md 9.5.4.
-// 그림으로 불러 쓰므로 색은 여기서 정한다. 늦가을 밤의 초록 위에 아이보리 가는 선. 이름 글자는 페이지 쪽(Map.astro)에서 얹는다.
+// 그림으로 불러 쓰므로 색은 여기서 정한다. 4막 램프의 방(종이) 위에 짙은 초록 가는 선(10/8, 전에는 밤의 초록 위 아이보리). 이름 글자는 페이지 쪽(Map.astro)에서 얹는다.
 import type { APIRoute } from 'astro';
 import map from '../content/map.json';
 import { palette } from '../content/lights';
@@ -9,7 +9,7 @@ type MapData = { ready: true; size: number; roads: Record<'major' | 'minor' | 'p
 export const GET: APIRoute = () => {
   const m = map as unknown as MapData | { ready: false };
   const S = m.ready ? m.size : 1000;
-  const I = palette.ivory;
+  const I = palette.floor;
   const path = (d: string, attrs: string) => (d ? `<path d="${d}" ${attrs}/>` : '');
   const body = m.ready
     ? [

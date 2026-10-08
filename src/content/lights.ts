@@ -8,6 +8,8 @@ export const palette = {
   amber: '#CDA668',    // 램프 호박빛
   morningShadow: '#AEBFB7', // 파생: 아침의 푸른 기운
   morningRoom: '#DDE0D4',   // 파생: 아침 실내의 바탕
+  lampRoom: '#F0EAD9',      // 파생: 4막의 실내. 갓을 씌운 램프 하나가 켜진 방. 아이보리에 호박빛이 조금 밴다
+  night: '#2A3328',         // 파생: 2년의 밤. 페이지에서 가장 긴 어둠은 여기 한 곳
 } as const;
 
 export type Light = {
@@ -31,7 +33,9 @@ export const lights: Light[] = [
   { id: 'hero-dusk', skyTop: palette.deep, skyBot: '#4C5A4C', bgTop: palette.olive, bgBot: palette.deep, text: palette.ivory, room: palette.floor, sparkle: palette.ivory, wind: 0.15 },
   { id: 'about', skyTop: palette.sun, skyBot: palette.olive, bgTop: palette.ivory, bgBot: palette.ivory, text: palette.floor, room: palette.ivory, shade: [180, 0.1], sparkle: palette.ivory, wind: 0.05 },
   { id: 'people', skyTop: palette.morningShadow, skyBot: palette.olive, bgTop: palette.morningRoom, bgBot: palette.morningRoom, text: palette.floor, room: palette.morningRoom, shade: [90, 0.13], sparkle: palette.ivory, wind: 0.05 },
-  { id: 'two-years', skyTop: palette.deep, skyBot: palette.floor, bgTop: palette.morningRoom, bgBot: palette.deep, text: palette.ivory, room: '#333C31', shade: [0, 0.32], sparkle: palette.ivory, wind: 0.35 },
-  { id: 'tickets', skyTop: palette.deep, skyBot: palette.floor, bgTop: palette.deep, bgBot: palette.floor, text: palette.ivory, room: '#313A2E', glow: 0.2, shade: [0, 0.34], sparkle: palette.ivory, wind: 0.62 },
-  { id: 'credits', skyTop: palette.floor, skyBot: palette.floor, bgTop: palette.floor, bgBot: palette.floor, text: palette.ivory, room: palette.floor, glow: 0.08, shade: [0, 0.3], sparkle: palette.deep, wind: 0.1 },
+  { id: 'two-years', skyTop: palette.deep, skyBot: palette.floor, bgTop: palette.morningRoom, bgBot: palette.deep, text: palette.ivory, room: palette.night, shade: [0, 0.32], sparkle: palette.ivory, wind: 0.35 },
+  // 4막. 밖은 폭풍이고 방에는 램프가 켜져 있다. 방은 램프 빛의 종이, 물은 폭풍의 밤(scroll.ts). 10/8 연출 "바탕이 너무 어둡다"
+  { id: 'tickets', skyTop: palette.deep, skyBot: palette.floor, bgTop: palette.lampRoom, bgBot: palette.lampRoom, text: palette.floor, room: palette.lampRoom, shade: [0, 0.07], sparkle: palette.ivory, wind: 0.62 },
+  // 끝. 포스터의 아랫단처럼 종이 위에 이름들. 물은 다시 포스터의 반영으로 돌아온다
+  { id: 'credits', skyTop: palette.olive, skyBot: palette.floor, bgTop: palette.ivory, bgBot: palette.ivory, text: palette.floor, room: '#F4F1E5', shade: [0, 0.05], sparkle: palette.ivory, wind: 0.1 },
 ];
