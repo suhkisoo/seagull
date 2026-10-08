@@ -216,7 +216,7 @@ async function submit() {
   document.querySelector<HTMLElement>('[data-steps]')!.hidden = true;
   const done = document.querySelector<HTMLElement>('[data-done]')!; done.hidden = false;
   renderBill(done.querySelector<HTMLElement>('[data-done-bill]')!, bill());
-  const tt = total(); done.querySelector<HTMLElement>('[data-done-total]')!.textContent = tt == null ? '가격 공개 뒤 안내' : won(tt);
+  const tt = r.amount ?? total(); done.querySelector<HTMLElement>('[data-done-total]')!.textContent = tt == null ? '가격 공개 뒤 안내' : won(tt);
   const acc = show.booking.account; const accText = acc.number ? `${acc.bank} ${acc.number} ${acc.holder}` : '추후 공개';
   done.querySelector<HTMLElement>('[data-done-account]')!.textContent = accText;
   done.querySelector<HTMLElement>('[data-done-id]')!.textContent = r.id;

@@ -21,11 +21,10 @@ import { show } from '../content/show';
         <p>{show.company}</p>
         <p>{show.credits.author}. {show.credits.directing}</p>
         <p>{show.period}. {show.venue.name}</p>
-        <ul class="action-list" role="list">
-            <li class="js-only"><span class="action-list__label">소리</span><span class="action-list__value"><button class="action" type="button" data-sound aria-pressed="false">소리 켜기</button></span></li>
+        {(show.links.instagram || show.links.contact) && <ul class="action-list" role="list">
             {show.links.instagram && <li><span class="action-list__label">인스타그램</span><span class="action-list__value"><a class="action" href={show.links.instagram} target="_blank" rel="noopener">인스타그램 열기</a></span></li>}
             {show.links.contact && <li><span class="action-list__label">문의</span><span class="action-list__value">{show.links.contact.includes('@') ? <a class="action" href={`mailto:${show.links.contact}`}>문의하기</a> : <span>{show.links.contact}</span>}</span></li>}
-        </ul>
+        </ul>}
         {show.sponsors && <p>{show.sponsors}</p>}
         <p class="colophon__title" data-end-title>〈{show.title}〉</p>
       </div>

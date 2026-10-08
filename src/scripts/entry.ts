@@ -58,8 +58,6 @@ function cssRipple() {
 
 async function start() {
   const { createScroll } = await import('./scroll');
-  const { initSound } = await import('./sound');
-  initSound(root);
   const { paintLeaves } = await import('./leaves');
   paintLeaves(root);
   let water = null;

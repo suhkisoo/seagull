@@ -8,7 +8,7 @@ export type Reservation = {
 };
 export type ShowStatus = { taken: string[]; balconyTaken: Balcony; goodsSold: Record<string, number> };
 export type ReserveInput = Omit<Reservation, 'id' | 'createdAt' | 'status' | 'confirmedAt' | 'note'>;
-export type ReserveResult = { ok: true; id: string } | { ok: false; reason: 'conflict' | 'balcony' | 'closed' | 'error'; conflict?: string[]; side?: string; message?: string };
+export type ReserveResult = { ok: true; id: string; amount?: number } | { ok: false; reason: 'conflict' | 'balcony' | 'closed' | 'error'; conflict?: string[]; side?: string; message?: string };
 
 export interface Store {
   demo: boolean;
