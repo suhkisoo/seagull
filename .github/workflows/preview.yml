@@ -30,6 +30,15 @@ jobs:
           ASTRO_TELEMETRY_DISABLED: '1'
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
           SITE_URL: ${{ steps.pages.outputs.origin }}
+      # 예매 장부(Apps Script) 연결 확인. 읽기만 한다(회차 하나의 잡힌 자리). 세션 안에서는 script.google.com이 막혀 있어 여기서 본다
+      - name: 장부 연결 확인
+        continue-on-error: true
+        run: |
+          API=$(grep -oE "apiUrl: '[^']+'" src/content/show.ts | sed -E "s/apiUrl: '([^']+)'/\1/")
+          if [ -z "$API" ]; then echo "apiUrl 없음(미리보기)"; exit 0; fi
+          echo "GET 상태:"; curl -sSL -m 30 "$API" ; echo
+          echo "GET 회차 상태:"; curl -sSL -m 30 "$API?action=status&show=1112-1500"; echo
+          echo "POST 회차 상태(사이트가 쓰는 방식):"; curl -sSL -m 30 -H 'Content-Type: text/plain;charset=utf-8' --data '{"action":"status","show":"1112-1500"}' "$API"; echo
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

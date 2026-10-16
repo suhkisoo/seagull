@@ -55,7 +55,7 @@ export const show = {
     commonUrl: '',                                // 외부 예매처 링크. 비면 이 페이지의 예매 흐름(/book/)을 쓴다
     vendorName: '',                               // 예매처 이름
     // 이 페이지의 예매 흐름(연출의 지시로 3단계 뒤에 추가). 좌석을 고르고 계좌로 입금하면 기획팀이 확인한다
-    apiUrl: '',                                   // Apps Script 웹 앱 주소 【빈칸】. 비면 예매 흐름은 미리보기(저장되지 않음)
+    apiUrl: 'https://script.google.com/macros/s/AKfycbzEhT6uHNdixJcreudUj5P35BV0fAq93AMZEg3EBiJFZuv4kNpf_VxLmuKKEu9P9R1r/exec', // Apps Script 웹 앱 주소(10/16 연출). 비면 예매 흐름은 미리보기(저장되지 않음)
     seatPrice: 9000 as number | null,             // 티켓 한 장(책갈피 증정). 연출이 10/7에 준 가격
     balconyPrice: 9000 as number | null,          // 발코니도 같은 값으로 둔다 【확인】
     // 티켓 구성. 티켓 한 장마다 하나를 고른다. 모든 구성에 티켓 책갈피가 함께 나간다. 연출이 10/7에 준 가격
