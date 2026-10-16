@@ -23,6 +23,8 @@ export const hall = {
     { row: 'A', seats: [12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1] },
   ] as SeatRow[],
   balcony: {
+    // 10/16 기획(고은채) "발코니석도 안 적어야 될 것 같아". 예매에서 뺀다. 다시 열려면 true로 바꾸고 backend/Code.gs의 CONFIG도 맞춘다(빌드가 알려 준다)
+    open: false,
     label: '1층 발코니',
     // 좌석표의 1st BALCONY (L), (R). 둘을 합쳐 회차당 8명이던 것을 반씩 나눴다 【확인】
     sides: [
@@ -34,4 +36,6 @@ export const hall = {
 };
 
 export const seatId = (row: string, n: number) => `${row}${n}`;
+// 예매에서 받는 발코니의 쪽들. 발코니를 닫으면 비어 있다
+export const balconySides = () => (hall.balcony.open ? hall.balcony.sides : []);
 export const allSeats = () => hall.rows.flatMap((r) => r.seats.map((n) => seatId(r.row, n)));

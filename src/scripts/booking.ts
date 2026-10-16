@@ -1,6 +1,6 @@
 // 예매 흐름. 다섯 단계가 차례로 열린다. 고른 자리에는 호박빛이 켜진다. 저장은 store.ts.
 import { show } from '../content/show';
-import { hall, noBalcony, balconySum, type BalconySide } from '../content/hall';
+import { hall, noBalcony, balconySum, balconySides, type BalconySide } from '../content/hall';
 import { fmtDay, fmtTime, epoch } from './format';
 import { now } from './state';
 import { createStore, type ShowStatus } from './store';
@@ -58,7 +58,7 @@ function summary(k: StepId): string {
 function validate() {
   let ok = false, msg = '';
   if (current === 'show') ok = !!showId;
-  else if (current === 'seats') { ok = seats.size + balconySum(balcony) > 0; if (!ok) msg = '좌석을 고르거나 발코니 인원을 정해 주세요'; }
+  else if (current === 'seats') { ok = seats.size + balconySum(balcony) > 0; if (!ok) msg = balconySides().length ? '좌석을 고르거나 발코니 인원을 정해 주세요' : '좌석을 골라 주세요'; }
   else if (current === 'goods') ok = true;
   else if (current === 'who') { ok = name().length >= 2 && /\d{3}-?\d{3,4}-?\d{4}/.test(phone()); }
   else if (current === 'confirm') ok = true;
@@ -93,7 +93,7 @@ function renderSeats() {
     btn.classList.toggle('is-taken', taken); btn.disabled = taken || (seatPrice == null && !store.demo);
     btn.classList.toggle('is-picked', seats.has(id)); btn.setAttribute('aria-pressed', String(seats.has(id)));
   }
-  for (const side of hall.balcony.sides) {
+  for (const side of balconySides()) {
     const box = document.querySelector<HTMLElement>(`[data-balcony="${side.id}"]`)!;
     const left = Math.max(0, side.max - status.balconyTaken[side.id]);
     if (balcony[side.id] > left) balcony[side.id] = left;
@@ -109,13 +109,13 @@ document.querySelector('[data-hall]')!.addEventListener('click', (e) => {
   const id = btn.dataset.seat!; if (seats.has(id)) seats.delete(id); else seats.add(id);
   renderSeats(); validate();
 });
-for (const side of hall.balcony.sides) {
+for (const side of balconySides()) {
   const box = document.querySelector<HTMLElement>(`[data-balcony="${side.id}"]`)!;
   box.querySelector('[data-balcony-plus]')!.addEventListener('click', () => { balcony[side.id]++; renderSeats(); validate(); });
   box.querySelector('[data-balcony-minus]')!.addEventListener('click', () => { balcony[side.id] = Math.max(0, balcony[side.id] - 1); renderSeats(); validate(); });
 }
 function balconyText(): string {
-  const parts = hall.balcony.sides.filter((s) => balcony[s.id] > 0).map((s) => `${s.label} ${balcony[s.id]}명`);
+  const parts = balconySides().filter((s) => balcony[s.id] > 0).map((s) => `${s.label} ${balcony[s.id]}명`);
   return parts.length ? `발코니 ${parts.join(', ')}` : '';
 }
 
@@ -209,7 +209,7 @@ async function submit() {
   if (!r.ok) {
     nextBtn.disabled = false;
     if (r.reason === 'conflict') { err.textContent = `${r.conflict!.join(', ')} 자리가 방금 예매되었습니다. 좌석을 다시 골라 주세요.`; await loadStatus(); open('seats'); }
-    else if (r.reason === 'balcony') { const sd = hall.balcony.sides.find((x) => x.id === r.side); err.textContent = `발코니${sd ? ` ${sd.label}` : ''} 자리가 모자랍니다. 인원을 줄여 주세요.`; await loadStatus(); open('seats'); }
+    else if (r.reason === 'balcony') { const sd = balconySides().find((x) => x.id === r.side); err.textContent = `발코니${sd ? ` ${sd.label}` : ''} 자리가 모자랍니다. 인원을 줄여 주세요.`; await loadStatus(); open('seats'); }
     else err.textContent = '보내지 못했습니다. 잠시 뒤 다시 눌러 주세요.';
     return;
   }

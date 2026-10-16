@@ -8,7 +8,7 @@ const expected = {
   seatPrice: show.booking.seatPrice, balconyPrice: show.booking.balconyPrice,
   packages: Object.fromEntries(show.booking.packages.map((p) => [p.id, p.price])),
   goods: Object.fromEntries(show.goods.filter((g) => g.price != null).map((g) => [g.id, g.price])),
-  balconyMax: Object.fromEntries(hall.balcony.sides.map((s) => [s.id, s.max])),
+  balconyMax: Object.fromEntries(hall.balcony.sides.map((s) => [s.id, hall.balcony.open ? s.max : 0])),
   rows: Object.fromEntries(hall.rows.map((r) => [r.row, Math.max(...r.seats)])),
   shows: show.shows.map((s) => s.id),
 };

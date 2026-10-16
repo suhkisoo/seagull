@@ -2,7 +2,7 @@
 // 예매. 회차, 좌석, 굿즈, 예매자, 확인의 다섯 단계가 한 페이지에 차례로 열린다. 팝업 없음. docs/plan.md 9.9.
 import Base from '../layouts/Base.astro';
 import { show } from '../content/show';
-import { hall, seatId } from '../content/hall';
+import { hall, seatId, balconySides } from '../content/hall';
 import { fmtDay, fmtTime } from '../scripts/format';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 // 굿즈 그림의 크기(scripts/make-goods.mjs가 쓴다)
@@ -10,6 +10,7 @@ import goodsDims from '../content/goods-images.json';
 const DIM = goodsDims as Record<string, [number, number]>;
 const won = (n: number | null) => (n == null ? '추후 공개' : `${n.toLocaleString('ko-KR')}원`);
 const balconyPrice = show.booking.balconyPrice ?? show.booking.seatPrice;
+const sides = balconySides();
 ---
 <Base title={`예매. ${show.meta.title}`} description={`〈${show.title}〉 예매. 회차와 좌석을 고르고 계좌로 입금합니다.`} noindex>
   <main class="book page" data-book data-api={show.booking.apiUrl} data-seat-price={show.booking.seatPrice ?? ''} data-balcony-price={balconyPrice ?? ''} data-hold-hours={show.booking.holdHours}>
@@ -44,10 +45,10 @@ const balconyPrice = show.booking.balconyPrice ?? show.booking.seatPrice;
         <h2 class="step__title"><span class="step__num">2</span> 좌석</h2>
         <p class="step__summary" data-summary></p>
         <div class="step__body">
-          <p class="step__hint">지정석 {won(show.booking.seatPrice)}. 발코니 {won(balconyPrice)}, 자리 지정 없이 {hall.balcony.sides.map((x) => `${x.label} ${x.max}명`).join(', ')}까지. 좌석을 누르면 불이 켜집니다.</p>
+          <p class="step__hint">지정석 {won(show.booking.seatPrice)}.{sides.length > 0 && ` 발코니 ${won(balconyPrice)}, 자리 지정 없이 ${sides.map((x) => `${x.label} ${x.max}명`).join(', ')}까지.`} 좌석을 누르면 불이 켜집니다.</p>
           <div class="hall" data-hall>
-            <div class="hall__balcony">
-              {hall.balcony.sides.map((side) => (
+            {sides.length > 0 && <div class="hall__balcony">
+              {sides.map((side) => (
                 <div class={`balcony balcony--${side.id}`} data-balcony={side.id}>
                   <p class="balcony__name">{hall.balcony.label} {side.label}</p>
                   <div class="balcony__ctrl">
@@ -58,7 +59,7 @@ const balconyPrice = show.booking.balconyPrice ?? show.booking.seatPrice;
                   <p class="balcony__left" data-balcony-left></p>
                 </div>
               ))}
-            </div>
+            </div>}
             <div class="seats" role="group" aria-label="지정석">
               {hall.rows.map((r) => (
                 <div class="seats__row" data-row={r.row}>

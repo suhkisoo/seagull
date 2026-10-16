@@ -1,12 +1,14 @@
 // 예매 저장소. apiUrl이 있으면 Apps Script 웹 앱, 없으면 이 브라우저의 localStorage(미리보기).
 // 요청은 text/plain JSON POST로 보내 CORS 사전 요청을 피한다(Apps Script의 제약).
-import { hall, asBalcony, noBalcony, type Balcony } from '../content/hall';
+import { asBalcony, noBalcony, balconySides, allSeats, type Balcony } from '../content/hall';
 export type Status = '입금대기' | '입금확인' | '취소';
 export type Reservation = {
   id: string; createdAt: string; show: string; seats: string[]; balcony: Balcony; goods: Record<string, number>;
   name: string; phone: string; payer: string; amount: number | null; status: Status; confirmedAt?: string; note?: string;
 };
 export type ShowStatus = { taken: string[]; balconyTaken: Balcony; goodsSold: Record<string, number> };
+export type AddInput = { show: string; seats: string; name: string; phone: string; amount: number; status: Status; note: string };
+export type AddResult = { ok: boolean; id?: string; message?: string };
 export type ReserveInput = Omit<Reservation, 'id' | 'createdAt' | 'status' | 'confirmedAt' | 'note'>;
 export type ReserveResult = { ok: true; id: string; amount?: number } | { ok: false; reason: 'conflict' | 'balcony' | 'closed' | 'error'; conflict?: string[]; side?: string; message?: string };
 
@@ -18,6 +20,8 @@ export interface Store {
   list(token: string): Promise<Reservation[]>;
   setStatus(token: string, id: string, status: Status): Promise<boolean>;
   releaseExpired(token: string, hours: number): Promise<number>;
+  add(token: string, input: AddInput): Promise<AddResult>;
+  setNote(token: string, id: string, note: string): Promise<boolean>;
 }
 
 const KEY = 'seagull-booking-demo';
@@ -40,13 +44,25 @@ function demoStore(): Store {
       const rows = read(); const st = await this.status(input.show);
       const conflict = input.seats.filter((s) => st.taken.includes(s));
       if (conflict.length) return { ok: false, reason: 'conflict', conflict };
-      for (const side of hall.balcony.sides) if (st.balconyTaken[side.id] + input.balcony[side.id] > side.max) return { ok: false, reason: 'balcony', side: side.id };
+      for (const side of balconySides()) if (st.balconyTaken[side.id] + input.balcony[side.id] > side.max) return { ok: false, reason: 'balcony', side: side.id };
       const id = genId();
       rows.push({ ...input, id, createdAt: new Date().toISOString(), status: '입금대기' });
       write(rows); return { ok: true, id };
     },
     async list() { return read().sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1)); },
     async setStatus(_t, id, status) { const rows = read(); const r = rows.find((x) => x.id === id); if (!r) return false; r.status = status; if (status === '입금확인') r.confirmedAt = new Date().toISOString(); write(rows); return true; },
+    async add(_t, a) {
+      const seats = [...new Set(a.seats.toUpperCase().split(/[\s,]+/).filter(Boolean))];
+      const bad = seats.filter((x) => !allSeats().includes(x)); if (bad.length) return { ok: false, message: `없는 자리: ${bad.join(', ')}` };
+      if (!seats.length) return { ok: false, message: '자리를 적어 주세요' };
+      if (!a.name.trim()) return { ok: false, message: '이름을 적어 주세요' };
+      const st = await this.status(a.show); const clash = seats.filter((x) => st.taken.includes(x));
+      if (clash.length) return { ok: false, message: `이미 예매된 자리: ${clash.join(', ')}` };
+      const rows = read(); const id = genId(); const now = new Date().toISOString();
+      rows.push({ id, createdAt: now, show: a.show, seats, balcony: noBalcony(), goods: { 'pkg:ticket': seats.length }, name: a.name.trim(), phone: a.phone.trim(), payer: a.name.trim(), amount: Math.max(0, a.amount || 0), status: a.status, confirmedAt: a.status === '입금확인' ? now : undefined, note: a.note || '관리 화면에서 넣음' });
+      write(rows); return { ok: true, id };
+    },
+    async setNote(_t, id, note) { const rows = read(); const r = rows.find((x) => x.id === id); if (!r) return false; r.note = note; write(rows); return true; },
     async releaseExpired(_t, hours) { const rows = read(); const limit = Date.now() - hours * 3600000; let n = 0; for (const r of rows) if (r.status === '입금대기' && Date.parse(r.createdAt) < limit) { r.status = '취소'; r.note = '기한 지나 자동 취소'; n++; } write(rows); return n; },
   };
 }
@@ -64,6 +80,8 @@ function apiStore(url: string): Store {
     async list(token) { const r = await call({ action: 'admin', token, op: 'list' }); if (!r.ok) throw new Error(r.message || '거부됨'); return (r.rows as Reservation[]).map((x) => ({ ...x, balcony: asBalcony(x.balcony) })); },
     async setStatus(token, id, status) { const r = await call({ action: 'admin', token, op: 'set', id, status }); return !!r.ok; },
     async releaseExpired(token, hours) { const r = await call({ action: 'admin', token, op: 'release', hours }); return r.ok ? r.count : 0; },
+    async add(token, a) { try { return await call({ action: 'admin', token, op: 'add', ...a }); } catch (e) { return { ok: false, message: String(e) }; } },
+    async setNote(token, id, note) { const r = await call({ action: 'admin', token, op: 'note', id, note }); return !!r.ok; },
   };
 }
 

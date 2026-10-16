@@ -15,9 +15,10 @@
  * 금액은 이 파일이 다시 센다. 브라우저가 보낸 금액은 믿지 않는다. 아래 CONFIG의 값은 show.ts, hall.ts와 같아야 하고,
  * 다르면 사이트 빌드가 멈춘다(astro.config.mjs). 가격을 바꾸면 show.ts와 여기 둘 다 고치고 Apps Script도 새 버전으로 배포한다.
  *
+ * 관리 화면(/admin/)에서 할 수 있는 것: 입금 확인, 자리 풀기와 되살리기, 메모, 자리 직접 넣기(초대석, 관계자석, 전화 예매), 회차별 좌석표, 명단 내려받기.
  * 자리 풀기: 시트에서 상태 칸을 "취소"로 바꿔도 되고, /admin/에서 "자리 풀기"를 눌러도 된다. 되돌리려면 "입금대기"로.
  */
-var CONFIG = /*config*/{"seatPrice":9000,"balconyPrice":9000,"packages":{"ticket":9000,"stamp":11000,"pin":13000,"book":20000,"book-stamp":21000,"book-pin":22000,"all":30000},"goods":{"programbook":15000,"pinbadge":4000,"stamp-sticker":3000},"balconyMax":{"L":4,"R":4},"rows":{"H":10,"G":12,"F":12,"E":12,"D":12,"C":12,"B":12,"A":12},"shows":["1112-1500","1112-1930","1113-1500","1113-1930","1114-1300","1114-1800"]}/*end*/;
+var CONFIG = /*config*/{"seatPrice":9000,"balconyPrice":9000,"packages":{"ticket":9000,"stamp":11000,"pin":13000,"book":20000,"book-stamp":21000,"book-pin":22000,"all":30000},"goods":{"programbook":15000,"pinbadge":4000,"stamp-sticker":3000},"balconyMax":{"L":0,"R":0},"rows":{"H":10,"G":12,"F":12,"E":12,"D":12,"C":12,"B":12,"A":12},"shows":["1112-1500","1112-1930","1113-1500","1113-1930","1114-1300","1114-1800"]}/*end*/;
 var SHEET = '예매';
 var HEAD = ['예매번호', '신청시각', '회차', '좌석', '발코니 왼쪽', '발코니 오른쪽', '굿즈', '이름', '연락처', '입금자명', '금액', '상태', '확인시각', '메모'];
 var COL_STATUS = 12, COL_CONFIRMED = 13, COL_NOTE = 14; // 1부터 센 열 번호
@@ -123,6 +124,30 @@ function admin_(b) {
     var r = rows_().filter(function (x) { return x.id === String(b.id); })[0]; if (!r) return { ok: false };
     var st = String(b.status); if (['입금대기', '입금확인', '취소'].indexOf(st) < 0) return { ok: false };
     sh.getRange(r.row, COL_STATUS).setValue(st); sh.getRange(r.row, COL_CONFIRMED).setValue(st === '입금확인' ? new Date() : '');
+    return { ok: true };
+  }
+  // 관리 화면에서 직접 넣기. 초대석, 관계자석, 전화나 현장에서 받은 예매. 금액은 기획팀이 적은 그대로(0이면 초대). 자리 겹침은 똑같이 막는다
+  if (b.op === 'add') {
+    var showId = String(b.show || ''); if (CONFIG.shows.indexOf(showId) < 0) return { ok: false, message: '회차가 없습니다' };
+    var seats = [], seen = {}, bad = [];
+    String(b.seats || '').toUpperCase().split(/[\s,]+/).filter(Boolean).forEach(function (x) { if (!seatOk_(x)) bad.push(x); else if (!seen[x]) { seen[x] = 1; seats.push(x); } });
+    if (bad.length) return { ok: false, message: '없는 자리: ' + bad.join(', ') };
+    if (!seats.length) return { ok: false, message: '자리를 적어 주세요' };
+    var who = text_(b.name, 30); if (!who) return { ok: false, message: '이름을 적어 주세요' };
+    var st2 = String(b.status || '입금대기'); if (['입금대기', '입금확인'].indexOf(st2) < 0) st2 = '입금대기';
+    var amount = Math.max(0, Math.floor(Number(b.amount) || 0));
+    var lock = LockService.getScriptLock(); lock.waitLock(10000);
+    try {
+      var taken = status_(showId).taken, clash = seats.filter(function (x) { return taken.indexOf(x) >= 0; });
+      if (clash.length) return { ok: false, message: '이미 예매된 자리: ' + clash.join(', ') };
+      var id = newId_();
+      sh.appendRow([id, new Date(), showId, seats.join(' '), 0, 0, 'pkg:ticket ' + seats.length, who, text_(b.phone, 20), who, amount, st2, st2 === '입금확인' ? new Date() : '', text_(b.note || '관리 화면에서 넣음', 80)]);
+      return { ok: true, id: id };
+    } finally { lock.releaseLock(); }
+  }
+  if (b.op === 'note') {
+    var rn = rows_().filter(function (x) { return x.id === String(b.id); })[0]; if (!rn) return { ok: false };
+    sh.getRange(rn.row, COL_NOTE).setValue(text_(b.note, 200));
     return { ok: true };
   }
   if (b.op === 'release') {

@@ -159,3 +159,25 @@
 .admin__table .action + .action { margin-left: 0; }
 .admin .wrap > *:not(.book__head) { max-width: none; }
 @media (max-width: 760px) { .admin__table thead { display: none; } .admin__table tr { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; padding: 12px 0; border-top: 1px solid var(--rule); } .admin__table td { border: 0; padding: 2px 0; } }
+/* 관리. 연결 표시, 좌석표, 자리 직접 넣기, 메모(10/16 기획 요청 "관리자에서 다 관리할 수 있게") */
+.admin__live { margin-top: 20px; font-size: var(--fs-small); color: var(--soft); max-width: var(--measure); }
+@media (min-width: 1024px) { .admin__live { grid-column: 6 / span 7; grid-row: 3; } }
+.admin__h { font-size: var(--fs-h3); font-weight: 400; letter-spacing: -0.01em; margin: 56px 0 8px; padding-top: 18px; border-top: 1px solid var(--rule); }
+.admin__filter--q input { background: transparent; border: 0; border-bottom: 1px solid color-mix(in srgb, currentColor 35%, transparent); color: inherit; font: inherit; font-size: var(--fs-small); min-height: 40px; width: 15em; border-radius: 0; }
+.admin__filter--q input:focus-visible { outline: none; border-bottom-color: var(--amber-ink); }
+.admin__hall { margin-top: 18px; }
+.admin .seat.is-paid { background: color-mix(in srgb, var(--floor) 80%, transparent); color: var(--ivory); }
+.admin .seat.is-wait { background: var(--amber); color: var(--floor); }
+/* 넣을 자리는 면을 칠하지 않고 짙은 테만 */
+.admin .seat.is-picked { background: transparent; color: var(--floor); outline: 2px solid var(--floor); outline-offset: -2px; }
+.admin__hall .seat { cursor: pointer; }
+.admin__fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(11em, 1fr)); column-gap: 28px; margin-top: 18px; max-width: 980px; }
+.admin__fields .field { max-width: none; }
+.admin__fields .field span { font-size: var(--fs-micro); letter-spacing: var(--track-micro); color: var(--soft); }
+.admin__fields .field input, .admin__fields .field select { background: transparent; border: 0; border-bottom: 1px solid color-mix(in srgb, currentColor 35%, transparent); color: inherit; font: inherit; font-size: var(--fs-body); padding: 6px 0 8px; min-height: 44px; border-radius: 0; width: 100%; }
+.admin__fields .field input:focus-visible, .admin__fields .field select:focus-visible { outline: none; border-bottom-color: var(--amber-ink); }
+.admin__field--wide { grid-column: 1 / -1; }
+.admin__add .field__error { color: var(--floor); margin: 0 0 0 20px; }
+.admin__note { min-width: 9em; }
+.admin__note span { display: block; }
+.admin__note-input { background: transparent; border: 0; border-bottom: 1px solid color-mix(in srgb, currentColor 35%, transparent); color: inherit; font: inherit; font-size: var(--fs-small); width: 100%; min-height: 36px; border-radius: 0; }
