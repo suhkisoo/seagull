@@ -36,9 +36,10 @@ jobs:
         run: |
           API=$(grep -oE "apiUrl: '[^']+'" src/content/show.ts | sed -E "s/apiUrl: '([^']+)'/\1/")
           if [ -z "$API" ]; then echo "apiUrl 없음(미리보기)"; exit 0; fi
-          echo "GET 상태:"; curl -sSL -m 30 "$API" ; echo
-          echo "GET 회차 상태:"; curl -sSL -m 30 "$API?action=status&show=1112-1500"; echo
-          echo "POST 회차 상태(사이트가 쓰는 방식):"; curl -sSL -m 30 -H 'Content-Type: text/plain;charset=utf-8' --data '{"action":"status","show":"1112-1500"}' "$API"; echo
+          see() { echo "== $1"; shift; curl -sSL -m 30 -o /tmp/b -w 'HTTP %{http_code} 최종 %{url_effective}\n' "$@"; grep -o '<title>[^<]*</title>' /tmp/b | head -1; head -c 300 /tmp/b | tr -d '\n'; echo; }
+          see "GET" "$API"
+          see "GET 회차 상태" "$API?action=status&show=1112-1500"
+          see "POST 회차 상태(사이트가 쓰는 방식)" -H 'Content-Type: text/plain;charset=utf-8' --data '{"action":"status","show":"1112-1500"}' "$API"
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
