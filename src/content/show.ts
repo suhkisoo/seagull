@@ -78,9 +78,10 @@ export const show = {
     packages: [
       // items: 구성에 든 굿즈(goods의 id). 그림으로 묶음을 보여 준다
       // pinPick: 구성 하나에 들어 있는 핀배지 가운데 예매자가 종류를 고르는 개수. 전체 구성은 두 종이 다 들어 있어 고르지 않는다(10/17 기획 확정)
+      // 티켓 + 핀배지는 10/17 기획표에 12,000원이었으나 같은 날 연출이 13,000원으로 정했다
       { id: 'ticket', name: '티켓', note: '책갈피 증정', price: 9000, items: [] as string[], pinPick: 0 },
       { id: 'stamp', name: '티켓 + 우표 스티커', note: '우표 스티커 두 장 한 묶음', price: 11000, items: ['stamp-sticker'], pinPick: 0 },
-      { id: 'pin', name: '티켓 + 핀배지', note: '핀배지 한 종 선택', price: 12000, items: ['pinbadge'], pinPick: 1 },
+      { id: 'pin', name: '티켓 + 핀배지', note: '핀배지 한 종 선택', price: 13000, items: ['pinbadge'], pinPick: 1 },
       { id: 'book', name: '티켓 + 프로그램북', note: '', price: 20000, items: ['programbook'], pinPick: 0 },
       { id: 'book-stamp', name: '티켓 + 프로그램북 + 우표 스티커', note: '', price: 21000, items: ['programbook', 'stamp-sticker'], pinPick: 0 },
       { id: 'book-pin', name: '티켓 + 프로그램북 + 핀배지', note: '핀배지 한 종 선택', price: 22000, items: ['programbook', 'pinbadge'], pinPick: 1 },

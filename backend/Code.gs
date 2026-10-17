@@ -12,13 +12,14 @@
  *  5. 나온 웹 앱 주소(https://script.google.com/macros/s/.../exec)를 src/content/show.ts의 booking.apiUrl에 넣고 사이트를 다시 빌드한다.
  *  6. 코드를 고치면 배포 → 배포 관리 → 연필 → 버전 "새 버전"으로 다시 배포해야 반영된다. 주소는 그대로다.
  *
+ * 핀배지 종류는 굿즈 칸에 "pinbadge:sogang 1, pinbadge:seagull 1"처럼 적힌다(sogang 서강연극회, seagull 갈매기). 관리 화면은 이름으로 보여 준다.
  * 금액은 이 파일이 다시 센다. 브라우저가 보낸 금액은 믿지 않는다. 아래 CONFIG의 값은 show.ts, hall.ts와 같아야 하고,
  * 다르면 사이트 빌드가 멈춘다(astro.config.mjs). 가격을 바꾸면 show.ts와 여기 둘 다 고치고 Apps Script도 새 버전으로 배포한다.
  *
  * 관리 화면(/admin/)에서 할 수 있는 것: 입금 확인, 자리 풀기와 되살리기, 메모, 자리 직접 넣기(초대석, 관계자석, 전화 예매), 회차별 좌석표, 명단 내려받기.
  * 자리 풀기: 시트에서 상태 칸을 "취소"로 바꿔도 되고, /admin/에서 "자리 풀기"를 눌러도 된다. 되돌리려면 "입금대기"로.
  */
-var CONFIG = /*config*/{"seatPrice":9000,"balconyPrice":9000,"packages":{"ticket":9000,"stamp":11000,"pin":12000,"book":20000,"book-stamp":21000,"book-pin":22000,"all":30000},"goods":{"programbook":15000,"pinbadge":4000,"stamp-sticker":3000},"balconyMax":{"L":0,"R":0},"rows":{"H":10,"G":12,"F":12,"E":12,"D":12,"C":12,"B":12,"A":12},"shows":["1112-1500","1112-1930","1113-1500","1113-1930","1114-1300","1114-1800"]}/*end*/;
+var CONFIG = /*config*/{"seatPrice":9000,"balconyPrice":9000,"packages":{"ticket":9000,"stamp":11000,"pin":13000,"book":20000,"book-stamp":21000,"book-pin":22000,"all":30000},"goods":{"programbook":15000,"pinbadge":4000,"stamp-sticker":3000},"balconyMax":{"L":0,"R":0},"rows":{"H":10,"G":12,"F":12,"E":12,"D":12,"C":12,"B":12,"A":12},"shows":["1112-1500","1112-1930","1113-1500","1113-1930","1114-1300","1114-1800"],"pinKinds":["sogang","seagull"],"pinPick":{"pin":1,"book-pin":1}}/*end*/;
 var SHEET = '예매';
 var HEAD = ['예매번호', '신청시각', '회차', '좌석', '발코니 왼쪽', '발코니 오른쪽', '굿즈', '이름', '연락처', '입금자명', '금액', '상태', '확인시각', '메모'];
 var COL_STATUS = 12, COL_CONFIRMED = 13, COL_NOTE = 14; // 1부터 센 열 번호
@@ -90,15 +91,23 @@ function reserve_(b) {
   var name = text_(b.name, 30), phone = text_(b.phone, 20), payer = text_(b.payer || b.name, 30);
   if (name.length < 2 || !/\d{3}-?\d{3,4}-?\d{4}/.test(phone)) return { ok: false, reason: 'error', message: 'who' };
   // 티켓 구성(pkg:)과 따로 사는 굿즈. 구성은 티켓 장수와 같아야 한다. 모자라면 '티켓'으로 채운다
-  var goods = {}, pk = 0, amount = 0, gn = 0;
+  var goods = {}, pk = 0, amount = 0, gn = 0, pinChosen = 0;
   Object.keys(b.goods || {}).forEach(function (k) {
     var n = int_(b.goods[k]); if (!n) return;
     if (k.indexOf('pkg:') === 0) { var p = CONFIG.packages[k.slice(4)]; if (p == null) return; goods[k] = n; pk += n; amount += n * p; }
     else if (CONFIG.goods[k] != null) { goods[k] = n; gn += n; amount += n * CONFIG.goods[k]; }
+    // 핀배지 종류(pinbadge:<종류>). 값을 바꾸지 않고 몇 개를 어느 종류로 골랐는지만 적는다(10/17)
+    else if (k.indexOf('pinbadge:') === 0 && CONFIG.pinKinds.indexOf(k.slice(9)) >= 0) { goods[k] = n; pinChosen += n; }
   });
   if (pk > tickets || gn > MAX_GOODS) return { ok: false, reason: 'error', message: 'goods' };
   if (pk < tickets) { var base = 'pkg:ticket'; goods[base] = (goods[base] || 0) + tickets - pk; amount += (tickets - pk) * CONFIG.packages.ticket; }
-  var note = b.amount != null && Number(b.amount) !== amount ? '화면 금액 ' + Number(b.amount) + '원과 다름' : '';
+  var notes = [];
+  if (b.amount != null && Number(b.amount) !== amount) notes.push('화면 금액 ' + Number(b.amount) + '원과 다름');
+  // 골라야 할 핀배지 수(한 종 구성 수 + 따로 산 핀배지)와 고른 종류의 합이 다르면 메모에 남긴다. 예매는 받는다
+  var pinNeed = (goods.pinbadge || 0);
+  Object.keys(CONFIG.pinPick).forEach(function (id) { pinNeed += (goods['pkg:' + id] || 0) * CONFIG.pinPick[id]; });
+  if (pinNeed !== pinChosen) notes.push('핀배지 종류 ' + pinChosen + '개 고름, ' + pinNeed + '개 필요');
+  var note = notes.join(', ');
 
   var lock = LockService.getScriptLock(); lock.waitLock(10000); // 같은 자리를 둘이 동시에 잡지 않게
   try {

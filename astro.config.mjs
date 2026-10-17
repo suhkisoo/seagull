@@ -11,6 +11,8 @@ const expected = {
   balconyMax: Object.fromEntries(hall.balcony.sides.map((s) => [s.id, hall.balcony.open ? s.max : 0])),
   rows: Object.fromEntries(hall.rows.map((r) => [r.row, Math.max(...r.seats)])),
   shows: show.shows.map((s) => s.id),
+  pinKinds: show.pinKinds.map((k) => k.id),
+  pinPick: Object.fromEntries(show.booking.packages.filter((p) => p.pinPick).map((p) => [p.id, p.pinPick])),
 };
 const gs = /\/\*config\*\/(.*?)\/\*end\*\//s.exec(readFileSync(new URL('./backend/Code.gs', import.meta.url), 'utf8'));
 if (!gs || JSON.stringify(JSON.parse(gs[1])) !== JSON.stringify(expected)) {
