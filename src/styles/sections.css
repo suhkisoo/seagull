@@ -22,8 +22,6 @@
 .prose { max-width: var(--measure); }
 .prose p + p { margin-top: 1.15em; }
 .prose--lede p:first-child { font-size: clamp(18.5px, 4.9vw, 23px); line-height: 1.72; letter-spacing: -0.01em; }
-/* 들어가며. 작품 소개 본문보다 한 단계 크고 대표 대사보다 작다. 등장 효과 없음 */
-.prologue p { font-size: var(--fs-h3); line-height: 1.75; letter-spacing: -0.01em; }
 .quote { margin-top: 15svh; max-width: 17em; }
 .quote__text { font-size: var(--fs-quote); line-height: 1.5; letter-spacing: -0.02em; }
 .quote__source { display: block; font-size: var(--fs-micro); letter-spacing: var(--track-micro); color: var(--soft); margin-top: 22px; }
@@ -31,12 +29,8 @@
 /* 라벨 대신 가는 선 하나(10/17) */
 .note__rule { margin: 0 0 28px; width: 4em; }
 /* 가운데 문단과 마지막 물음, 서명은 접어 둔다. 누르면 그 자리에서 펼쳐지고 버튼은 물러난다 */
-.note__more { margin-top: 1.1em; }
-.note__more > summary { list-style: none; font-size: var(--fs-small); color: var(--soft); }
-.note__more > summary::-webkit-details-marker { display: none; }
-.note__more[open] > summary { display: none; }
-.note__more > p + p, .note__more > summary + p { margin-top: 1.1em; }
-.note .note__last { margin-top: 2.4em; }
+/* 연출의 글. 작품 소개 본문보다 한 단계 크고 대표 대사보다 작다(10/17) */
+.note p:not(.note__by) { font-size: var(--fs-h3); line-height: 1.75; letter-spacing: -0.01em; }
 .note .note__by { margin-top: 1.4em; text-align: right; font-size: var(--fs-small); color: var(--soft); letter-spacing: var(--track-micro); }
 
 /* 글자로 된 동작. 버튼 모양이 아니다. 닿는 높이 44px, 밑줄은 가는 선 */
@@ -147,9 +141,6 @@ html:not(.js) .js-only { display: none; }
 .cast__row { display: flex; gap: 12px; }
 .cast__row dt { color: var(--soft); min-width: 5.2em; }
 .book-link { margin-top: 56px; }
-/* 들어가며의 마지막 물음. 예매 버튼 바로 위 */
-.book-line { margin-top: 56px; max-width: var(--measure); font-size: var(--fs-h3); line-height: 1.6; letter-spacing: -0.01em; }
-.book-line + .book-link { margin-top: 20px; }
 .book-link a { font-size: var(--fs-h3); letter-spacing: -0.01em; text-decoration: none; display: inline-flex; align-items: baseline; gap: 14px; padding-bottom: 10px; border-bottom: 1px solid currentColor; min-height: 44px; }
 .book-link__hint { font-size: var(--fs-micro); letter-spacing: var(--track-micro); color: var(--soft); }
 .facts { margin-top: 64px; border-top: 1px solid var(--rule); }
@@ -198,7 +189,6 @@ html.js .section--credits { padding-bottom: 0; }
 .colophon .action-list { margin-top: 32px; font-size: var(--fs-small); letter-spacing: 0; }
 
 /* 자바스크립트가 없으면 방의 빛 대신 구간마다 고정된 빛 */
-html:not(.js) .section--prologue { background: var(--ivory); color: var(--floor); }
 html:not(.js) .section--about { background: var(--ivory); color: var(--floor); }
 html:not(.js) .section--people { background: var(--morning-room); color: var(--floor); }
 html:not(.js) .section--two-years { background: linear-gradient(to bottom, var(--morning-room), #2A3328 50%); color: var(--ivory); }

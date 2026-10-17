@@ -21,24 +21,16 @@ import Video from './Video.astro';
       </figure>
       <Video />
       {show.texts.directorsNote && (() => {
-        // 연출의 말. 보이는 라벨 없이 가는 선 하나로 앞 문단과 나눈다. 스크린리더에는 "서기수의 글"로 읽힌다.
-        // 접혀 있을 때는 첫 문단만, "이어 읽기"를 누르면 나머지 문단과 마지막 물음, 서명이 그 자리에 펼쳐진다(10/17 연출).
-        // 마지막 물음의 "거리"는 가운데 문단을 받으므로 접힌 상태에서는 보이지 않는다
+        // 연출의 글. 보이는 라벨 없이 가는 선 하나로 앞 문단과 나눈다. 스크린리더에는 "서기수의 글"로 읽힌다.
+        // 10/17 연출. 접지 않고 네 문단을 다 보인다. 글자는 작품 소개 본문보다 한 단계 크다
         const ps = show.texts.directorsNote.split('\n\n');
         const by = show.texts.directorsNoteBy;
         return (
           <div class="note prose">
             <h3 class="visually-hidden">{by ? `${by}의 글` : '연출의 말'}</h3>
             <hr class="rule note__rule" aria-hidden="true" />
-            <p>{ps[0]}</p>
-            {ps.length > 1 && (
-              <details class="note__more">
-                <summary class="action">이어 읽기</summary>
-                {ps.slice(1, -1).map((p) => <p>{p}</p>)}
-                <p class="note__last">{ps[ps.length - 1]}</p>
-                {by && <p class="note__by">{by}</p>}
-              </details>
-            )}
+            {ps.map((p) => <p>{p}</p>)}
+            {by && <p class="note__by">{by}</p>}
           </div>
         );
       })()}

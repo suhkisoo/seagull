@@ -31,8 +31,6 @@ export const lights: Light[] = [
   { id: 'hero', skyTop: palette.olive, skyBot: palette.floor, bgTop: palette.sun, bgBot: palette.olive, text: palette.ivory, room: palette.floor, sparkle: palette.sun, wind: 0.15 },
   // 첫 화면이 다 저문 뒤. 달빛은 아래 물에서 올라온다
   { id: 'hero-dusk', skyTop: palette.deep, skyBot: '#4C5A4C', bgTop: palette.olive, bgBot: palette.deep, text: palette.ivory, room: palette.floor, sparkle: palette.ivory, wind: 0.15 },
-  // 들어가며. 작품 소개와 같은 한낮의 종이. 1막의 무대는 여기서 끝난다(scroll.ts)
-  { id: 'prologue', skyTop: palette.sun, skyBot: palette.olive, bgTop: palette.ivory, bgBot: palette.ivory, text: palette.floor, room: palette.ivory, shade: [180, 0.1], sparkle: palette.ivory, wind: 0.05 },
   { id: 'about', skyTop: palette.sun, skyBot: palette.olive, bgTop: palette.ivory, bgBot: palette.ivory, text: palette.floor, room: palette.ivory, shade: [180, 0.1], sparkle: palette.ivory, wind: 0.05 },
   { id: 'people', skyTop: palette.morningShadow, skyBot: palette.olive, bgTop: palette.morningRoom, bgBot: palette.morningRoom, text: palette.floor, room: palette.morningRoom, shade: [90, 0.13], sparkle: palette.ivory, wind: 0.05 },
   { id: 'two-years', skyTop: palette.deep, skyBot: palette.floor, bgTop: palette.morningRoom, bgBot: palette.deep, text: palette.ivory, room: palette.night, shade: [0, 0.32], sparkle: palette.ivory, wind: 0.35 },
