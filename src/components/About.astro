@@ -22,18 +22,42 @@ import Video from './Video.astro';
       <Video />
       {show.texts.directorsNote && (() => {
         // 연출의 글. 보이는 라벨 없이 가는 선 하나로 앞 문단과 나눈다. 스크린리더에는 "서기수의 글"로 읽힌다.
-        // 10/17 연출. 접지 않고 네 문단을 다 보인다. 글자는 작품 소개 본문보다 한 단계 크다
+        // 랜딩 페이지라 첫 문단만 보이고, "이어 읽기"를 누르면 나머지 문단과 마지막 물음, 서명이 그 자리에 천천히 펼쳐진다(10/17 연출).
+        // 다 읽은 자리에 "접기"가 있다(자바스크립트가 있을 때). 접으면 글의 첫 문단으로 돌아온다
         const ps = show.texts.directorsNote.split('\n\n');
         const by = show.texts.directorsNoteBy;
         return (
-          <div class="note prose">
+          <div class="note prose" data-note>
             <h3 class="visually-hidden">{by ? `${by}의 글` : '연출의 말'}</h3>
             <hr class="rule note__rule" aria-hidden="true" />
-            {ps.map((p) => <p>{p}</p>)}
-            {by && <p class="note__by">{by}</p>}
+            <p>{ps[0]}</p>
+            {ps.length > 1 && (
+              <details class="note__more">
+                <summary class="note__open">이어 읽기</summary>
+                {ps.slice(1, -1).map((p) => <p>{p}</p>)}
+                <p class="note__last">{ps[ps.length - 1]}</p>
+                {by && <p class="note__by">{by}</p>}
+                <button class="note__close" type="button" data-note-close hidden>접기</button>
+              </details>
+            )}
           </div>
         );
       })()}
     </div>
   </div>
 </section>
+<script>
+  // 접기. 닫고 나서 글의 첫 문단이 화면 밖(위)에 있으면 그 자리로 돌아온다. 움직임 줄이기에서는 바로 옮긴다
+  const note = document.querySelector<HTMLElement>('[data-note]');
+  const more = note?.querySelector<HTMLDetailsElement>('.note__more');
+  const close = note?.querySelector<HTMLButtonElement>('[data-note-close]');
+  if (note && more && close) {
+    close.hidden = false;
+    close.addEventListener('click', () => {
+      more.open = false;
+      const top = note.getBoundingClientRect().top;
+      if (top < 0) window.scrollTo({ top: top + window.scrollY - window.innerHeight * 0.18, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      more.querySelector('summary')?.focus({ preventScroll: true });
+    });
+  }
+</script>

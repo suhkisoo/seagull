@@ -31,6 +31,22 @@
 /* 가운데 문단과 마지막 물음, 서명은 접어 둔다. 누르면 그 자리에서 펼쳐지고 버튼은 물러난다 */
 /* 연출의 글. 작품 소개 본문보다 한 단계 크고 대표 대사보다 작다(10/17) */
 .note p:not(.note__by) { font-size: var(--fs-h3); line-height: 1.75; letter-spacing: -0.01em; }
+/* 접힌 글. 첫 문단 아래 "이어 읽기"와 짧은 가는 선. 닿으면 선이 조금 늘어나고 밝아진다 */
+.note__more { margin-top: 1.4em; interpolate-size: allow-keywords; }
+.note__open, .note__close { display: inline-flex; align-items: center; gap: 14px; min-height: 44px; font-size: var(--fs-small); letter-spacing: 0.02em; color: var(--soft); cursor: pointer; list-style: none; transition: color 400ms var(--ease); }
+.note__open::-webkit-details-marker { display: none; }
+.note__open::after, .note__close::after { content: ''; width: 2.6em; height: 1px; background: currentColor; opacity: 0.45; transition: width 600ms var(--ease), opacity 400ms var(--ease); }
+.note__open:hover, .note__open:focus-visible, .note__close:hover, .note__close:focus-visible { color: inherit; }
+.note__open:hover::after, .note__open:focus-visible::after, .note__close:hover::after, .note__close:focus-visible::after { width: 4.4em; opacity: 0.8; }
+.note__more[open] > .note__open { display: none; }
+/* 펼칠 때 높이가 천천히 열리고 글이 배어 나온다. 지원하지 않는 브라우저는 바로 열린다 */
+.note__more::details-content { block-size: 0; opacity: 0; overflow: clip; transition: block-size 800ms var(--ease), opacity 700ms var(--ease) 150ms, content-visibility 800ms allow-discrete; }
+.note__more[open]::details-content { block-size: auto; opacity: 1; }
+.note__more > p + p { margin-top: 1.15em; }
+.note .note__last { margin-top: 2.6em; }
+.note__close { margin-top: 2.2em; background: none; border: 0; padding: 0; font-family: inherit; }
+.note__close[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) { .note__more::details-content, .note__open::after, .note__close::after { transition: none; } }
 .note .note__by { margin-top: 1.4em; text-align: right; font-size: var(--fs-small); color: var(--soft); letter-spacing: var(--track-micro); }
 
 /* 글자로 된 동작. 버튼 모양이 아니다. 닿는 높이 44px, 밑줄은 가는 선 */
