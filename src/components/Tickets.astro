@@ -64,6 +64,7 @@ const bookExternal = !!show.booking.commonUrl;
         ))}
       </fieldset>
       <p class="showtimes__hint">시간을 누르면 그 회차 출연진이 보입니다</p>
+      {show.texts.bookingLine && <p class="book-line">{show.texts.bookingLine}</p>}
       <p class="book-link"><a href={bookHref} data-book-link target={bookExternal ? '_blank' : undefined} rel={bookExternal ? 'noopener' : undefined}>좌석 고르고 예매하기</a></p>
       <dl class="facts">
         <div class="facts__row"><dt>가격과 좌석</dt><dd>{show.pricing || '추후 공개'}</dd></div>

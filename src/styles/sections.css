@@ -22,6 +22,8 @@
 .prose { max-width: var(--measure); }
 .prose p + p { margin-top: 1.15em; }
 .prose--lede p:first-child { font-size: clamp(18.5px, 4.9vw, 23px); line-height: 1.72; letter-spacing: -0.01em; }
+/* 들어가며. 작품 소개 본문보다 한 단계 크고 대표 대사보다 작다. 등장 효과 없음 */
+.prologue p { font-size: var(--fs-h3); line-height: 1.75; letter-spacing: -0.01em; }
 .quote { margin-top: 15svh; max-width: 17em; }
 .quote__text { font-size: var(--fs-quote); line-height: 1.5; letter-spacing: -0.02em; }
 .quote__source { display: block; font-size: var(--fs-micro); letter-spacing: var(--track-micro); color: var(--soft); margin-top: 22px; }
@@ -145,6 +147,9 @@ html:not(.js) .js-only { display: none; }
 .cast__row { display: flex; gap: 12px; }
 .cast__row dt { color: var(--soft); min-width: 5.2em; }
 .book-link { margin-top: 56px; }
+/* 들어가며의 마지막 물음. 예매 버튼 바로 위 */
+.book-line { margin-top: 56px; max-width: var(--measure); font-size: var(--fs-h3); line-height: 1.6; letter-spacing: -0.01em; }
+.book-line + .book-link { margin-top: 20px; }
 .book-link a { font-size: var(--fs-h3); letter-spacing: -0.01em; text-decoration: none; display: inline-flex; align-items: baseline; gap: 14px; padding-bottom: 10px; border-bottom: 1px solid currentColor; min-height: 44px; }
 .book-link__hint { font-size: var(--fs-micro); letter-spacing: var(--track-micro); color: var(--soft); }
 .facts { margin-top: 64px; border-top: 1px solid var(--rule); }
@@ -193,6 +198,7 @@ html.js .section--credits { padding-bottom: 0; }
 .colophon .action-list { margin-top: 32px; font-size: var(--fs-small); letter-spacing: 0; }
 
 /* 자바스크립트가 없으면 방의 빛 대신 구간마다 고정된 빛 */
+html:not(.js) .section--prologue { background: var(--ivory); color: var(--floor); }
 html:not(.js) .section--about { background: var(--ivory); color: var(--floor); }
 html:not(.js) .section--people { background: var(--morning-room); color: var(--floor); }
 html:not(.js) .section--two-years { background: linear-gradient(to bottom, var(--morning-room), #2A3328 50%); color: var(--ivory); }

@@ -52,8 +52,10 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
     // 띠는 휴대폰 96px, 데스크톱 110px로 고정한다. 4막에도, 페이지 끝에서도 더 커지지 않는다(10/17 연출 "본문을 덮는다")
     heroPx = 0.38 * svh + safe; bandPx = (window.innerWidth >= 1024 ? 110 : 96) + safe; endPx = bandPx;
     maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    // 한낮의 빛은 들어가며(있으면)에서 시작해 작품 소개 끝까지. 1막의 무대와 달의 길은 들어가며 앞에서 끝난다
     const ab = root.querySelector<HTMLElement>('[data-light="about"]')?.getBoundingClientRect();
-    if (ab) { aboutTop = ab.top + window.scrollY; aboutBot = ab.bottom + window.scrollY; }
+    const pr = root.querySelector<HTMLElement>('[data-light="prologue"]')?.getBoundingClientRect();
+    if (ab) { aboutTop = (pr ?? ab).top + window.scrollY; aboutBot = ab.bottom + window.scrollY; }
     const tk = root.querySelector<HTMLElement>('[data-light="tickets"]')?.getBoundingClientRect();
     if (tk) { actTop = tk.top + window.scrollY; actBot = tk.bottom + window.scrollY; }
     stops = [];
