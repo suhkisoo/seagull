@@ -22,7 +22,9 @@ let boost = 0;
 function raiseLamp() {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const t0 = performance.now();
-  const step = (t: number) => { const k = Math.min(1, (t - t0) / 1600); boost = Math.sin(Math.PI * k) * 0.7 * (1 - 0.4 * k); trackLamp(); if (k < 1) requestAnimationFrame(step); else { boost = 0; trackLamp(); } };
+  // 방의 램프(.room__lamp)도 같이 돋운다
+  const up = (v: number) => document.documentElement.style.setProperty('--lamp-up', v.toFixed(3));
+  const step = (t: number) => { const k = Math.min(1, (t - t0) / 1600); boost = Math.sin(Math.PI * k) * 0.7 * (1 - 0.4 * k); trackLamp(); up(boost); if (k < 1) requestAnimationFrame(step); else { boost = 0; trackLamp(); up(0); } };
   requestAnimationFrame(step);
 }
 window.addEventListener('scroll', trackLamp, { passive: true });

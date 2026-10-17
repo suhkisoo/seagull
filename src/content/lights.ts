@@ -8,7 +8,8 @@ export const palette = {
   amber: '#CDA668',    // 램프 호박빛
   morningShadow: '#AEBFB7', // 파생: 아침의 푸른 기운
   morningRoom: '#DDE0D4',   // 파생: 아침 실내의 바탕
-  lampRoom: '#F0EAD9',      // 파생: 4막의 실내. 갓을 씌운 램프 하나가 켜진 방. 아이보리에 호박빛이 조금 밴다
+  lampRoom: '#F0EAD9',      // 파생: 예매 화면의 종이. 아이보리에 호박빛이 조금 밴다
+  lampDusk: '#3B3A2E',      // 파생: 4막의 실내. 어스름에 갓을 씌운 램프 하나만 켜진 방. 초록이 밴 누런 어둠(10/17 연출)
   night: '#2A3328',         // 파생: 2년의 밤. 페이지에서 가장 긴 어둠은 여기 한 곳
 } as const;
 
@@ -34,8 +35,9 @@ export const lights: Light[] = [
   { id: 'about', skyTop: palette.sun, skyBot: palette.olive, bgTop: palette.ivory, bgBot: palette.ivory, text: palette.floor, room: palette.ivory, shade: [180, 0.1], sparkle: palette.ivory, wind: 0.05 },
   { id: 'people', skyTop: palette.morningShadow, skyBot: palette.olive, bgTop: palette.morningRoom, bgBot: palette.morningRoom, text: palette.floor, room: palette.morningRoom, shade: [90, 0.13], sparkle: palette.ivory, wind: 0.05 },
   { id: 'two-years', skyTop: palette.deep, skyBot: palette.floor, bgTop: palette.morningRoom, bgBot: palette.deep, text: palette.ivory, room: palette.night, shade: [0, 0.32], sparkle: palette.ivory, wind: 0.35 },
-  // 4막. 밖은 폭풍이고 방에는 램프가 켜져 있다. 방은 램프 빛의 종이, 물은 폭풍의 밤(scroll.ts). 10/8 연출 "바탕이 너무 어둡다"
-  { id: 'tickets', skyTop: palette.deep, skyBot: palette.floor, bgTop: palette.lampRoom, bgBot: palette.lampRoom, text: palette.floor, room: palette.lampRoom, shade: [0, 0.07], sparkle: palette.ivory, wind: 0.62 },
+  // 4막. 밖은 폭풍이고 방은 어스름, 갓을 씌운 램프 하나만 켜져 있다. 램프의 호박빛 웅덩이는 .room__lamp, 물은 폭풍의 밤(scroll.ts).
+  // 10/8에 종이처럼 밝혔다가 10/17 연출 "4막의 어둑어둑한데 램프가 켜진 느낌이 아니다"로 다시 어둑하게
+  { id: 'tickets', skyTop: palette.deep, skyBot: palette.floor, bgTop: palette.lampDusk, bgBot: palette.lampDusk, text: palette.ivory, room: palette.lampDusk, shade: [0, 0.07], sparkle: palette.ivory, wind: 0.62 },
   // 끝. 포스터의 아랫단처럼 종이 위에 이름들. 물은 다시 포스터의 반영으로 돌아온다
   { id: 'credits', skyTop: palette.olive, skyBot: palette.floor, bgTop: palette.ivory, bgBot: palette.ivory, text: palette.floor, room: '#F4F1E5', shade: [0, 0.05], sparkle: palette.ivory, wind: 0.1 },
 ];

@@ -29,8 +29,8 @@
 /* 라벨 대신 가는 선 하나(10/17) */
 .note__rule { margin: 0 0 28px; width: 4em; }
 /* 가운데 문단과 마지막 물음, 서명은 접어 둔다. 누르면 그 자리에서 펼쳐지고 버튼은 물러난다 */
-/* 연출의 글. 작품 소개 본문보다 한 단계 크고 대표 대사보다 작다(10/17) */
-.note p:not(.note__by) { font-size: var(--fs-h3); line-height: 1.75; letter-spacing: -0.01em; }
+/* 연출의 글. 글자는 작품 소개 본문과 같다(10/17 연출 "글자 크기가 이상하다". 한 단계 크게 했던 것을 되돌림). 줄 간격만 조금 넓다 */
+.note p:not(.note__by) { font-size: var(--fs-body); line-height: 1.85; }
 /* 접힌 글. 첫 문단 아래 "이어 읽기"와 짧은 가는 선. 닿으면 선이 조금 늘어나고 밝아진다 */
 .note__more { margin-top: 1.4em; interpolate-size: allow-keywords; }
 .note__open, .note__close { display: inline-flex; align-items: center; gap: 14px; min-height: 44px; font-size: var(--fs-small); letter-spacing: 0.02em; color: var(--soft); cursor: pointer; list-style: none; transition: color 400ms var(--ease); }
@@ -208,7 +208,7 @@ html.js .section--credits { padding-bottom: 0; }
 html:not(.js) .section--about { background: var(--ivory); color: var(--floor); }
 html:not(.js) .section--people { background: var(--morning-room); color: var(--floor); }
 html:not(.js) .section--two-years { background: linear-gradient(to bottom, var(--morning-room), #2A3328 50%); color: var(--ivory); }
-html:not(.js) .section--tickets { background: #F0EAD9; color: var(--floor); }
+html:not(.js) .section--tickets { background: #3B3A2E; color: var(--ivory); }
 html:not(.js) .section--credits { background: #F4F1E5; color: var(--floor); }
 
 @media (prefers-reduced-motion: reduce) {

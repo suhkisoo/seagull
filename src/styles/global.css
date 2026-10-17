@@ -25,6 +25,25 @@ a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 0.28e
 /* 물에서 올라오는 낮은 빛. 저녁과 밤의 구간에서만 */
 .room::after { content: ''; position: absolute; inset: 0; opacity: var(--glow, 0);
   background: radial-gradient(140% 62% at 50% 100%, color-mix(in srgb, var(--sun) 55%, var(--ivory)) 0, color-mix(in srgb, var(--sun) 40%, transparent) 30%, transparent 72%); }
+/* 4막. 어스름의 방에 갓을 씌운 램프 하나. 호박빛이 한 자리에 고이고 가장자리는 어둠으로 풀린다.
+   갓이 위를 가리므로 빛은 램프 아래쪽으로 더 퍼진다. 촛불처럼 아주 조금 일렁인다. 세기는 scroll.ts(--lamp-on), 회차를 고르면 잠깐 돋운다(tickets.ts, --lamp-up) */
+.room__lamp { position: absolute; inset: 0; opacity: calc(var(--lamp-on, 0) * (0.82 + 0.35 * var(--lamp-up, 0))); }
+.room__lamp::before, .room__lamp::after { content: ''; position: absolute; inset: 0; }
+/* 방에 번진 빛 */
+.room__lamp::before { background: radial-gradient(ellipse 72% 54% at 66% 44%, color-mix(in srgb, var(--amber) 24%, transparent) 0, color-mix(in srgb, var(--amber) 12%, transparent) 42%, color-mix(in srgb, var(--amber) 4%, transparent) 72%, transparent 100%); }
+/* 갓 아래로 떨어진 빛. 갓의 그늘이 위를 가로로 자른다. 원반이 되지 않게 납작하고 아래로 풀린다 */
+.room__lamp::after { transform-origin: 80% 36%; animation: lamp-flame 7.3s ease-in-out infinite;
+  background: radial-gradient(ellipse 46% 16% at 80% 36%, color-mix(in srgb, var(--amber) 44%, transparent) 0, color-mix(in srgb, var(--amber) 20%, transparent) 38%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 32%, #000 36.5%, #000 52%, transparent 70%); mask-image: linear-gradient(to bottom, transparent 32%, #000 36.5%, #000 52%, transparent 70%); }
+/* 데스크톱은 구간 제목 아래 빈 왼쪽 단에 램프가 놓이고, 빛이 오른쪽 본문으로 번진다 */
+@media (min-width: 1024px) {
+  .room__lamp::before { background: radial-gradient(ellipse 54% 62% at 34% 56%, color-mix(in srgb, var(--amber) 24%, transparent) 0, color-mix(in srgb, var(--amber) 12%, transparent) 42%, color-mix(in srgb, var(--amber) 4%, transparent) 72%, transparent 100%); }
+  .room__lamp::after { transform-origin: 22% 58%;
+    background: radial-gradient(ellipse 22% 15% at 22% 58%, color-mix(in srgb, var(--amber) 44%, transparent) 0, color-mix(in srgb, var(--amber) 20%, transparent) 40%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 54%, #000 58.5%, #000 72%, transparent 88%); mask-image: linear-gradient(to bottom, transparent 54%, #000 58.5%, #000 72%, transparent 88%); }
+}
+@keyframes lamp-flame { 0%, 100% { opacity: 1; transform: scale(1); } 14% { opacity: 0.93; transform: scale(0.992); } 23% { opacity: 0.99; } 41% { opacity: 0.9; transform: scale(1.006) translateY(0.4%); } 55% { opacity: 1; } 72% { opacity: 0.94; transform: scale(0.996); } 86% { opacity: 0.985; } }
+@media (prefers-reduced-motion: reduce) { .room__lamp::after { animation: none; } }
 html.js .page { color: var(--ink); }
 /* 장면의 날짜. 구간 사이 암전 속에 하나씩 놓인다(content/show.ts texts.stageTimes) */
 .stage-time { position: absolute; left: 0; right: 0; max-width: 1480px; margin-inline: auto; padding-inline: var(--gutter); top: calc(var(--section-pad) * 0.38); font-size: var(--fs-small); letter-spacing: 0.04em; font-variant-numeric: tabular-nums lining-nums; color: color-mix(in srgb, currentColor 72%, transparent); }

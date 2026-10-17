@@ -22,7 +22,7 @@ import Video from './Video.astro';
       <Video />
       {show.texts.directorsNote && (() => {
         // 연출의 글. 보이는 라벨 없이 가는 선 하나로 앞 문단과 나눈다. 스크린리더에는 "서기수의 글"로 읽힌다.
-        // 랜딩 페이지라 첫 문단만 보이고, "이어 읽기"를 누르면 나머지 문단과 마지막 물음, 서명이 그 자리에 천천히 펼쳐진다(10/17 연출).
+        // 글자는 본문과 같은 크기. 랜딩 페이지라 첫 문단만 보이고, "이어 읽기"를 누르면 나머지 문단과 마지막 물음, 서명이 그 자리에 천천히 펼쳐진다(10/17 연출).
         // 다 읽은 자리에 "접기"가 있다(자바스크립트가 있을 때). 접으면 글의 첫 문단으로 돌아온다
         const ps = show.texts.directorsNote.split('\n\n');
         const by = show.texts.directorsNoteBy;

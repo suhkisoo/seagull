@@ -40,7 +40,7 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
   let stage = false, stageT = 0, eyesSaid = false, stageK = 0; const ptsI = new Float32Array(6);
   const probe = document.createElement('div'); probe.style.cssText = 'position:fixed;top:0;left:0;height:100svh;width:0;pointer-events:none;visibility:hidden;padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:content-box';
   document.body.appendChild(probe);
-  let svh = 0, safe = 0, heroPx = 0, bandPx = 0, endPx = 0, maxY = 0, aboutTop = 0, aboutBot = 0, actTop = 0, actBot = 0, duskStart = performance.now();
+  let svh = 0, safe = 0, heroPx = 0, bandPx = 0, endPx = 0, maxY = 0, aboutTop = 0, aboutBot = 0, actTop = 0, actBot = 0, lampTop = 0, lastLamp = -1, duskStart = performance.now();
   const heroTitle = root.querySelector<HTMLElement>('[data-title]'), endTitle = root.querySelector<HTMLElement>('[data-end-title]');
   let reflectEl = heroTitle;
 
@@ -58,7 +58,7 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
     if (tk) { actTop = tk.top + window.scrollY; actBot = tk.bottom + window.scrollY; }
     stops = [];
     // 10/8 고침. 암전은 2년 한 곳에만 둔다. 다른 구간 사이는 빛이 곧바로 바뀐다(가운데가 흙빛으로 흐려지지 않게).
-    // 4막은 2년의 밤에서 시작해 첫 지문(램프 하나가 켜져 있다)을 지나면 램프의 방으로 밝아진다
+    // 4막은 2년의 밤에서 시작해 첫 지문(램프 하나가 켜져 있다)을 지나면 어스름의 방이 되고 램프가 켜진다(10/17)
     const secs = [...root.querySelectorAll<HTMLElement>('[data-light]')];
     secs.forEach((el, i) => {
       const r = el.getBoundingClientRect(); const top = r.top + window.scrollY, bot = top + r.height;
@@ -77,7 +77,8 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
         const st = el.querySelector<HTMLElement>('.stage-time--long');
         const D = st ? st.getBoundingClientRect().bottom + window.scrollY - top : 0.2 * svh;
         const n = hex(byId('two-years').room);
-        stops.push({ y: top, c: n, w, g: 0.3, a, s: 0.32 }, { y: top + D, c: n, w, g: 0.2, a, s: 0.3 }, { y: top + D + 0.1 * svh, c: hex('#B39660'), w, g: 0.1, a, s: 0.12 }, { y: top + D + 0.24 * svh, c, w, g, a, s: sh });
+        lampTop = top + D;
+        stops.push({ y: top, c: n, w, g: 0.3, a, s: 0.32 }, { y: top + D, c: n, w, g: 0.2, a, s: 0.3 }, { y: top + D + 0.3 * svh, c, w, g: 0.08, a, s: sh });
       } else if (i === 0) stops.push({ y: top, c: FLOOR, w, g: 0, a, s: 0 }, { y: top + T, c, w, g, a, s: sh });
       else stops.push({ y: top + T / 2, c, w, g, a, s: sh });
       stops.push({ y: next && next !== 'two-years' ? bot - T / 2 : bot, c, w, g, a, s: sh });
@@ -139,7 +140,7 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
     const room = roomAt(y + 0.58 * svh);
     const ink = mix(IVORY, FLOOR, smooth((lum(room.c) - 0.15) / 0.08));
     // 띠의 물은 포스터의 반영이다(10/8 고침, 전에는 늘 어두운 호수였다). 낮에는 그림의 초록 줄기가 비치고,
-    // 밤(2년)과 4막의 폭풍에서는 어두운 호수로 가라앉는다. 4막은 방이 램프로 밝아도 물은 밤이다
+    // 밤(2년)과 4막의 폭풍에서는 어두운 호수로 가라앉는다. 4막은 방도 어스름, 물은 밤이다
     const bandRoom = roomAt(y + svh - h);
     const ry0 = y + 0.58 * svh;
     const act0 = actBot > actTop ? smooth((ry0 - actTop) / (0.6 * svh)) * (1 - smooth((ry0 - actBot + 0.2 * svh) / (0.5 * svh))) : 0;
@@ -159,6 +160,9 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
     // 4막(일정과 예매, 오시는 길). 폭풍 이틀째. 정면 유리문으로 나간 램프 빛이 거친 물에 부서진다.
     // 끝(만든 사람들)에 들어서면 바람이 잦아들어 맺음의 제목이 비친다
     const actW = act0;
+    // 4막의 램프. 첫 지문을 지나면 켜지고 끝(만든 사람들)으로 넘어가며 꺼진다. 호박빛 웅덩이의 세기(global.css .room__lamp)
+    const lampW = lampTop > 0 ? smooth((ry0 - lampTop) / (0.4 * svh)) * (1 - smooth((ry0 - actBot + 0.25 * svh) / (0.4 * svh))) : 0;
+    if (Math.abs(lampW - lastLamp) > 0.004) { lastLamp = lampW; root.style.setProperty('--lamp-on', lampW.toFixed(3)); }
     if (water) {
       const sum = moonW + aboutW + actW + 1e-3, a = moonW / sum, b = aboutW / sum, c = actW / sum, vw = window.innerWidth;
       water.state.glade = [vw * (0.54 * a + 0.2 * b + 0.47 * c), moonW * 0.8 + aboutW * 0.45 + actW * 0.42, 9 * a + 39 * b + 24 * c, aboutW];
