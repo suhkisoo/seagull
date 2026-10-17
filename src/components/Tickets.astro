@@ -17,7 +17,8 @@ const pin = geo ? `${encodeURIComponent(show.venue.mapQuery || show.venue.name)}
 const naver = show.venue.naverMap || `https://map.naver.com/p/search/${q}`;
 const kakao = show.venue.kakaoMap || (geo ? `https://map.kakao.com/link/map/${pin}` : `https://map.kakao.com/?q=${q}`);
 const kakaoTo = geo ? `https://map.kakao.com/link/to/${pin}` : '';
-const openText = show.booking.openAt ? `${fmtDate(show.booking.openAt)} ${fmtTime(show.booking.openAt)}` : '추후 공개';
+// 오픈 시각이 비어 있어도 장부가 연결되어 있으면 지금 예매를 받는다(10/17 연출 "이제 오픈해줘")
+const openText = show.booking.openAt ? `${fmtDate(show.booking.openAt)} ${fmtTime(show.booking.openAt)}` : show.booking.apiUrl || show.booking.commonUrl ? '지금 예매 중' : '추후 공개';
 const castOf = (s: (typeof show.shows)[number]) => show.roles.map((r) => ({ role: r.name, actor: s.cast[r.id] || '' }));
 const bookHref = show.booking.commonUrl || `${base}/book/`;
 const bookExternal = !!show.booking.commonUrl;

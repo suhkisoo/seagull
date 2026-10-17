@@ -69,9 +69,9 @@ export const show = {
       { id: 'book-pin', name: '티켓 + 프로그램북 + 핀배지', note: '', price: 22000, items: ['programbook', 'pinbadge'] },
       { id: 'all', name: '티켓 + 굿즈 전체', note: '프로그램북, 핀배지, 우표 스티커', price: 30000, items: ['programbook', 'pinbadge', 'stamp-sticker'] },
     ],
-    account: { bank: '', number: '', holder: '' }, // 입금 계좌 【빈칸】
+    account: { bank: '카카오뱅크', number: '3333327681353', holder: '고은채' }, // 입금 계좌(10/17 기획 고은채, 예금주는 연출)
     holdHours: 24,                                // 입금 대기 시간. 지나면 기획팀이 관리 화면에서 자리를 풀 수 있다
-    contact: '',                                  // 예매 문의(카카오톡 채널, 전화 등) 【빈칸】
+    contact: '010-8255-2119',                     // 예매와 입금 문의(10/17 기획 고은채)
   },
   // 굿즈. 9/17 인스타 일정표와 9/21 기획 스탭회의 기준 【확인】. 가격과 재고는 【빈칸】. price가 비면 "추후 공개"로 보이고 고를 수 없다
   // 따로 더 사는 굿즈. 티켓과 함께만 예매한다. 연출이 10/7에 준 가격. 그림은 드라이브 굿즈 폴더(10/5)
@@ -133,7 +133,7 @@ export const show = {
     ] as { text: string; source: string; act?: 'act1' | 'act4'; cue?: 'stage' | 'eyes' }[],
   },
   video: { youtubeId: '', aspect: '16/9', poster: '' }, // 비면 숨김
-  links: { instagram: '', contact: '' },          // 비면 숨김
+  links: { instagram: '', contact: 'sogangtheatre@naver.com' },          // 비면 숨김
   sponsors: '',                                   // 비면 숨김
   meta: {
     title: '〈갈매기〉 서강연극회 118회 정기공연',   // 【확인】
