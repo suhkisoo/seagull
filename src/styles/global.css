@@ -53,8 +53,11 @@ html.js .page { color: var(--ink); }
 /* 첫 화면의 날짜는 막 위에. 막이 오르면 함께 오르며 사라진다 */
 /* 극 안의 시각은 공연 정보와 섞이지 않게 막 한가운데, 옅고 성기게. 공연 날짜(아래 오른쪽)와 극단 표기(위 왼쪽) 사이의 다른 층 */
 /* 휴대폰에서는 표기 바로 아래, 제목 오른쪽 열에 둔다. 글자를 키운 폰에서도 제목과 겹치지 않는다(10/17). 데스크톱은 막 한가운데 */
-.curtain__time { margin: 22px 0 0; padding-left: calc(var(--fs-title-a) + 36px); text-align: right; font-size: var(--fs-micro); line-height: 1.75; letter-spacing: 0.14em; color: var(--ivory); opacity: 0.8; pointer-events: none; will-change: transform, opacity; }
-@media (min-width: 1024px) { .curtain__time { position: absolute; left: 0; right: 0; top: 31svh; margin: 0; padding: 0; text-align: center; letter-spacing: 0.16em; } }
+/* 1막의 시각. 휴대폰에서도 화면 31% 자리에 떠 있어서, 막이 오르는 동안 보인다(10/17. 전에는 윗줄 아래 흐름 속에 있어 스크롤하면 바로 나갔다) */
+.curtain__time { position: absolute; left: 0; right: 0; top: 31svh; margin: 0; padding: 0 var(--gutter); text-align: right; font-size: var(--fs-micro); line-height: 1.75; letter-spacing: 0.14em; color: var(--ivory); opacity: 0.8; pointer-events: none; will-change: transform, opacity; }
+/* 막이 오르기 전에는 보이지 않는다(scroll.ts가 올린다). 10/17 */
+html.js .curtain__time { opacity: 0; }
+@media (min-width: 1024px) { .curtain__time { padding: 0; text-align: center; letter-spacing: 0.16em; } }
 /* 극 안의 날짜 앞의 막 이름. 날짜가 극 안의 시간이라는 것을 알린다 */
 .stage-time__act { margin-right: 0.9em; padding-right: 0.9em; border-right: 1px solid color-mix(in srgb, currentColor 45%, transparent); letter-spacing: 0.1em; }
 .curtain__time .stage-time__act { display: inline-block; }

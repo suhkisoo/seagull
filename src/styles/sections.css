@@ -103,7 +103,8 @@ html:not(.js) .js-only { display: none; }
 .role__summary { position: relative; list-style: none; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; column-gap: 16px; padding: 22px 0 20px; }
 .role__summary::-webkit-details-marker { display: none; }
 .role__name { font-size: clamp(22px, 5.8vw, 34px); line-height: 1.2; letter-spacing: -0.02em; }
-.role__actors { font-size: var(--fs-small); line-height: 1.6; text-align: right; display: flex; flex-direction: column; color: var(--soft); transition: color 600ms var(--ease); }
+/* 배우 이름. 휴대폰에서도 한 줄에 나란히, 본문 크기(10/17 연출 "배역에 비해 너무 조용하다") */
+.role__actors { font-size: var(--fs-body); line-height: 1.6; text-align: right; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0 1em; color: var(--soft); transition: color 600ms var(--ease); }
 .role__win[open] .role__actors { color: currentColor; }
 .role__body { position: relative; padding: 0 0 28px; font-size: var(--fs-small); line-height: 1.75; max-width: 26em; }
 .role__script { color: var(--soft); }
@@ -112,7 +113,7 @@ html:not(.js) .js-only { display: none; }
 .role__line { margin-top: 18px; font-size: var(--fs-body); }
 @media (min-width: 1024px) {
   .role__summary { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 26px 0 24px; }
-  .role__actors { text-align: left; flex-direction: row; gap: 0 1.4em; font-size: var(--fs-body); }
+  .role__actors { text-align: left; justify-content: flex-start; gap: 0 1.4em; }
   .role__body { margin-left: 50%; padding-left: 0; }
 }
 

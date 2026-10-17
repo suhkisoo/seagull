@@ -18,9 +18,9 @@ import { show } from '../content/show';
         ))}
       </dl>
       <div class="colophon">
+        <!-- 판권면. 기획과 연출은 위 명단에, 일정과 극장은 일정 구간에 있으므로 되풀이하지 않는다(10/17). 작가는 여기에만 -->
+        <p>{show.credits.author}</p>
         <p>{show.company}</p>
-        <p>{show.credits.author}.{show.credits.planning ? ` ${show.credits.planning}.` : ''} {show.credits.directing}</p>
-        <p>{show.period}. {show.venue.name}</p>
         {(show.links.instagram || show.links.contact) && <ul class="action-list" role="list">
             {show.links.instagram && <li><span class="action-list__label">인스타그램</span><span class="action-list__value"><a class="action" href={show.links.instagram} target="_blank" rel="noopener">인스타그램 열기</a></span></li>}
             {show.links.contact && <li><span class="action-list__label">문의</span><span class="action-list__value">{show.links.contact.includes('@') ? <a class="action" href={`mailto:${show.links.contact}`}>문의하기</a> : <span>{show.links.contact}</span>}</span></li>}

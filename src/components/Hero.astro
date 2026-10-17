@@ -23,12 +23,11 @@ const nobreak = (t: string) => t.split(' ').flatMap((w) => w.split(/(?<=~)/)).ma
     <img src={lakeReflection.src} alt="" data-reflection hidden decoding="async" />
   </div>
   <div class="hero__content">
+    <!-- 첫 화면에는 작품과 날짜만(10/17 연출 "글씨가 너무 많다"). 작, 기획, 연출은 끝의 만든 사람들과 판권면에 있다 -->
     <div class="hero__meta">
       <p>{show.company}</p>
-      <p>{show.credits.author}</p>
-      {show.credits.planning && <p>{show.credits.planning}</p>}
-      <p>{show.credits.directing}</p>
     </div>
+    <!-- 1막의 시각. 처음에는 보이지 않다가 막이 오르기 시작하면 떠오르고, 막과 함께 올라가며 사라진다(scroll.ts). 자바스크립트가 없으면 그냥 보인다 -->
     {show.texts.stageTimes.act1 && <p class="curtain__time" data-curtain-time>{show.texts.stageActs.act1 && <span class="stage-time__act">{show.texts.stageActs.act1}</span>}<span>{show.texts.stageTimes.act1}</span></p>}
     <h1 class="hero__title" data-title set:html={titleHtml}></h1>
     {show.originalTitle && <p class="hero__original" aria-label={show.originalTitle}>{show.originalTitle}</p>}

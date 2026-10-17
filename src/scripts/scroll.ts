@@ -126,7 +126,7 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
       root.style.setProperty('--curtain', p.toFixed(4));
       // 막은 위로 걷히며 모인다. 올라가는 동안 천이 가볍게 흔들린다
       if (curtain) { const e = smooth(p); curtain.style.transform = `translate3d(0, ${(-e * 70).toFixed(2)}%, 0) scaleY(${(1 - 0.35 * e).toFixed(3)}) skewX(${(Math.max(-1, Math.min(1, vel)) * 1.2 * (1 - p)).toFixed(2)}deg)`; curtain.style.opacity = String(1 - smooth((p - 0.7) / 0.3)); }
-      if (curtainTime) { const e = smooth(p); curtainTime.style.transform = `translate3d(0, ${(-e * 0.7 * 0.62 * svh).toFixed(1)}px, 0)`; curtainTime.style.opacity = String(1 - smooth(p / 0.45)); }
+      if (curtainTime) { const e = smooth(p); curtainTime.style.transform = `translate3d(0, ${(-e * 0.7 * 0.62 * svh).toFixed(1)}px, 0)`; curtainTime.style.opacity = (0.85 * smooth(p / 0.1) * (1 - smooth((p - 0.3) / 0.35))).toFixed(3); }
       wrapper.classList.toggle('is-band', p > 0.98);
       wrapper.classList.toggle('is-hero', p < 0.02);
       water?.updateBand();
