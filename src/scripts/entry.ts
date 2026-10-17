@@ -17,8 +17,11 @@ const pool = (act: string) => {
   return own.length ? own : [show.texts.mainLine.text, ...show.texts.waterLines.filter((l) => l.text && !l.act).map((l) => l.text)];
 };
 let first = true; const seen = new Map<string, number>();
+// 첫 화면과 1막 극중극에서는 물 위에 글을 띄우지 않는다. 불빛과 붉은 점만 남긴다(10/17 연출 "정신없어")
+const quietHere = () => document.querySelector('.water')?.classList.contains('is-hero') || root.dataset.act === 'act1';
 function nextLine(band: boolean) {
   const el = document.querySelector<HTMLElement>('.water__line'); if (!el) return;
+  if (quietHere()) { el.textContent = ''; return; }
   const act = root.dataset.act || '';
   const lines = pool(act);
   let text = lines[0];
@@ -38,7 +41,7 @@ let cueT = 0;
 window.addEventListener('seagull:cue', (e) => {
   const cue = (e as CustomEvent<string>).detail;
   const l = show.texts.waterLines.find((x) => x.cue === cue); const el = document.querySelector<HTMLElement>('.water__line');
-  if (!l || !el) return;
+  if (!l || !el || l.act === 'act1') return;
   el.textContent = l.text; el.classList.add('is-cue');
   clearTimeout(cueT); cueT = window.setTimeout(() => el.classList.remove('is-cue'), 7000);
 });

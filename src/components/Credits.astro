@@ -19,7 +19,7 @@ import { show } from '../content/show';
       </dl>
       <div class="colophon">
         <p>{show.company}</p>
-        <p>{show.credits.author}. {show.credits.directing}</p>
+        <p>{show.credits.author}. {show.credits.directing}{show.credits.planning ? `. ${show.credits.planning}` : ''}</p>
         <p>{show.period}. {show.venue.name}</p>
         {(show.links.instagram || show.links.contact) && <ul class="action-list" role="list">
             {show.links.instagram && <li><span class="action-list__label">인스타그램</span><span class="action-list__value"><a class="action" href={show.links.instagram} target="_blank" rel="noopener">인스타그램 열기</a></span></li>}

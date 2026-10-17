@@ -33,7 +33,7 @@ html.js .page { color: var(--ink); }
 .stage-time__direction { margin-top: 10px; max-width: 24em; line-height: 1.85; color: color-mix(in srgb, currentColor 82%, transparent); }
 /* 첫 화면의 날짜는 막 위에. 막이 오르면 함께 오르며 사라진다 */
 /* 극 안의 시각은 공연 정보와 섞이지 않게 막 한가운데, 옅고 성기게. 공연 날짜(아래 오른쪽)와 극단 표기(위 왼쪽) 사이의 다른 층 */
-.curtain__time { position: absolute; left: 0; right: 0; top: 17svh; text-align: center; font-size: var(--fs-micro); letter-spacing: 0.16em; color: var(--ivory); opacity: 0.72; pointer-events: none; will-change: transform, opacity; }
+.curtain__time { position: absolute; left: 0; right: 0; top: max(17svh, 152px); text-align: center; font-size: var(--fs-micro); letter-spacing: 0.16em; color: var(--ivory); opacity: 0.72; pointer-events: none; will-change: transform, opacity; }
 @media (min-width: 1024px) { .curtain__time { top: 31svh; } }
 
 /* ---- 첫 화면 ---- */

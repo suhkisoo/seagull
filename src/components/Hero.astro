@@ -25,6 +25,7 @@ const titleHtml = `<span class="title title--a">${charHtml}</span>`;
       <p>{show.company}</p>
       <p>{show.credits.author}</p>
       <p>{show.credits.directing}</p>
+      {show.credits.planning && <p>{show.credits.planning}</p>}
     </div>
     <h1 class="hero__title" data-title set:html={titleHtml}></h1>
     {show.originalTitle && <p class="hero__original" aria-label={show.originalTitle}>{show.originalTitle}</p>}
