@@ -1,5 +1,5 @@
 // 오시는 길 지도의 바탕. src/content/map.json(OpenStreetMap 자료)을 빌드 때 SVG 한 장으로 그린다. docs/plan.md 9.5.4.
-// 그림으로 불러 쓰므로 색은 여기서 정한다. 4막 어스름의 방 위에 아이보리 가는 선(10/17, 10/8~10/17에는 종이 위 짙은 초록). 이름 글자는 페이지 쪽(Map.astro)에서 얹는다.
+// 그림으로 불러 쓰므로 색은 여기서 정한다. 4막 어스름의 방 위에 아이보리 가는 선(10/17, 10/8~10/17에는 종이 위 짙은 초록). 어둠 위라 선은 밝게(연출 "지도가 안 보여"). 이름 글자는 페이지 쪽(Map.astro)에서 얹는다.
 import type { APIRoute } from 'astro';
 import map from '../content/map.json';
 import { palette } from '../content/lights';
@@ -13,15 +13,15 @@ export const GET: APIRoute = () => {
   const path = (d: string, attrs: string) => (d ? `<path d="${d}" ${attrs}/>` : '');
   const body = m.ready
     ? [
-      path(m.water, `fill="${I}" fill-opacity=".05"`),
-      path(m.campus, `fill="${I}" fill-opacity=".045" stroke="${I}" stroke-opacity=".22" stroke-width=".6" vector-effect="non-scaling-stroke"`),
-      path(m.buildings, `fill="${I}" fill-opacity=".09"`),
+      path(m.water, `fill="${I}" fill-opacity=".07"`),
+      path(m.campus, `fill="${I}" fill-opacity=".08" stroke="${I}" stroke-opacity=".3" stroke-width=".6" vector-effect="non-scaling-stroke"`),
+      path(m.buildings, `fill="${I}" fill-opacity=".15"`),
       `<g fill="none" stroke="${I}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">`,
-      path(m.rails.tunnel, `stroke-opacity=".28" stroke-width=".9" stroke-dasharray="3 5" vector-effect="non-scaling-stroke"`),
-      path(m.roads.path, `stroke-opacity=".3" stroke-width=".6" stroke-dasharray="1 3" vector-effect="non-scaling-stroke"`),
-      path(m.roads.minor, `stroke-opacity=".42" stroke-width=".7" vector-effect="non-scaling-stroke"`),
-      path(m.roads.major, `stroke-opacity=".78" stroke-width="1.6" vector-effect="non-scaling-stroke"`),
-      path(m.rails.open, `stroke-opacity=".55" stroke-width="1" vector-effect="non-scaling-stroke"`),
+      path(m.rails.tunnel, `stroke-opacity=".4" stroke-width=".9" stroke-dasharray="3 5" vector-effect="non-scaling-stroke"`),
+      path(m.roads.path, `stroke-opacity=".42" stroke-width=".6" stroke-dasharray="1 3" vector-effect="non-scaling-stroke"`),
+      path(m.roads.minor, `stroke-opacity=".6" stroke-width=".7" vector-effect="non-scaling-stroke"`),
+      path(m.roads.major, `stroke-opacity=".95" stroke-width="1.8" vector-effect="non-scaling-stroke"`),
+      path(m.rails.open, `stroke-opacity=".7" stroke-width="1" vector-effect="non-scaling-stroke"`),
       '</g>',
       path(m.venue.outline, `fill="${I}" fill-opacity=".9"`),
     ].join('')
