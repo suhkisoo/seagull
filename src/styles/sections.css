@@ -29,6 +29,13 @@
 .note__title { font-size: var(--fs-small); letter-spacing: var(--track-micro); color: var(--soft); font-weight: 400; margin-bottom: 18px; }
 /* 마지막 물음은 한 줄 떨어져 홀로 선다 */
 .note p:last-child:not(:first-of-type) { margin-top: 2.4em; }
+/* 가운데 문단은 접어 둔다. 누르면 그 자리에서 펼쳐지고 버튼은 물러난다 */
+.note__more { margin-top: 1.1em; }
+.note__more > summary { list-style: none; font-size: var(--fs-small); color: var(--soft); }
+.note__more > summary::-webkit-details-marker { display: none; }
+.note__more[open] > summary { display: none; }
+.note__more > p + p, .note__more > summary + p { margin-top: 1.1em; }
+.note .note__last { margin-top: 2.4em; }
 
 /* 글자로 된 동작. 버튼 모양이 아니다. 닿는 높이 44px, 밑줄은 가는 선 */
 .action { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline; text-decoration-color: var(--rule); text-decoration-thickness: 1px; text-underline-offset: 0.36em; min-height: 44px; display: inline-flex; align-items: center; transition: text-decoration-color 300ms var(--ease); }

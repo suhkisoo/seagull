@@ -49,7 +49,9 @@ const titleHtml = `<span class="title title--a">${charHtml}</span>`;
   .hero--a .title__char { display: block; line-height: 1; }
   .hero--a .title__char + .title__char { margin-top: 0.12em; }
   .hero--a .hero__original { left: calc(var(--gutter) + var(--fs-title-a) + 16px); bottom: 14px; writing-mode: vertical-rl; }
-  .hero--a .hero__when { right: var(--gutter); bottom: 22px; }
+  /* 날짜는 세로 원제(ЧАЙКА) 오른쪽에서 시작한다. 좁은 화면이나 글자를 키운 폰에서는 두 줄로 접힌다(10/17 겹침 고침) */
+  .hero--a .hero__when { right: var(--gutter); bottom: 22px; left: calc(var(--gutter) + var(--fs-title-a) + 60px); white-space: normal; }
+  @media (min-width: 1024px) { .hero--a .hero__when { left: auto; white-space: nowrap; } }
   .hero__when-full { display: none; }
   @media (min-width: 1024px) { .hero__when-short { display: none; } .hero__when-full { display: inline; } }
   .hero--a .hero__meta { position: absolute; left: var(--gutter); top: var(--gutter); }
