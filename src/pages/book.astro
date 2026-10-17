@@ -124,7 +124,7 @@ const sides = balconySides();
                 <li class="shelf__row" data-pin-kind={k.id}>
                   <span class="shelf__pics" aria-hidden="true"><img src={`${base}/${k.image}`} alt="" width={DIM[k.image]?.[0]} height={DIM[k.image]?.[1]} loading="lazy" decoding="async" /></span>
                   <span class="shelf__text"><span class="shelf__name">{k.name}</span></span>
-                  <span class="qty"><button class="qty__btn" type="button" data-qty-minus aria-label={`핀배지 ${k.name || `${i + 1}번 그림`} 줄이기`}>−</button><output class="qty__n" data-qty>0</output><button class="qty__btn" type="button" data-qty-plus aria-label={`핀배지 ${k.name || `${i + 1}번 그림`} 늘리기`}>+</button></span>
+                  <span class="qty"><button class="qty__btn" type="button" data-qty-minus aria-label={`${k.name || `핀배지 ${i + 1}번 그림`} 줄이기`}>−</button><output class="qty__n" data-qty>0</output><button class="qty__btn" type="button" data-qty-plus aria-label={`${k.name || `핀배지 ${i + 1}번 그림`} 늘리기`}>+</button></span>
                 </li>
               ))}
             </ul>

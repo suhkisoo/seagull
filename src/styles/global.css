@@ -33,8 +33,12 @@ html.js .page { color: var(--ink); }
 .stage-time__direction { margin-top: 10px; max-width: 24em; line-height: 1.85; color: color-mix(in srgb, currentColor 82%, transparent); }
 /* 첫 화면의 날짜는 막 위에. 막이 오르면 함께 오르며 사라진다 */
 /* 극 안의 시각은 공연 정보와 섞이지 않게 막 한가운데, 옅고 성기게. 공연 날짜(아래 오른쪽)와 극단 표기(위 왼쪽) 사이의 다른 층 */
-.curtain__time { position: absolute; left: 0; right: 0; top: max(17svh, 152px); text-align: center; font-size: var(--fs-micro); letter-spacing: 0.16em; color: var(--ivory); opacity: 0.72; pointer-events: none; will-change: transform, opacity; }
-@media (min-width: 1024px) { .curtain__time { top: 31svh; } }
+/* 휴대폰에서는 표기 바로 아래, 제목 오른쪽 열에 둔다. 글자를 키운 폰에서도 제목과 겹치지 않는다(10/17). 데스크톱은 막 한가운데 */
+.curtain__time { margin: 22px 0 0; padding-left: calc(var(--fs-title-a) + 36px); text-align: right; font-size: var(--fs-micro); line-height: 1.75; letter-spacing: 0.14em; color: var(--ivory); opacity: 0.8; pointer-events: none; will-change: transform, opacity; }
+@media (min-width: 1024px) { .curtain__time { position: absolute; left: 0; right: 0; top: 31svh; margin: 0; padding: 0; text-align: center; letter-spacing: 0.16em; } }
+/* 극 안의 날짜 앞의 막 이름. 날짜가 극 안의 시간이라는 것을 알린다 */
+.stage-time__act { margin-right: 0.9em; padding-right: 0.9em; border-right: 1px solid color-mix(in srgb, currentColor 45%, transparent); letter-spacing: 0.1em; }
+.curtain__time .stage-time__act { display: inline-block; }
 
 /* ---- 첫 화면 ---- */
 .hero { position: relative; min-height: 100vh; min-height: 100svh; overflow: clip; background: var(--olive); color: var(--ivory); }

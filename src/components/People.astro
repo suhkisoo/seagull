@@ -5,7 +5,7 @@ import { show } from '../content/show';
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 <section class="section section--people" id="people" data-light="people" aria-labelledby="people-title">
-  {show.texts.stageTimes.act3 && <p class="stage-time">{show.texts.stageTimes.act3}</p>}
+  {show.texts.stageTimes.act3 && <p class="stage-time">{show.texts.stageActs.act3 && <span class="stage-time__act">{show.texts.stageActs.act3}</span>}{show.texts.stageTimes.act3}</p>}
   <div class="window-light" aria-hidden="true"><span class="window-light__long"></span><span class="window-light__bent"><span class="window-light__tree"></span></span></div>
   <div class="wrap grid">
     <hr class="rule rule--section" />

@@ -21,7 +21,7 @@ let rows: Reservation[] = [];
 const showLabel = (id: string) => { const s = show.shows.find((x) => x.id === id); return s ? `${fmtDay(s.startAt)} ${fmtTime(s.startAt)}` : id; };
 const won = (n: number | null) => (n == null ? '미정' : `${n.toLocaleString('ko-KR')}원`);
 const when = (iso: string) => { const d = new Date(iso); return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
-const pinName = (id: string) => { const i = show.pinKinds.findIndex((k) => k.id === id); return `핀배지 ${show.pinKinds[i]?.name || `${i + 1}번 그림`}`; };
+const pinName = (id: string) => { const i = show.pinKinds.findIndex((k) => k.id === id); return show.pinKinds[i]?.name || (i < 0 ? `핀배지 ${id}` : `핀배지 ${i + 1}번 그림`); };
 const goodsText = (r: Reservation) => Object.entries(r.goods).map(([k, n]) => `${k.startsWith('pkg:') ? show.booking.packages.find((p) => p.id === k.slice(4))?.name ?? k : k.startsWith('pinbadge:') ? pinName(k.slice(9)) : show.goods.find((g) => g.id === k)?.name ?? k} ${n}`).join(', ');
 const placeText = (r: Reservation) => [r.seats.join(' '), balconySides().filter((x) => r.balcony[x.id] > 0).map((x) => `발코니 ${x.label} ${r.balcony[x.id]}`).join(', ')].filter(Boolean).join(', ');
 const norm = (s: string) => s.replace(/[\s-]/g, '').toLowerCase();

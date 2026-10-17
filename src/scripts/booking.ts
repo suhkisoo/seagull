@@ -35,7 +35,7 @@ const ticketsN = () => seats.size + balconySum(balcony);
 const pkgName = (id: string) => show.booking.packages.find((p) => p.id === id)?.name ?? id;
 // 핀배지 종류. 한 종을 고르는 구성과 따로 사는 핀배지는 개수만큼 종류를 나눠 고른다. 전체 구성은 두 종이 다 들어 있어 고르지 않는다(10/17)
 const pins: Record<string, number> = Object.fromEntries(show.pinKinds.map((k) => [k.id, 0]));
-const pinLabel = (id: string) => { const i = show.pinKinds.findIndex((k) => k.id === id); const k = show.pinKinds[i]; return k?.name || `${i + 1}번 그림`; };
+const pinLabel = (id: string) => { const i = show.pinKinds.findIndex((k) => k.id === id); const k = show.pinKinds[i]; return k?.name || `핀배지 ${i + 1}번 그림`; };
 const pinNeed = () => show.booking.packages.reduce((a, p) => a + (pkgs[p.id] || 0) * (p.pinPick || 0), 0) + (goods.pinbadge || 0);
 const pinSum = () => Object.values(pins).reduce((a, n) => a + n, 0);
 // 연락처는 숫자만 남겨 01로 시작하는 10~11자리일 때만 받는다(10/17)
@@ -60,7 +60,7 @@ function summary(k: StepId): string {
   const s = show.shows.find((x) => x.id === showId);
   if (k === 'show') return s ? `${fmtDay(s.startAt)} ${fmtTime(s.startAt)}` : '';
   if (k === 'seats') return [seats.size ? `지정석 ${[...seats].sort(seatSort).join(', ')}` : '', balconyText()].filter(Boolean).join(' · ');
-  if (k === 'goods') { const p = Object.entries(pkgs).filter(([, n]) => n > 0).map(([id, n]) => `${pkgName(id)} ${n}`); const g = Object.entries(goods).filter(([, n]) => n > 0).map(([id, n]) => `${show.goods.find((x) => x.id === id)?.name} ${n}`); const k2 = Object.entries(pins).filter(([, n]) => n > 0).map(([id, n]) => `핀배지 ${pinLabel(id)} ${n}`); return [...p, ...g, ...k2].join(', ') || '없음'; }
+  if (k === 'goods') { const p = Object.entries(pkgs).filter(([, n]) => n > 0).map(([id, n]) => `${pkgName(id)} ${n}`); const g = Object.entries(goods).filter(([, n]) => n > 0).map(([id, n]) => `${show.goods.find((x) => x.id === id)?.name} ${n}`); const k2 = Object.entries(pins).filter(([, n]) => n > 0).map(([id, n]) => `${pinLabel(id)} ${n}`); return [...p, ...g, ...k2].join(', ') || '없음'; }
   if (k === 'who') return `${name()} ${phoneFmt()}`;
   return '';
 }

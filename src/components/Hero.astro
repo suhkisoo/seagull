@@ -20,16 +20,16 @@ const nobreak = (t: string) => t.split(' ').flatMap((w) => w.split(/(?<=~)/)).ma
     <div class="hero__dusk" aria-hidden="true"></div>
     <div class="hero__night" aria-hidden="true"></div>
     <div class="curtain" aria-hidden="true"></div>
-    {show.texts.stageTimes.act1 && <p class="curtain__time" data-curtain-time>{show.texts.stageTimes.act1}</p>}
     <img src={lakeReflection.src} alt="" data-reflection hidden decoding="async" />
   </div>
   <div class="hero__content">
     <div class="hero__meta">
       <p>{show.company}</p>
       <p>{show.credits.author}</p>
-      <p>{show.credits.directing}</p>
       {show.credits.planning && <p>{show.credits.planning}</p>}
+      <p>{show.credits.directing}</p>
     </div>
+    {show.texts.stageTimes.act1 && <p class="curtain__time" data-curtain-time>{show.texts.stageActs.act1 && <span class="stage-time__act">{show.texts.stageActs.act1}</span>}<span>{show.texts.stageTimes.act1}</span></p>}
     <h1 class="hero__title" data-title set:html={titleHtml}></h1>
     {show.originalTitle && <p class="hero__original" aria-label={show.originalTitle}>{show.originalTitle}</p>}
     <p class="hero__when"><span class="hero__when-short" set:html={nobreak(show.periodShort)}></span><span class="hero__when-full" set:html={nobreak(show.period)}></span><span class="hero__when-venue">{show.venue.name}</span></p>
@@ -59,9 +59,9 @@ const nobreak = (t: string) => t.split(' ').flatMap((w) => w.split(/(?<=~)/)).ma
   .hero__when-full { display: none; }
   .hero__when .nb { white-space: nowrap; }
   @media (min-width: 1024px) { .hero__when-short { display: none; } .hero__when-full { display: inline; } }
-  .hero--a .hero__meta { position: absolute; left: var(--gutter); top: var(--gutter); }
+  .hero--a .hero__meta { position: static; }
   @media (min-width: 1024px) {
-    .hero--a .hero__meta { top: 24px; }
+    .hero--a .hero__meta { position: absolute; left: var(--gutter); top: 24px; }
   }
   .title--a { font-family: 'Seagull Title', var(--font); }
   /* 정지 수면의 거울상은 제목과 같은 자리에 선다 */

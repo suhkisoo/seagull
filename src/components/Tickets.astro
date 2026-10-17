@@ -26,7 +26,7 @@ const bookExternal = !!show.booking.commonUrl;
 <section class="section section--tickets" id="tickets" data-light="tickets" aria-labelledby="tickets-title">
   {show.texts.stageTimes.act4 && (
     <div class="stage-time stage-time--long">
-      <p>{show.texts.stageTimes.act4}</p>
+      <p>{show.texts.stageActs.act4 && <span class="stage-time__act">{show.texts.stageActs.act4}</span>}{show.texts.stageTimes.act4}</p>
       {show.texts.act4Direction && <p class="stage-time__direction">{show.texts.act4Direction}</p>}
     </div>
   )}

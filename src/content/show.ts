@@ -97,10 +97,10 @@ export const show = {
     { id: 'pinbadge', name: '핀배지', price: 4000 as number | null, stock: null as number | null, note: '한 종 선택', images: ['goods/pinbadge-1.webp', 'goods/pinbadge-2.webp'] },
     { id: 'stamp-sticker', name: '우표 스티커', price: 3000 as number | null, stock: null as number | null, note: '두 장 한 묶음', images: ['goods/stamp-sticker-1.webp', 'goods/stamp-sticker-2.webp'] },
   ],
-  // 핀배지 두 종(10/17 기획 확정). 이름이 비면 그림으로 고른다. 이름은 연출이 채운다 【빈칸】
+  // 핀배지 두 종(10/17 기획 확정, 이름은 같은 날 연출). 이름이 비면 그림으로 고른다. id는 장부에 pinbadge:<id>로 적힌다
   pinKinds: [
-    { id: '1', name: '', image: 'goods/pinbadge-1.webp' },
-    { id: '2', name: '', image: 'goods/pinbadge-2.webp' },
+    { id: 'sogang', name: '서강연극회 핀배지', image: 'goods/pinbadge-2.webp' },   // 초록 바탕, sogang Theatre
+    { id: 'seagull', name: '갈매기 핀배지', image: 'goods/pinbadge-1.webp' },      // 아이보리 바탕, 갈매기와 ЧАЙКА
   ],
   bookmarkImages: ['goods/bookmark-1.webp', 'goods/bookmark-2.webp'], // 티켓 책갈피(증정) 그림. scripts/make-goods.mjs
   tumblbug: { url: '', startAt: '', endAt: '' },  // 기간 안에서만 보인다
@@ -133,6 +133,8 @@ export const show = {
     stageDirection: '셋째 막과 넷째 막 사이에 2년이 흐른다.',
     // 극 안의 날짜. 연출부 「타임라인 총람」 v2 봉인판(2026-08-30) §4-1 확정 스파인, 신력. 대본이 아니라 이 공연이 정한 값이다 【확인】
     // 구간 사이 암전에 장면의 시각처럼 하나씩 놓인다. 첫 화면은 막 위에, 2년 구간에는 놓지 않는다(두 날짜 사이의 빈자리가 2년이다)
+    // 극 안의 날짜 앞에 붙는 막 이름(10/17 연출 "날짜의 의미가 안 느껴진다"). 비면 날짜만
+    stageActs: { act1: '1막', act2: '2막', act3: '3막', act4: '4막' },
     stageTimes: {
       act1: '1895년 8월 7일 수요일 저녁 8시 30분',   // 막이 오르는 시각. 달이 떠오를 때
       act2: '1895년 8월 12일 월요일 정오',
