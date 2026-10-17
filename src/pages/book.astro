@@ -60,6 +60,7 @@ const sides = balconySides();
                 </div>
               ))}
             </div>}
+            {hall.entranceCorner.startsWith('top') && <p class={`hall__door hall__door--${hall.entranceCorner}`}>입구</p>}
             <div class="seats" role="group" aria-label="지정석">
               {hall.rows.map((r) => (
                 <div class="seats__row" data-row={r.row}>
@@ -77,6 +78,7 @@ const sides = balconySides();
               ))}
             </div>
             <p class="hall__stage">무대</p>
+            {hall.entranceCorner.startsWith('bottom') && <p class={`hall__door hall__door--${hall.entranceCorner}`}>입구</p>}
             <p class="hall__entrance">{hall.entrance}</p>
           </div>
           <p class="seats__legend"><span class="seat seat--legend" aria-hidden="true"></span> 빈자리 <span class="seat seat--legend is-picked" aria-hidden="true"></span> 고른 자리 <span class="seat seat--legend is-taken" aria-hidden="true"></span> 예매된 자리</p>
@@ -114,6 +116,19 @@ const sides = balconySides();
               </li>
             ))}
           </ul>
+          <div class="pins" data-pins hidden>
+            <h3 class="shelf__head">핀배지 종류</h3>
+            <p class="step__hint pins__hint" data-pins-hint></p>
+            <ul class="shelf" role="list">
+              {show.pinKinds.map((k, i) => (
+                <li class="shelf__row" data-pin-kind={k.id}>
+                  <span class="shelf__pics" aria-hidden="true"><img src={`${base}/${k.image}`} alt="" width={DIM[k.image]?.[0]} height={DIM[k.image]?.[1]} loading="lazy" decoding="async" /></span>
+                  <span class="shelf__text"><span class="shelf__name">{k.name}</span></span>
+                  <span class="qty"><button class="qty__btn" type="button" data-qty-minus aria-label={`핀배지 ${k.name || `${i + 1}번 그림`} 줄이기`}>−</button><output class="qty__n" data-qty>0</output><button class="qty__btn" type="button" data-qty-plus aria-label={`핀배지 ${k.name || `${i + 1}번 그림`} 늘리기`}>+</button></span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </li>
 
@@ -122,7 +137,7 @@ const sides = balconySides();
         <p class="step__summary" data-summary></p>
         <div class="step__body">
           <div class="field"><label for="bk-name">이름</label><input id="bk-name" name="name" type="text" autocomplete="name" required maxlength="30" /></div>
-          <div class="field"><label for="bk-phone">연락처</label><input id="bk-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" required maxlength="20" placeholder="010-0000-0000" /></div>
+          <div class="field"><label for="bk-phone">연락처</label><input id="bk-phone" name="phone" type="tel" autocomplete="tel" inputmode="numeric" required maxlength="20" placeholder="01000000000" /></div>
           <div class="field"><label for="bk-payer">입금자명</label><input id="bk-payer" name="payer" type="text" maxlength="30" placeholder="이름과 다르면 적어 주세요" /></div>
           <p class="field__note">이름과 연락처는 예매 확인과 공연 안내에만 쓰고 공연이 끝나면 지웁니다.</p>
           <p class="field__error" data-who-error aria-live="polite"></p>

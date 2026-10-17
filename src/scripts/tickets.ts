@@ -72,6 +72,29 @@ export function initTickets() {
     }
     mapFrame.classList.add('is-lit'); clearTimeout(lampT); lampT = window.setTimeout(() => mapFrame.classList.remove('is-lit'), 650);
   });
+  // 역 이름 자리. 틀의 비율에 따라 가장자리가 잘리므로 화면에서 재어 놓는다(10/17).
+  // 공연장 표시(원과 이름)에 닿거나 오른쪽 끝을 넘으면 점의 왼쪽으로 옮기고, 점이 틀 밖이면 그 역은 숨긴다
+  const placeStations = () => {
+    if (!mapFrame) return;
+    const f = mapFrame.getBoundingClientRect(); if (!f.width) return;
+    const venue = mapFrame.querySelector<HTMLElement>('.map__venue'), vname = mapFrame.querySelector<HTMLElement>('.map__venue-name');
+    const v = venue?.getBoundingClientRect(), n = vname?.getBoundingClientRect();
+    const keep = [v ? { left: v.left - 22, right: v.left + 22, top: v.top - 22, bottom: v.top + 22 } : null, n].filter(Boolean) as { left: number; right: number; top: number; bottom: number }[];
+    const hit = (a: DOMRect) => keep.some((b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom);
+    for (const st of mapFrame.querySelectorAll<HTMLElement>('.map__station')) {
+      st.classList.remove('map__station--left'); st.hidden = false;
+      const r = st.getBoundingClientRect(); const dot = r.left; // 점은 글자의 왼쪽 끝
+      if (dot < f.left + 4 || dot > f.right - 4 || r.top < f.top || r.bottom > f.bottom) { st.hidden = true; continue; }
+      if (hit(r) || r.right > f.right - 4) {
+        st.classList.add('map__station--left');
+        const l = st.getBoundingClientRect();
+        if (l.left < f.left + 4 || hit(l)) st.hidden = true;
+      }
+    }
+  };
+  placeStations();
+  let placeT = 0; window.addEventListener('resize', () => { clearTimeout(placeT); placeT = window.setTimeout(placeStations, 150); });
+  document.fonts?.ready.then(placeStations);
   // 주소 복사. 안 되면 주소 글자를 선택해 준다
   const copyBtn = document.querySelector<HTMLButtonElement>('[data-copy-address]');
   const copyDone = document.querySelector<HTMLElement>('[data-copy-done]');

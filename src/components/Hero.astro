@@ -9,6 +9,9 @@ const variant = 'a';
 const titleChars = [...show.title];
 const charHtml = titleChars.map((c) => `<span class="title__char">${c}</span>`).join('');
 const titleHtml = `<span class="title title--a">${charHtml}</span>`;
+// 날짜 토막("12일(목)~", "14일(토)")은 줄바꿈으로 갈라지지 않는다. 줄은 띄어쓰기와 물결표 뒤에서만 바뀐다(10/17)
+const nobreak = (t: string) => t.split(' ').flatMap((w) => w.split(/(?<=~)/)).map((w) => `<span class="nb">${w}</span>`).join(' ').replace(/~<\/span> <span/g, '~</span><wbr><span');
+
 ---
 <header class={`hero hero--${variant}`} id="top">
   <div class="hero__sky">
@@ -29,7 +32,7 @@ const titleHtml = `<span class="title title--a">${charHtml}</span>`;
     </div>
     <h1 class="hero__title" data-title set:html={titleHtml}></h1>
     {show.originalTitle && <p class="hero__original" aria-label={show.originalTitle}>{show.originalTitle}</p>}
-    <p class="hero__when"><span class="hero__when-short">{show.periodShort}</span><span class="hero__when-full">{show.period}</span><span class="hero__when-venue">{show.venue.name}</span></p>
+    <p class="hero__when"><span class="hero__when-short" set:html={nobreak(show.periodShort)}></span><span class="hero__when-full" set:html={nobreak(show.period)}></span><span class="hero__when-venue">{show.venue.name}</span></p>
   </div>
   <WaterBand titleHtml={titleHtml} variant={variant} />
   <!-- 1막 극중극의 불빛. 수평선 바로 위에 선다(scroll.ts가 켜고 끈다). 늪의 불빛 넷, 붉은 점 둘 -->
@@ -54,6 +57,7 @@ const titleHtml = `<span class="title title--a">${charHtml}</span>`;
   .hero--a .hero__when { right: var(--gutter); bottom: 22px; left: calc(var(--gutter) + var(--fs-title-a) + 60px); white-space: normal; }
   @media (min-width: 1024px) { .hero--a .hero__when { left: auto; white-space: nowrap; } }
   .hero__when-full { display: none; }
+  .hero__when .nb { white-space: nowrap; }
   @media (min-width: 1024px) { .hero__when-short { display: none; } .hero__when-full { display: inline; } }
   .hero--a .hero__meta { position: absolute; left: var(--gutter); top: var(--gutter); }
   @media (min-width: 1024px) {

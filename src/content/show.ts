@@ -27,6 +27,7 @@ export const show = {
     author: '안톤 체호프 作',                     // 포스터 표기 【확인】
     directing: '연출·각색·번역 서기수',
     planning: '기획 고은채',                      // 10/17 연출 "첫 화면에 기획 고은채도"
+    painting: '',                                 // 첫 화면 그림의 출처 한 줄. 끝의 크레딧 아래에 놓인다. 비면 숨김 【빈칸】
   },
   genreNote: '4막 희극 · 러시아어 원문 직역 · 7인 각색', // 비면 숨김 【확인】
   period: '2026년 11월 12일(목)~14일(토), 하루 2회, 모두 6회',
@@ -38,18 +39,32 @@ export const show = {
     mapQuery: '서강대학교 메리홀',                  // 지도 앱에서 찾을 말
     naverMap: '',                                 // 비면 mapQuery로 찾는 링크를 만든다
     kakaoMap: '',                                 // 비면 지도 자료의 좌표로 만든다
+    // 오시는 길 안내. 값이 빈 행은 화면에 나오지 않는다. 값은 연출이 채운다 【빈칸】
+    directions: [
+      { label: '가까운 역과 출구', value: '' },
+      { label: '걸어서 걸리는 시간', value: '' },
+      { label: '건물 안 위치', value: '' },   // 층과 입구
+    ],
   },
   shows: [
-    { id: '1112-1500', startAt: '2026-11-12T15:00:00+09:00', url: '', soldOut: false, cast: {} },
-    { id: '1112-1930', startAt: '2026-11-12T19:30:00+09:00', url: '', soldOut: false, cast: {} },
-    { id: '1113-1500', startAt: '2026-11-13T15:00:00+09:00', url: '', soldOut: false, cast: {} },
-    { id: '1113-1930', startAt: '2026-11-13T19:30:00+09:00', url: '', soldOut: false, cast: {} },
-    { id: '1114-1300', startAt: '2026-11-14T13:00:00+09:00', url: '', soldOut: false, cast: {} },
-    { id: '1114-1800', startAt: '2026-11-14T18:00:00+09:00', url: '', soldOut: false, cast: {} },
-  ] as ShowTime[],
+    { id: '1112-1500', startAt: '2026-11-12T15:00:00+09:00', url: '', soldOut: false, cast: { arkadina: '서채림', treplev: '백경환', sorin: '부신빈', nina: '김현아', masha: '이예림', trigorin: '오규헌', dorn: '전아침' } },
+    { id: '1112-1930', startAt: '2026-11-12T19:30:00+09:00', url: '', soldOut: false, cast: { arkadina: '박세은', treplev: '이영종', sorin: '부신빈', nina: '김시연', masha: '이예림', trigorin: '조민석', dorn: '전아침' } },
+    { id: '1113-1500', startAt: '2026-11-13T15:00:00+09:00', url: '', soldOut: false, cast: { arkadina: '박세은', treplev: '백경환', sorin: '부신빈', nina: '김시연', masha: '이예림', trigorin: '오규헌', dorn: '전아침' } },
+    { id: '1113-1930', startAt: '2026-11-13T19:30:00+09:00', url: '', soldOut: false, cast: { arkadina: '서채림', treplev: '이영종', sorin: '부신빈', nina: '김현아', masha: '이예림', trigorin: '조민석', dorn: '전아침' } },
+    { id: '1114-1300', startAt: '2026-11-14T13:00:00+09:00', url: '', soldOut: false, cast: { arkadina: '서채림', treplev: '이영종', sorin: '부신빈', nina: '김시연', masha: '이예림', trigorin: '조민석', dorn: '전아침' } },
+    { id: '1114-1800', startAt: '2026-11-14T18:00:00+09:00', url: '', soldOut: false, cast: { arkadina: '박세은', treplev: '백경환', sorin: '부신빈', nina: '김현아', masha: '이예림', trigorin: '오규헌', dorn: '전아침' } },
+  ] as ShowTime[], // 회차별 출연은 10/17 연출이 준 표
   runningMinutes: null as number | null,          // 인터미션 포함 총 시간. 비면 180분으로 본다 【확인】
-  intermission: '',                               // 비면 숨김
-  ageLimit: '',                                   // 비면 숨김
+  // 예매 전 안내. 공연 일정과 예매의 "가격과 좌석", "예매 오픈" 아래에 놓인다. 값이 빈 행은 화면에 나오지 않는다. 값은 연출이 채운다 【빈칸】
+  notices: [
+    { label: '러닝타임', value: '' },
+    { label: '인터미션', value: '' },
+    { label: '관람 연령', value: '' },
+    { label: '지각 입장', value: '' },
+    { label: '취소와 환불', value: '' },
+    { label: '휠체어 접근', value: '' },
+    { label: '촬영', value: '' },
+  ],
   pricing: '티켓 9,000원, 책갈피 증정. 굿즈를 묶은 구성은 11,000원부터 30,000원까지', // 비면 "추후 공개". 연출이 10/7에 준 가격에서
   booking: {
     openAt: '',                                   // 예매 오픈 시각 ISO. 비면 "예매 일정 보기"
@@ -62,13 +77,14 @@ export const show = {
     // 티켓 구성. 티켓 한 장마다 하나를 고른다. 모든 구성에 티켓 책갈피가 함께 나간다. 연출이 10/7에 준 가격
     packages: [
       // items: 구성에 든 굿즈(goods의 id). 그림으로 묶음을 보여 준다
-      { id: 'ticket', name: '티켓', note: '책갈피 증정', price: 9000, items: [] as string[] },
-      { id: 'stamp', name: '티켓 + 우표 스티커', note: '우표 스티커 두 장 한 묶음', price: 11000, items: ['stamp-sticker'] },
-      { id: 'pin', name: '티켓 + 핀배지', note: '', price: 13000, items: ['pinbadge'] },
-      { id: 'book', name: '티켓 + 프로그램북', note: '', price: 20000, items: ['programbook'] },
-      { id: 'book-stamp', name: '티켓 + 프로그램북 + 우표 스티커', note: '', price: 21000, items: ['programbook', 'stamp-sticker'] },
-      { id: 'book-pin', name: '티켓 + 프로그램북 + 핀배지', note: '', price: 22000, items: ['programbook', 'pinbadge'] },
-      { id: 'all', name: '티켓 + 굿즈 전체', note: '프로그램북, 핀배지, 우표 스티커', price: 30000, items: ['programbook', 'pinbadge', 'stamp-sticker'] },
+      // pinPick: 구성 하나에 들어 있는 핀배지 가운데 예매자가 종류를 고르는 개수. 전체 구성은 두 종이 다 들어 있어 고르지 않는다(10/17 기획 확정)
+      { id: 'ticket', name: '티켓', note: '책갈피 증정', price: 9000, items: [] as string[], pinPick: 0 },
+      { id: 'stamp', name: '티켓 + 우표 스티커', note: '우표 스티커 두 장 한 묶음', price: 11000, items: ['stamp-sticker'], pinPick: 0 },
+      { id: 'pin', name: '티켓 + 핀배지', note: '핀배지 한 종 선택', price: 12000, items: ['pinbadge'], pinPick: 1 },
+      { id: 'book', name: '티켓 + 프로그램북', note: '', price: 20000, items: ['programbook'], pinPick: 0 },
+      { id: 'book-stamp', name: '티켓 + 프로그램북 + 우표 스티커', note: '', price: 21000, items: ['programbook', 'stamp-sticker'], pinPick: 0 },
+      { id: 'book-pin', name: '티켓 + 프로그램북 + 핀배지', note: '핀배지 한 종 선택', price: 22000, items: ['programbook', 'pinbadge'], pinPick: 1 },
+      { id: 'all', name: '티켓 + 굿즈 전체', note: '프로그램북, 핀배지 두 종, 우표 스티커', price: 30000, items: ['programbook', 'pinbadge', 'stamp-sticker'], pinPick: 0 },
     ],
     account: { bank: '카카오뱅크', number: '3333327681353', holder: '고은채' }, // 입금 계좌(10/17 기획 고은채, 예금주는 연출)
     holdHours: 24,                                // 입금 대기 시간. 지나면 기획팀이 관리 화면에서 자리를 풀 수 있다
@@ -78,8 +94,13 @@ export const show = {
   // 따로 더 사는 굿즈. 티켓과 함께만 예매한다. 연출이 10/7에 준 가격. 그림은 드라이브 굿즈 폴더(10/5)
   goods: [
     { id: 'programbook', name: '프로그램북', price: 15000 as number | null, stock: null as number | null, note: '', images: ['goods/programbook-1.webp'] as string[] },
-    { id: 'pinbadge', name: '핀배지', price: 4000 as number | null, stock: null as number | null, note: '', images: ['goods/pinbadge-1.webp', 'goods/pinbadge-2.webp'] },
+    { id: 'pinbadge', name: '핀배지', price: 4000 as number | null, stock: null as number | null, note: '한 종 선택', images: ['goods/pinbadge-1.webp', 'goods/pinbadge-2.webp'] },
     { id: 'stamp-sticker', name: '우표 스티커', price: 3000 as number | null, stock: null as number | null, note: '두 장 한 묶음', images: ['goods/stamp-sticker-1.webp', 'goods/stamp-sticker-2.webp'] },
+  ],
+  // 핀배지 두 종(10/17 기획 확정). 이름이 비면 그림으로 고른다. 이름은 연출이 채운다 【빈칸】
+  pinKinds: [
+    { id: '1', name: '', image: 'goods/pinbadge-1.webp' },
+    { id: '2', name: '', image: 'goods/pinbadge-2.webp' },
   ],
   bookmarkImages: ['goods/bookmark-1.webp', 'goods/bookmark-2.webp'], // 티켓 책갈피(증정) 그림. scripts/make-goods.mjs
   tumblbug: { url: '', startAt: '', endAt: '' },  // 기간 안에서만 보인다
@@ -121,7 +142,8 @@ export const show = {
     // 4막 첫 지문의 뒤쪽 문장들(시각, 빛, 소리). 공연대본 7인 각색판 806~807행 그대로 【확인】. 일정 구간의 날짜 아래에 놓는다
     act4Direction: '저녁. 갓을 씌운 램프 하나가 켜져 있다. 어스름. 나무들이 웅성대는 소리, 굴뚝에서 바람이 우는 소리가 들린다. 야경꾼이 딱따기를 친다.',
     // 연출이 10/2 대화로 준 임시본. 정리된 판이 오면 받은 그대로 바꾼다 【확인】. 문단은 빈 줄(\n\n)로 나눈다
-    directorsNote: '체호프는 이 희곡의 표지에 "희극"이라고 적었습니다. 백삼십 년 전 첫 공연은 그 말을 웃음거리로 읽어 실패했고, 두 해 뒤 다시 올린 공연은 그 말을 비극으로 읽어 성공했습니다. 우리는 세 번째로 읽어 보려고 합니다. 이 극은 웃긴 극이 아니라, 무언가가 부서진 다음에도 저녁이 계속되는 극입니다.\n\n여기 일곱 사람이 있습니다. 배우가 된 사람과 작가가 된 사람, 아직 되지 못한 두 젊은이, 원하기만 하다가 늙은 사람, 아무것도 원하지 않으려 애쓰는 사람, 그리고 첫 대사부터 자기 인생을 상복이라고 부르는 사람. 이 극에서는 원하던 것이 된 사람조차 원하던 곳에 닿지 못합니다. 되는 것과 도착하는 것은 다른 일이고, 사람은 그 사이의 거리를 삽니다. 미워하고, 슬퍼하고, 견디면서.\n\n그들은 살기 위해 저마다 자기에게 이름 하나를 붙입니다. 나는 갈매기다, 나는 불행하다, 나는 원하기만 했던 사람이다. 정확한 이름은 하나도 없습니다. 그래도 하나는 믿어야 살 수 있어서, 사람들은 정확하지 않은 이름을 입고 저녁을 먹으러 갑니다. 그 이름을 알아차리는 순간은 크게 오지 않습니다. 저녁을 먹다가, 카드를 하다가, 누가 하는 말을 듣다가 옵니다. 말하는 사람은 잔잔하고 듣는 사람은 알아듣지 못합니다. 이 극에서 아무도 웃기려 하지 않는데 웃음이 나는 것은 그 때문입니다. 모두가 진심이고, 진심은 자기가 빗나가는 것을 잘 보지 못합니다.\n\n우리는 이 희곡을 러시아어에서 직접 옮기고 일곱 사람으로 다시 지었습니다. 백 석의 작은 방을 고른 것도 그래서입니다. 큰 극장이 이 극을 못 하는 것이 아니라, 작은 방이 이 극의 원래 크기라고 생각합니다. 관객 여러분은 그 방에 잠시 앉았다가, 그들이 무언가를 알아차리기 직전에 나가게 될 것입니다. 그들은 여러분이 오기 전부터 거기 있었고, 여러분이 나간 뒤에도 거기서 저녁을 먹고 있을 것입니다.\n\n당신은 그 거리를 어떻게 견디고 있습니까.',
+    directorsNoteBy: '서기수',                     // 연출의 말 끝의 서명. 화면에서 라벨 대신 "서기수의 글"로 읽힌다(스크린리더)
+    directorsNote: '체호프는 이 희곡의 표지에 "희극"이라고 적었습니다. 백삼십 년 전 첫 공연은 관객이 그 말을 웃음거리로 받아 실패했고, 두 해 뒤 다시 올린 공연은 그 말을 비극으로 읽어 성공했습니다. 우리는 세 번째로 읽어 보려고 합니다. 이 극은 웃긴 극이 아니라, 무언가가 부서진 다음에도 저녁이 계속되는 극입니다.\n\n여기 일곱 사람이 있습니다. 이미 배우인 사람과 이미 작가인 사람, 아직 되지 못한 두 젊은이, 원하기만 하다가 늙은 사람, 아무것도 원하지 않으려 애쓰는 사람, 그리고 첫 대사부터 자기 인생을 상복이라고 부르는 사람. 이 극에서는 원하던 것이 된 사람조차 원하던 곳에 닿지 못합니다. 되는 것과 도착하는 것은 다른 일이고, 사람은 그 사이의 거리를 삽니다. 미워하고, 슬퍼하고, 견디면서.\n\n그들은 살기 위해 저마다 자기에게 이름 하나를 붙입니다. 나는 갈매기다, 나는 불행하다, 나는 원하기만 했던 사람이다. 정확한 이름은 하나도 없습니다. 그래도 하나는 믿어야 살 수 있어서, 사람들은 정확하지 않은 이름을 입고 저녁을 먹으러 갑니다. 그 이름을 알아차리는 순간은 크게 오지 않습니다. 저녁을 먹다가, 카드를 하다가, 누가 하는 말을 듣다가 옵니다. 말하는 사람은 잔잔하고 듣는 사람은 알아듣지 못합니다. 이 극에서 아무도 웃기려 하지 않는데 웃음이 나는 것은 그 때문입니다. 모두가 진심이고, 진심은 자기가 빗나가는 것을 잘 보지 못합니다.\n\n우리는 이 희곡을 러시아어에서 직접 옮기고 일곱 사람으로 다시 지었습니다. 아흔네 석의 작은 방을 고른 것도 그래서입니다. 큰 극장이 이 극을 못 하는 것이 아니라, 작은 방이 이 극의 원래 크기라고 생각합니다. 관객 여러분은 그 방에 잠시 앉았다가, 그들이 무언가를 알아차리기 직전에 나가게 될 것입니다. 그들은 여러분이 오기 전부터 거기 있었고, 여러분이 나간 뒤에는 거기서 아침을 먹고 있을 것입니다.\n\n당신은 그 거리를 어떻게 견디고 있습니까.',
     // 수면에 띄울 대사. 멈추면 한 줄씩 떠오른다. act가 있으면 그 막의 구간에서만 뜬다. 공연대본 7인 각색판 그대로 【확인】
     waterLines: [
       // 1막 극중극(트레플레프의 무대). 막이 오르면 떠오른다. cue가 있으면 그 순간(stage: 막이 오르고 어두워질 때, eyes: 붉은 점 두 개가 나타날 때)에 뜬다

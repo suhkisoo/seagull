@@ -20,24 +20,28 @@ import Video from './Video.astro';
         <figcaption class="quote__source">{show.texts.mainLine.source}</figcaption>
       </figure>
       <Video />
-      {show.texts.directorsNote && (
-        <div class="note prose">
-          <h3 class="note__title">연출의 말</h3>
-          {(() => {
-            // 글은 받은 그대로 둔다. 길어서 첫 문단과 맺음 한 줄만 펼쳐 두고 가운데는 접는다(10/17 연출 "연출의 말이 너무 길지 않나")
-            const ps = show.texts.directorsNote.split('\n\n');
-            if (ps.length < 4) return ps.map((p) => <p>{p}</p>);
-            return (<>
-              <p>{ps[0]}</p>
+      {show.texts.directorsNote && (() => {
+        // 연출의 말. 보이는 라벨 없이 가는 선 하나로 앞 문단과 나눈다. 스크린리더에는 "서기수의 글"로 읽힌다.
+        // 접혀 있을 때는 첫 문단만, "이어 읽기"를 누르면 나머지 문단과 마지막 물음, 서명이 그 자리에 펼쳐진다(10/17 연출).
+        // 마지막 물음의 "거리"는 가운데 문단을 받으므로 접힌 상태에서는 보이지 않는다
+        const ps = show.texts.directorsNote.split('\n\n');
+        const by = show.texts.directorsNoteBy;
+        return (
+          <div class="note prose">
+            <h3 class="visually-hidden">{by ? `${by}의 글` : '연출의 말'}</h3>
+            <hr class="rule note__rule" aria-hidden="true" />
+            <p>{ps[0]}</p>
+            {ps.length > 1 && (
               <details class="note__more">
-                <summary class="action">연출의 말 전부 읽기</summary>
+                <summary class="action">이어 읽기</summary>
                 {ps.slice(1, -1).map((p) => <p>{p}</p>)}
+                <p class="note__last">{ps[ps.length - 1]}</p>
+                {by && <p class="note__by">{by}</p>}
               </details>
-              <p class="note__last">{ps[ps.length - 1]}</p>
-            </>);
-          })()}
-        </div>
-      )}
+            )}
+          </div>
+        );
+      })()}
     </div>
   </div>
 </section>

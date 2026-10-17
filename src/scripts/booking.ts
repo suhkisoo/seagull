@@ -33,6 +33,15 @@ const pkgs: Record<string, number> = Object.fromEntries(show.booking.packages.ma
 const BASE_PKG = show.booking.packages[0].id;
 const ticketsN = () => seats.size + balconySum(balcony);
 const pkgName = (id: string) => show.booking.packages.find((p) => p.id === id)?.name ?? id;
+// 핀배지 종류. 한 종을 고르는 구성과 따로 사는 핀배지는 개수만큼 종류를 나눠 고른다. 전체 구성은 두 종이 다 들어 있어 고르지 않는다(10/17)
+const pins: Record<string, number> = Object.fromEntries(show.pinKinds.map((k) => [k.id, 0]));
+const pinLabel = (id: string) => { const i = show.pinKinds.findIndex((k) => k.id === id); const k = show.pinKinds[i]; return k?.name || `${i + 1}번 그림`; };
+const pinNeed = () => show.booking.packages.reduce((a, p) => a + (pkgs[p.id] || 0) * (p.pinPick || 0), 0) + (goods.pinbadge || 0);
+const pinSum = () => Object.values(pins).reduce((a, n) => a + n, 0);
+// 연락처는 숫자만 남겨 01로 시작하는 10~11자리일 때만 받는다(10/17)
+const phoneDigits = () => phone().replace(/\D/g, '');
+const phoneOk = () => /^01\d{8,9}$/.test(phoneDigits());
+const phoneFmt = () => { const d = phoneDigits(); return d.length === 11 ? `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}` : `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}`; };
 let status: ShowStatus = { taken: [], balconyTaken: noBalcony(), goodsSold: {} };
 
 // ----- 단계 열기와 닫기 -----
@@ -51,16 +60,16 @@ function summary(k: StepId): string {
   const s = show.shows.find((x) => x.id === showId);
   if (k === 'show') return s ? `${fmtDay(s.startAt)} ${fmtTime(s.startAt)}` : '';
   if (k === 'seats') return [seats.size ? `지정석 ${[...seats].sort(seatSort).join(', ')}` : '', balconyText()].filter(Boolean).join(' · ');
-  if (k === 'goods') { const p = Object.entries(pkgs).filter(([, n]) => n > 0).map(([id, n]) => `${pkgName(id)} ${n}`); const g = Object.entries(goods).filter(([, n]) => n > 0).map(([id, n]) => `${show.goods.find((x) => x.id === id)?.name} ${n}`); return [...p, ...g].join(', ') || '없음'; }
-  if (k === 'who') return `${name()} ${phone()}`;
+  if (k === 'goods') { const p = Object.entries(pkgs).filter(([, n]) => n > 0).map(([id, n]) => `${pkgName(id)} ${n}`); const g = Object.entries(goods).filter(([, n]) => n > 0).map(([id, n]) => `${show.goods.find((x) => x.id === id)?.name} ${n}`); const k2 = Object.entries(pins).filter(([, n]) => n > 0).map(([id, n]) => `핀배지 ${pinLabel(id)} ${n}`); return [...p, ...g, ...k2].join(', ') || '없음'; }
+  if (k === 'who') return `${name()} ${phoneFmt()}`;
   return '';
 }
 function validate() {
   let ok = false, msg = '';
   if (current === 'show') ok = !!showId;
   else if (current === 'seats') { ok = seats.size + balconySum(balcony) > 0; if (!ok) msg = balconySides().length ? '좌석을 고르거나 발코니 인원을 정해 주세요' : '좌석을 골라 주세요'; }
-  else if (current === 'goods') ok = true;
-  else if (current === 'who') { ok = name().length >= 2 && /\d{3}-?\d{3,4}-?\d{4}/.test(phone()); }
+  else if (current === 'goods') { const need = pinNeed(), have = pinSum(); ok = need === have; const hint = document.querySelector<HTMLElement>('[data-pins-hint]'); if (hint) hint.textContent = need ? `핀배지 ${need}개의 종류를 나눠 골라 주세요. 지금 ${have}개를 골랐습니다.` : ''; }
+  else if (current === 'who') { ok = name().length >= 2 && phoneOk(); }
   else if (current === 'confirm') ok = true;
   nextBtn.disabled = !ok;
   nextBtn.setAttribute('aria-disabled', String(!ok));
@@ -127,7 +136,7 @@ for (const row of document.querySelectorAll<HTMLElement>('[data-goods]')) {
     const soon = row.querySelector('.goods__soon'); if (soon) { const span = document.createElement('span'); span.className = 'qty'; span.innerHTML = '<button class="qty__btn" type="button" data-qty-minus aria-label="줄이기">−</button><output class="qty__n" data-qty>0</output><button class="qty__btn" type="button" data-qty-plus aria-label="늘리기">+</button>'; soon.replaceWith(span); }
   }
   const out = row.querySelector<HTMLElement>('[data-qty]');
-  const upd = () => { if (out) out.textContent = String(goods[id]); row.classList.toggle('is-lit', goods[id] > 0); };
+  const upd = () => { if (out) out.textContent = String(goods[id]); row.classList.toggle('is-lit', goods[id] > 0); syncPins(); };
   row.querySelector('[data-qty-plus]')?.addEventListener('click', () => { const stock = row.dataset.stock ? Number(row.dataset.stock) - (status.goodsSold[id] || 0) : 99; if (goods[id] < Math.min(10, stock)) goods[id]++; upd(); });
   row.querySelector('[data-qty-minus]')?.addEventListener('click', () => { goods[id] = Math.max(0, goods[id] - 1); upd(); });
 }
@@ -147,6 +156,29 @@ function syncPkgs() {
     row.classList.toggle('is-lit', pkgs[id] > 0);
   }
   const c = document.querySelector<HTMLElement>('[data-pkg-count]'); if (c) c.textContent = n ? `티켓 ${n}장` : '';
+  syncPins();
+}
+// 고를 핀배지 수가 줄면 뒤의 종류부터 덜어 낸다. 고를 것이 없으면 칸을 숨긴다
+const pinBox = document.querySelector<HTMLElement>('[data-pins]');
+const pinRows = [...document.querySelectorAll<HTMLElement>('[data-pin-kind]')];
+function syncPins() {
+  const need = pinNeed();
+  let over = pinSum() - need;
+  for (const k of [...show.pinKinds].reverse()) { if (over <= 0) break; const cut = Math.min(pins[k.id], over); pins[k.id] -= cut; over -= cut; }
+  if (pinBox) pinBox.hidden = need === 0;
+  for (const row of pinRows) {
+    const id = row.dataset.pinKind!;
+    row.querySelector<HTMLElement>('[data-qty]')!.textContent = String(pins[id]);
+    (row.querySelector('[data-qty-plus]') as HTMLButtonElement).disabled = pinSum() >= need;
+    (row.querySelector('[data-qty-minus]') as HTMLButtonElement).disabled = pins[id] <= 0;
+    row.classList.toggle('is-lit', pins[id] > 0);
+  }
+  if (current === 'goods') validate();
+}
+for (const row of pinRows) {
+  const id = row.dataset.pinKind!;
+  row.querySelector('[data-qty-plus]')!.addEventListener('click', () => { if (pinSum() < pinNeed()) pins[id]++; syncPins(); });
+  row.querySelector('[data-qty-minus]')!.addEventListener('click', () => { if (pins[id] > 0) pins[id]--; syncPins(); });
 }
 for (const row of pkgRows) {
   const id = row.dataset.pkg!;
@@ -182,7 +214,9 @@ function bill(): [string, string][] {
   if (bn) rows.push(['발코니', balconyText().replace('발코니 ', '')]);
   for (const p of show.booking.packages) if (pkgs[p.id] > 0) rows.push([p.name, `${pkgs[p.id]}장, ${won(pkgs[p.id] * p.price)}`]);
   for (const [id, n] of Object.entries(goods)) if (n > 0) { const g = show.goods.find((x) => x.id === id)!; const pr = goodsPrice(id); rows.push([g.name, `${n}개${pr != null ? `, ${won(n * pr)}` : ''}`]); }
-  rows.push(['예매자', `${name()} ${phone()}`]); if (payer() !== name()) rows.push(['입금자명', payer()]);
+  const pk = Object.entries(pins).filter(([, n]) => n > 0).map(([id, n]) => `${pinLabel(id)} ${n}개`);
+  if (pk.length) rows.push(['핀배지 종류', pk.join(', ')]);
+  rows.push(['예매자', `${name()} ${phoneFmt()}`]); if (payer() !== name()) rows.push(['입금자명', payer()]);
   return rows;
 }
 function renderBill(el: HTMLElement, rows: [string, string][]) { el.replaceChildren(...rows.flatMap(([k, v]) => { const dt = document.createElement('dt'); dt.textContent = k; const dd = document.createElement('dd'); dd.textContent = v; return [dt, dd]; })); }
@@ -196,7 +230,13 @@ nextBtn.addEventListener('click', async () => {
   if (!validate()) return;
   const i = ORDER.indexOf(current);
   if (current === 'confirm') { await submit(); return; }
-  if (current === 'seats') { await loadStatus(); if (!validate()) return; }
+  if (current === 'seats') {
+    // 남은 자리를 다시 묻는 동안(약 1~2초) 버튼은 "확인 중"으로 멈춘다
+    nextBtn.disabled = true; nextBtn.setAttribute('aria-busy', 'true'); nextBtn.textContent = '확인 중';
+    await loadStatus();
+    nextBtn.removeAttribute('aria-busy'); nextBtn.textContent = '다음';
+    if (!validate()) return;
+  }
   if (ORDER[i + 1] === 'goods') syncPkgs();
   if (ORDER[i + 1] === 'confirm') renderConfirm();
   open(ORDER[i + 1]);
@@ -204,7 +244,7 @@ nextBtn.addEventListener('click', async () => {
 async function submit() {
   const err = document.querySelector<HTMLElement>('[data-confirm-error]')!; err.textContent = '';
   nextBtn.disabled = true; nextBtn.textContent = '보내는 중';
-  const r = await store.reserve({ show: showId, seats: [...seats].sort(seatSort), balcony: { ...balcony }, goods: Object.fromEntries([...Object.entries(pkgs).map(([id, n]) => [`pkg:${id}`, n] as [string, number]), ...Object.entries(goods)].filter(([, n]) => n > 0)), name: name(), phone: phone(), payer: payer(), amount: total() });
+  const r = await store.reserve({ show: showId, seats: [...seats].sort(seatSort), balcony: { ...balcony }, goods: Object.fromEntries([...Object.entries(pkgs).map(([id, n]) => [`pkg:${id}`, n] as [string, number]), ...Object.entries(goods), ...Object.entries(pins).map(([id, n]) => [`pinbadge:${id}`, n] as [string, number])].filter(([, n]) => n > 0)), name: name(), phone: phoneFmt(), payer: payer(), amount: total() });
   nextBtn.textContent = '예매 신청';
   if (!r.ok) {
     nextBtn.disabled = false;

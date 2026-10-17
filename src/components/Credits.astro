@@ -26,6 +26,7 @@ import { show } from '../content/show';
             {show.links.contact && <li><span class="action-list__label">문의</span><span class="action-list__value">{show.links.contact.includes('@') ? <a class="action" href={`mailto:${show.links.contact}`}>문의하기</a> : <span>{show.links.contact}</span>}</span></li>}
         </ul>}
         {show.sponsors && <p>{show.sponsors}</p>}
+        {show.credits.painting && <p class="colophon__painting">{show.credits.painting}</p>}
         <p class="colophon__title" data-end-title>〈{show.title}〉</p>
       </div>
     </div>

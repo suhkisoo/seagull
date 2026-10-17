@@ -39,7 +39,7 @@
 
   /* 수면 띠. 초기값은 첫 화면의 물 높이. docs/plan.md 3.6과 4.2 */
   --water-hero: calc(38svh + env(safe-area-inset-bottom, 0px));
-  --water-band: calc(max(12svh, 84px) + env(safe-area-inset-bottom, 0px));
+  --water-band: calc(96px + env(safe-area-inset-bottom, 0px));
   --water-h: var(--water-hero);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 
@@ -48,5 +48,5 @@
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 @media (min-width: 1024px) {
-  :root { --gutter: 6vw; --section-pad: 26svh; --button-h: 54px; --fs-water-line: 16px; --fs-button: 15.5px; }
+  :root { --water-band: calc(110px + env(safe-area-inset-bottom, 0px)); --gutter: 6vw; --section-pad: 26svh; --button-h: 54px; --fs-water-line: 16px; --fs-button: 15.5px; }
 }

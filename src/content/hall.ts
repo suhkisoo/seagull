@@ -32,7 +32,10 @@ export const hall = {
       { id: 'R', label: '오른쪽', max: 4 },
     ] as { id: BalconySide; label: string; max: number }[],
   },
-  entrance: '입구는 객석 왼쪽 뒤',
+  // 좌석도는 무대가 아래라 화면의 왼쪽과 관객 기준 왼쪽이 반대다. 그래서 무대를 바라보는 쪽으로 적는다(10/17)
+  entrance: '입구는 무대를 바라볼 때 왼쪽 뒤',
+  // 좌석도에서 "입구" 표시를 놓을 모서리. 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'. 무대를 바라볼 때 왼쪽 뒤는 화면 오른쪽 위
+  entranceCorner: 'top-right' as 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right',
 };
 
 export const seatId = (row: string, n: number) => `${row}${n}`;

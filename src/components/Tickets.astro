@@ -63,14 +63,12 @@ const bookExternal = !!show.booking.commonUrl;
           </div>
         ))}
       </fieldset>
+      <p class="showtimes__hint">시간을 누르면 그 회차 출연진이 보입니다</p>
       <p class="book-link"><a href={bookHref} data-book-link target={bookExternal ? '_blank' : undefined} rel={bookExternal ? 'noopener' : undefined}>좌석 고르고 예매하기</a></p>
       <dl class="facts">
-        {(show.runningMinutes || show.intermission) && (
-          <div class="facts__row"><dt>러닝타임</dt><dd>{show.runningMinutes ? `${show.runningMinutes}분` : ''}{show.runningMinutes && show.intermission ? ', ' : ''}{show.intermission}</dd></div>
-        )}
-        {show.ageLimit && <div class="facts__row"><dt>관람 연령</dt><dd>{show.ageLimit}</dd></div>}
         <div class="facts__row"><dt>가격과 좌석</dt><dd>{show.pricing || '추후 공개'}</dd></div>
         <div class="facts__row"><dt>예매 오픈</dt><dd>{openText}{show.booking.vendorName && show.booking.openAt ? `, ${show.booking.vendorName}` : ''}</dd></div>
+        {show.notices.filter((n) => n.value).map((n) => <div class="facts__row"><dt>{n.label}</dt><dd>{n.value}</dd></div>)}
         {show.tumblbug.url && (
           <div class="facts__row" data-tumblbug data-start={show.tumblbug.startAt} data-end={show.tumblbug.endAt} hidden={!tumblbugOn}><dt>텀블벅</dt><dd><a class="action" href={show.tumblbug.url} target="_blank" rel="noopener">텀블벅 열기</a></dd></div>
         )}
@@ -88,6 +86,11 @@ const bookExternal = !!show.booking.commonUrl;
         <p class="venue__name">{show.venue.name}</p>
         <p class="venue__address" data-address>{show.venue.address}</p>
       </div>
+      {show.venue.directions.some((n) => n.value) && (
+        <dl class="facts facts--venue">
+          {show.venue.directions.filter((n) => n.value).map((n) => <div class="facts__row"><dt>{n.label}</dt><dd>{n.value}</dd></div>)}
+        </dl>
+      )}
       <VenueMap />
       <ul class="action-list" role="list">
         <li><span class="action-list__label">지도</span><span class="action-list__value"><a class="action" href={naver} target="_blank" rel="noopener">네이버 지도 열기</a><a class="action" href={kakao} target="_blank" rel="noopener">카카오맵 열기</a></span></li>

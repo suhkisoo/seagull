@@ -60,22 +60,34 @@
 .balcony.is-lit .balcony__count { color: var(--amber-ink); }
 .balcony__left { font-size: var(--fs-micro); letter-spacing: 0.04em; color: var(--soft); white-space: nowrap; }
 .seats { display: flex; flex-direction: column; gap: 5px; }
-.seats__row { display: grid; grid-template-columns: 1em 1fr 1em; align-items: center; gap: 6px; }
-.seats__label { font-size: 11px; letter-spacing: 0.06em; color: var(--soft); text-align: center; }
-.seats__cells { display: flex; justify-content: center; gap: 3px; }
-.seats__aisle { width: 12px; }
-.seat { width: min(22px, calc((100cqw - 70px) / 12)); aspect-ratio: 1; height: auto; padding: 0; border: 0; background: color-mix(in srgb, currentColor 9%, transparent); color: color-mix(in srgb, currentColor 62%, transparent); font: inherit; font-size: 10px; line-height: 1; cursor: pointer; font-variant-numeric: tabular-nums; transition: background-color 400ms var(--ease), color 300ms var(--ease); }
-@media (min-width: 480px) { .seat { width: min(30px, calc((100cqw - 112px) / 12)); font-size: 11.5px; } .seats__cells { gap: 5px; } .seats__aisle { width: 18px; } .seats__row { grid-template-columns: 1.4em 1fr 1.4em; gap: 10px; } .seats { gap: 6px; } }
+/* 휴대폰. 행 글자는 왼쪽에만 좁게 두고 좌석도를 화면 끝 6px까지 넓혀 좌석 칸을 26px 넘게 키운다. 가로 넘침은 없다(10/17) */
+.seats__row { display: grid; grid-template-columns: 11px 1fr; align-items: center; gap: 2px; }
+.seats__row > .seats__label:last-child { display: none; }
+.seats__label { font-size: 11px; letter-spacing: 0.02em; color: var(--soft); text-align: center; }
+.seats__cells { display: flex; justify-content: center; gap: 2px; }
+.seats__aisle { width: 8px; }
+.seat { width: clamp(22px, calc((100cqw - 35px) / 12), 30px); aspect-ratio: 1; height: auto; padding: 0; border: 0; background: color-mix(in srgb, var(--floor) 7%, transparent); color: color-mix(in srgb, currentColor 62%, transparent); font: inherit; font-size: 11px; line-height: 1; cursor: pointer; transition: background-color 400ms var(--ease), color 400ms var(--ease); }
+@media (max-width: 599px) { .book .hall { margin-inline: calc(6px - var(--gutter)); max-width: none; } }
+@media (min-width: 600px) { .seat { width: min(30px, calc((100cqw - 112px) / 12)); font-size: 11.5px; } .seats__cells { gap: 5px; } .seats__aisle { width: 18px; } .seats__row { grid-template-columns: 1.4em 1fr 1.4em; gap: 10px; } .seats__row > .seats__label:last-child { display: block; } .seats { gap: 6px; } }
 @media (min-width: 1024px) { .seat { width: min(34px, calc((100cqw - 112px) / 12)); font-size: 12px; } }
-.seat:hover:not(:disabled) { background: color-mix(in srgb, currentColor 18%, transparent); color: inherit; }
+.seat:hover:not(:disabled) { background: color-mix(in srgb, var(--floor) 16%, transparent); color: inherit; }
 .seat.is-picked { background: var(--amber); color: var(--floor); }
-.seat.is-taken, .seat:disabled { background: color-mix(in srgb, currentColor 3%, transparent); outline: 1px solid color-mix(in srgb, currentColor 10%, transparent); outline-offset: -1px; color: transparent; cursor: default; }
+/* 예매된 자리. 짙은 면, 번호 없음. 범례의 칸도 같은 모양 */
+.seat.is-taken, .seat:disabled { background: color-mix(in srgb, var(--floor) 34%, transparent); color: transparent; cursor: default; }
 .seat.is-taken.is-picked { background: var(--amber); color: var(--floor); }
 .seat--legend { display: inline-block; vertical-align: -3px; width: 14px; height: 14px; margin: 0 6px 0 16px; pointer-events: none; }
 .seat--legend:first-child { margin-left: 0; }
 .seats__legend { font-size: var(--fs-micro); letter-spacing: 0.04em; color: var(--soft); margin-top: 24px; }
 .hall__stage { margin-top: 26px; padding-top: 10px; border-top: 1px solid color-mix(in srgb, currentColor 45%, transparent); text-align: center; font-size: var(--fs-micro); letter-spacing: 0.6em; text-indent: 0.6em; color: var(--soft); }
 .hall__entrance { font-size: var(--fs-micro); letter-spacing: 0.04em; color: var(--soft); margin-top: 6px; }
+/* 입구 표시. 좌석도의 한 모서리(hall.ts의 entranceCorner). 가는 선 하나와 글자 */
+.hall__door { font-size: var(--fs-micro); letter-spacing: 0.08em; color: var(--soft); margin: 0 0 8px; }
+.hall__door--top-right, .hall__door--bottom-right { text-align: right; }
+.hall__door--bottom-left, .hall__door--bottom-right { margin: 8px 0 0; }
+.hall__door::after { content: ''; display: block; width: 2.4em; border-top: 1px solid currentColor; margin-top: 3px; }
+.hall__door--top-right::after, .hall__door--bottom-right::after { margin-left: auto; }
+/* 핀배지 종류 고르기 */
+.pins__hint { margin-bottom: 10px; }
 
 /* 3. 굿즈 */
 .goods { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); max-width: 600px; }

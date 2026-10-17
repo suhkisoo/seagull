@@ -12,6 +12,17 @@ await new Promise((r) => setTimeout(r, 1500));
 const url = (qs = '') => `http://127.0.0.1:${PORT}${BASE}${qs}`;
 const exe = process.env.CHROME_PATH || '/opt/pw-browsers/chromium';
 const browser = await chromium.launch({ executablePath: exe, args: ['--no-sandbox'] });
+// 예매 장부(Apps Script)는 실제로 돌고 있다. 스크린샷은 장부에 닿지 않는다. 모든 요청을 목으로 받는다(10/17).
+// 예매 신청은 가짜 번호로, 관리 목록은 빈 목록으로, 남은 자리는 빈 회차로 답한다
+const mockLedger = (route) => {
+  const body = route.request().postData() || '';
+  const json = (o) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(o) });
+  if (body.includes('"reserve"')) return json({ ok: true, id: 'G0000-SHOT', amount: null });
+  if (body.includes('"admin"')) return json({ ok: true, rows: [] });
+  return json({ taken: [], balconyTaken: { L: 0, R: 0 }, goodsSold: {} });
+};
+const ledgerSafe = (b) => { const open = b.newContext.bind(b); b.newContext = async (o) => { const c = await open(o); await c.route(/script\.google(usercontent)?\.com/, mockLedger); return c; }; return b; };
+ledgerSafe(browser);
 const sizes = { m390: { width: 390, height: 844, mobile: true, full: true }, m360: { width: 360, height: 800, mobile: true }, t768: { width: 768, height: 1024, mobile: true }, d1440: { width: 1440, height: 900, mobile: false, full: true } };
 const only = process.env.SIZES ? process.env.SIZES.split(',') : Object.keys(sizes);
 const sections = ['about', 'people', 'two-years', 'tickets', 'directions', 'credits'];
@@ -62,8 +73,8 @@ for (const [name, now] of states) {
   for (const [key, vp, mobile] of [['m390', { width: 390, height: 844 }, true], ['d1440', { width: 1440, height: 900 }, false]]) {
     const ctx = await browser.newContext({ viewport: vp, deviceScaleFactor: 1, isMobile: mobile, hasTouch: mobile });
     const page = await ctx.newPage(); await page.goto(U); await page.waitForTimeout(700); await shot(page, `${out}/${key}-50-book-show.jpg`);
-    await click(page, '[data-step-next]'); await page.waitForTimeout(700); await click(page, '[data-seat="D6"]'); await click(page, '[data-seat="D7"]'); await click(page, '[data-balcony-plus]'); await page.waitForTimeout(400); await shot(page, `${out}/${key}-51-book-seats.jpg`);
-    await click(page, '[data-step-next]'); await page.waitForTimeout(700); await click(page, '[data-goods="pinbadge"] [data-qty-plus]'); await page.waitForTimeout(200); await shot(page, `${out}/${key}-52-book-goods.jpg`);
+    await click(page, '[data-step-next]'); await page.waitForTimeout(700); await click(page, '[data-seat="D6"]'); await click(page, '[data-seat="D7"]'); await page.waitForTimeout(400); await shot(page, `${out}/${key}-51-book-seats.jpg`);
+    await click(page, '[data-step-next]'); await page.waitForTimeout(700); await click(page, '[data-goods="pinbadge"] [data-qty-plus]'); await page.locator('[data-pin-kind] [data-qty-plus]').first().dispatchEvent('click'); await page.waitForTimeout(200); await shot(page, `${out}/${key}-52-book-goods.jpg`);
     await click(page, '[data-step-next]'); await page.waitForTimeout(600); await page.fill('#bk-name', '홍길동'); await page.fill('#bk-phone', '010-1234-5678'); await page.waitForTimeout(200);
     await click(page, '[data-step-next]'); await page.waitForTimeout(700); await shot(page, `${out}/${key}-53-book-confirm.jpg`);
     await click(page, '[data-step-next]'); await page.waitForTimeout(900); await shot(page, `${out}/${key}-54-book-done.jpg`);
@@ -78,7 +89,7 @@ await shot(page, `${out}/m390-40-reduced-motion.jpg`); await goTo(page, 'tickets
 ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, javaScriptEnabled: false });
 page = await ctx.newPage(); await page.goto(url()); await page.waitForTimeout(800);
 await shot(page, `${out}/m390-42-no-js.jpg`); await page.evaluate(() => document.getElementById('tickets').scrollIntoView()); await page.waitForTimeout(300); await shot(page, `${out}/m390-43-no-js-tickets.jpg`); await ctx.close();
-const nogl = await chromium.launch({ executablePath: exe, args: ['--no-sandbox', '--disable-webgl'] });
+const nogl = ledgerSafe(await chromium.launch({ executablePath: exe, args: ['--no-sandbox', '--disable-webgl'] }));
 ctx = await nogl.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true });
 page = await ctx.newPage(); await page.goto(url()); await page.waitForTimeout(1500); await page.touchscreen.tap(200, 700); await page.waitForTimeout(300);
 await shot(page, `${out}/m390-44-no-webgl.jpg`); await ctx.close(); await nogl.close();

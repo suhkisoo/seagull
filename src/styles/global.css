@@ -130,9 +130,9 @@ html:not(.js) .water { height: var(--water-band); }
 html:not(.js) .water__mirror { display: none; }
 html:not(.js) .water.is-hero .ticket { top: 12px; }
 
-/* 띠 뒤에 가려질 자리. 본 페이지의 끝에서는 물이 올라오므로(scroll.ts의 endPx) 그만큼 비운다 */
+/* 띠 뒤에 가려질 자리. 본문 끝에 띠 높이만큼 비워 어떤 글자도 띠에 가리지 않게 한다 */
 .after-water { height: var(--water-band); }
-html.js .after-water--end { height: calc(max(30svh, var(--water-band)) + var(--safe-bottom, 0px) + 18px); }
+html.js .after-water--end { height: calc(var(--water-band) + 18px); }
 
 @media (prefers-reduced-motion: reduce) {
   .water canvas { display: none; }

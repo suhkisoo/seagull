@@ -37,7 +37,7 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
   // 1막 극중극. 막을 올리기 시작하면 무대가 켜진다(어두워짐, 달의 길, 늪의 불빛, 붉은 점 둘). 첫 화면을 벗어나면 꺼진다
   const lights = root.querySelector<HTMLElement>('.stage-lights');
   const PTS = [[0.13, 0], [0.33, 0], [0.74, 0], [0.9, 0], [0.655, 1], [0.685, 1]] as const;
-  let stage = false, stageT = 0, eyesSaid = false, actH = 0, stageK = 0; const ptsI = new Float32Array(6);
+  let stage = false, stageT = 0, eyesSaid = false, stageK = 0; const ptsI = new Float32Array(6);
   const probe = document.createElement('div'); probe.style.cssText = 'position:fixed;top:0;left:0;height:100svh;width:0;pointer-events:none;visibility:hidden;padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:content-box';
   document.body.appendChild(probe);
   let svh = 0, safe = 0, heroPx = 0, bandPx = 0, endPx = 0, maxY = 0, aboutTop = 0, aboutBot = 0, actTop = 0, actBot = 0, duskStart = performance.now();
@@ -49,7 +49,8 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
   let stops: Stop[] = [];
   const measure = () => {
     svh = probe.offsetHeight; safe = parseFloat(getComputedStyle(probe).paddingBottom) || 0; svh -= safe;
-    heroPx = 0.38 * svh + safe; bandPx = Math.max(0.12 * svh, 84) + safe; endPx = Math.max(0.3 * svh, bandPx - safe) + safe;
+    // 띠는 휴대폰 96px, 데스크톱 110px로 고정한다. 4막에도, 페이지 끝에서도 더 커지지 않는다(10/17 연출 "본문을 덮는다")
+    heroPx = 0.38 * svh + safe; bandPx = (window.innerWidth >= 1024 ? 110 : 96) + safe; endPx = bandPx;
     maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
     const ab = root.querySelector<HTMLElement>('[data-light="about"]')?.getBoundingClientRect();
     if (ab) { aboutTop = ab.top + window.scrollY; aboutBot = ab.bottom + window.scrollY; }
@@ -115,7 +116,7 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
     const e = maxY > svh ? smooth((y - (maxY - 0.55 * svh)) / (0.55 * svh)) : 0;
     let h = heroPx + (bandPx - heroPx) * p + (endPx - bandPx) * e;
     // 4막. 집채만 한 파도. 물이 화면 위로 부풀었다 가라앉는다. 예매 버튼도 그 위에 떠서 오르내린다. 멈추면 너울이 낮아진다
-    if (actH > 0.001) { const s1 = now / 1000; const heave = (0.5 + 0.5 * Math.sin(s1 * 0.9)) * (0.6 + 0.4 * Math.sin(s1 * 0.31 + 1)); const calmK = wrapper.classList.contains('is-calm') ? 0.45 : 1; h += actH * (0.07 * svh + 0.06 * svh * heave * calmK); }
+    // 4막의 너울은 띠 높이를 바꾸지 않고 물결(셰이더의 u_storm)로만 보인다
     if (Math.abs(h - lastH) > 0.05) { wrapper.style.setProperty('--water-h', `${h.toFixed(1)}px`); root.style.setProperty('--water-live', `${h.toFixed(1)}px`); if (p === lastP) water?.updateBand(); lastH = h; }
     wrapper.classList.toggle('is-end', e > 0.35);
     // 물에 비칠 제목. 끝에 가까우면 맺음의 제목으로
@@ -157,7 +158,7 @@ export function createScroll(root: HTMLElement, water: { state: WaterState; upda
     if (treeLeaves && Math.abs(aboutW - lastTree) > 0.004) { lastTree = aboutW; treeLeaves.style.opacity = (aboutW * 0.95).toFixed(3); }
     // 4막(일정과 예매, 오시는 길). 폭풍 이틀째. 정면 유리문으로 나간 램프 빛이 거친 물에 부서진다.
     // 끝(만든 사람들)에 들어서면 바람이 잦아들어 맺음의 제목이 비친다
-    const actW = actH = act0;
+    const actW = act0;
     if (water) {
       const sum = moonW + aboutW + actW + 1e-3, a = moonW / sum, b = aboutW / sum, c = actW / sum, vw = window.innerWidth;
       water.state.glade = [vw * (0.54 * a + 0.2 * b + 0.47 * c), moonW * 0.8 + aboutW * 0.45 + actW * 0.42, 9 * a + 39 * b + 24 * c, aboutW];
