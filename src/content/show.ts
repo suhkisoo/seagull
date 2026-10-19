@@ -58,7 +58,7 @@ export const show = {
   // 예매 전 안내. 공연 일정과 예매의 "가격과 좌석", "예매 오픈" 아래에 놓인다. 값이 빈 행은 화면에 나오지 않는다. 값은 연출이 채운다 【빈칸】
   notices: [
     { label: '러닝타임', value: '135분' },
-    { label: '인터미션', value: '' },
+    { label: '인터미션', value: '없음' },
     { label: '관람 연령', value: '' },
     { label: '지각 입장', value: '' },
     { label: '취소와 환불', value: '' },
