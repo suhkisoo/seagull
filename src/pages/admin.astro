@@ -1,0 +1,86 @@
+---
+// 기획팀 관리. 예매 목록, 입금 확인, 자리 풀기, 메모, 자리 직접 넣기, 회차별 좌석표, 명단 내려받기. 관리 암호(Apps Script의 스크립트 속성 ADMIN_TOKEN)를 넣어야 열린다.
+import Base from '../layouts/Base.astro';
+import { show } from '../content/show';
+import { hall, seatId } from '../content/hall';
+import { fmtDay, fmtTime } from '../scripts/format';
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+<Base title={`예매 관리. ${show.meta.title}`} description="기획팀 예매 관리" noindex>
+  <main class="book admin page" data-admin data-api={show.booking.apiUrl} data-hold-hours={show.booking.holdHours} data-seat-price={show.booking.seatPrice ?? ''}>
+    <div class="wrap">
+    <header class="book__head grid">
+      <p class="book__eyebrow"><a href={`${base}/`}>〈{show.title}〉 {show.company}</a></p>
+      <h1 class="book__title">예매 관리</h1>
+      <p class="book__demo" data-demo hidden>장부(구글 시트)에 아직 연결되지 않았습니다. 지금 보이는 것은 이 브라우저에서 신청하고 넣은 예매뿐이고, 다른 사람의 예매는 보이지 않습니다. 연결하려면 Apps Script 웹 앱 주소를 사이트에 넣어야 합니다.</p>
+      <p class="admin__live" data-live hidden>장부(구글 시트)에 연결되어 있습니다. 여기서 바꾼 것은 시트에 바로 적힙니다.</p>
+    </header>
+    <form class="admin__login" data-login>
+      <div class="field"><label for="ad-token">관리 암호</label><input id="ad-token" type="password" autocomplete="current-password" /></div>
+      <p class="action-row"><button class="action" type="submit">열기</button><span class="field__error" data-login-error aria-live="polite"></span></p>
+    </form>
+    <section class="admin__body" data-body hidden>
+      <div class="admin__tools">
+        <label class="admin__filter">회차 <select data-filter-show><option value="">전체</option>{show.shows.map((s) => <option value={s.id}>{fmtDay(s.startAt)} {fmtTime(s.startAt)}</option>)}</select></label>
+        <label class="admin__filter">상태 <select data-filter-status><option value="">전체</option><option value="입금대기">입금대기</option><option value="입금확인">입금확인</option><option value="취소">취소</option></select></label>
+        <label class="admin__filter admin__filter--q">찾기 <input type="search" data-filter-q placeholder="이름, 연락처, 예매 번호, 자리" /></label>
+        <button class="action" type="button" data-refresh>새로 고침</button>
+        <button class="action" type="button" data-release>기한 지난 대기 자리 풀기</button>
+        <button class="action" type="button" data-export>명단 내려받기</button>
+      </div>
+      <dl class="admin__counts" data-counts></dl>
+
+      <div class="admin__map" data-map-wrap>
+        <h2 class="admin__h">좌석표</h2>
+        <p class="admin__hint" data-map-hint>위에서 회차를 고르면 그 회차의 좌석표가 보입니다.</p>
+        <div class="hall admin__hall" data-admin-hall hidden>
+          <div class="seats" role="group" aria-label="좌석표">
+            {hall.rows.map((r) => (
+              <div class="seats__row">
+                <span class="seats__label">{r.row}</span>
+                <div class="seats__cells">
+                  {r.seats.map((n) => (
+                    <>
+                      <button class="seat" type="button" data-admin-seat={seatId(r.row, n)} aria-label={`${r.row}열 ${n}번`}>{n}</button>
+                      {r.gapAfter === n && <span class="seats__aisle" aria-hidden="true"></span>}
+                    </>
+                  ))}
+                </div>
+                <span class="seats__label">{r.row}</span>
+              </div>
+            ))}
+          </div>
+          <p class="hall__stage">무대</p>
+          <p class="seats__legend"><span class="seat seat--legend"></span>빈자리<span class="seat seat--legend is-wait"></span>입금대기<span class="seat seat--legend is-paid"></span>입금확인<span class="seat seat--legend is-picked"></span>넣을 자리</p>
+          <p class="admin__hint">빈자리를 누르면 아래 "자리 직접 넣기"에 담깁니다. 예매된 자리를 누르면 그 예매를 찾습니다.</p>
+        </div>
+      </div>
+
+      <form class="admin__add" data-add>
+        <h2 class="admin__h">자리 직접 넣기</h2>
+        <p class="admin__hint">초대석, 관계자석, 전화나 현장에서 받은 예매를 넣습니다. 금액을 0으로 두면 초대입니다.</p>
+        <div class="admin__fields">
+          <label class="field"><span>회차</span><select data-add-show required><option value="">고르기</option>{show.shows.map((s) => <option value={s.id}>{fmtDay(s.startAt)} {fmtTime(s.startAt)}</option>)}</select></label>
+          <label class="field"><span>자리</span><input data-add-seats placeholder="D6 D7" autocomplete="off" required /></label>
+          <label class="field"><span>이름</span><input data-add-name autocomplete="off" required /></label>
+          <label class="field"><span>연락처</span><input data-add-phone inputmode="tel" autocomplete="off" /></label>
+          <label class="field"><span>금액</span><input data-add-amount type="number" min="0" step="1000" inputmode="numeric" /></label>
+          <label class="field"><span>상태</span><select data-add-status><option value="입금확인">입금확인</option><option value="입금대기">입금대기</option></select></label>
+          <label class="field admin__field--wide"><span>메모</span><input data-add-note placeholder="초대, 관계자석, 현장 예매" autocomplete="off" /></label>
+        </div>
+        <p class="action-row"><button class="action" type="submit">자리 넣기</button><span class="field__error" data-add-msg aria-live="polite"></span></p>
+      </form>
+
+      <h2 class="admin__h">예매 목록</h2>
+      <p class="admin__hint">입금을 확인하면 "입금 확인"을 누릅니다. 입금이 없으면 "자리 풀기"를 누르면 그 예매가 취소되고 자리가 다시 열립니다. 되돌리려면 "대기로"를 누릅니다.</p>
+      <table class="admin__table">
+        <thead><tr><th>예매 번호</th><th>신청</th><th>회차</th><th>자리</th><th>굿즈</th><th>예매자</th><th>금액</th><th>상태</th><th>메모</th><th>처리</th></tr></thead>
+        <tbody data-rows></tbody>
+      </table>
+      <p class="field__error" data-admin-error aria-live="polite"></p>
+    </section>
+    </div>
+    <div class="after-water" aria-hidden="true"></div>
+  </main>
+  <script src="../scripts/admin.ts"></script>
+</Base>

@@ -1,0 +1,18 @@
+---
+// 호수 띠. 페이지에 하나뿐인 예매 버튼이 여기 산다. docs/plan.md 3.1, 4.2.
+import { show } from '../content/show';
+import { ticketState } from '../scripts/state.server';
+interface Props { titleHtml: string; variant?: 'a' }
+const { titleHtml, variant = 'a' } = Astro.props;
+const st = ticketState(); // 빌드 시점 상태(JS 없을 때 그대로 보인다)
+---
+<div class="water is-hero" data-water="css" data-variant={variant}>
+  <div class="water__still" aria-hidden="true">
+    <div class={`water__mirror water__mirror--${variant}`} set:html={titleHtml}></div>
+  </div>
+  <canvas aria-hidden="true"></canvas>
+  <p class="water__line" aria-hidden="true"></p>
+  {'href' in st
+    ? <a class="ticket" data-ticket-button href={st.href} data-state={st.id} target={'external' in st && st.external ? '_blank' : undefined} rel={'external' in st && st.external ? 'noopener' : undefined}>{st.label}</a>
+    : <a class="ticket" data-ticket-button role="button" aria-disabled="true" data-state={st.id}>{st.label}</a>}
+</div>

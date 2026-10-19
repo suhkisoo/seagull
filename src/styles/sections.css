@@ -1,0 +1,234 @@
+/* 첫 화면 아래 다섯 구간. 바탕은 구간마다 칠하지 않는다. 고정된 방(.room)의 빛이 스크롤에 따라 바뀌고, 구간 사이에서 어두워졌다 밝아진다(docs/plan.md 3.3, 9.5.3).
+   편집 그리드. 데스크톱은 12단, 구간 제목은 왼쪽 네 단에 머물고(sticky) 본문은 여섯째 단부터. 상자, 카드, 그림자 없음. 괘선은 얇은 가로선뿐 */
+:root { --rule: color-mix(in srgb, currentColor 17%, transparent); --soft: color-mix(in srgb, currentColor 70%, transparent); }
+
+.wrap { padding-inline: var(--gutter); max-width: 1480px; margin-inline: auto; }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr); }
+.section { position: relative; padding-block: var(--section-pad); }
+.rule { border: 0; border-top: 1px solid var(--rule); margin: 0; }
+.rule--section { grid-column: 1 / -1; margin-bottom: 22px; }
+.section__head { margin-bottom: 44px; }
+.section__title { font-size: var(--fs-display); font-weight: 400; line-height: 1.16; letter-spacing: -0.03em; }
+.section__caption { font-size: var(--fs-small); line-height: 1.7; color: var(--soft); margin-top: 16px; letter-spacing: 0.01em; }
+.section__body { min-width: 0; }
+.wrap + .wrap { margin-top: calc(var(--section-pad) * 0.6); }
+@media (min-width: 1024px) {
+  .grid { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: 24px; }
+  .section__head { grid-column: 1 / span 4; position: sticky; top: 16svh; align-self: start; margin-bottom: 0; padding-right: 24px; }
+  .section__body { grid-column: 6 / span 7; }
+  .rule--section { margin-bottom: 28px; }
+}
+
+.prose { max-width: var(--measure); }
+.prose p + p { margin-top: 1.15em; }
+.prose--lede p:first-child { font-size: clamp(18.5px, 4.9vw, 23px); line-height: 1.72; letter-spacing: -0.01em; }
+.quote { margin-top: 15svh; max-width: 17em; }
+.quote__text { font-size: var(--fs-quote); line-height: 1.5; letter-spacing: -0.02em; }
+.quote__source { display: block; font-size: var(--fs-micro); letter-spacing: var(--track-micro); color: var(--soft); margin-top: 22px; }
+.note { margin-top: 15svh; }
+/* 라벨 대신 가는 선 하나(10/17) */
+.note__rule { margin: 0 0 28px; width: 4em; }
+/* 가운데 문단과 마지막 물음, 서명은 접어 둔다. 누르면 그 자리에서 펼쳐지고 버튼은 물러난다 */
+/* 연출의 글. 글자는 작품 소개 본문과 같다(10/17 연출 "글자 크기가 이상하다". 한 단계 크게 했던 것을 되돌림). 줄 간격만 조금 넓다 */
+.note p:not(.note__by) { font-size: var(--fs-body); line-height: 1.85; }
+/* 접힌 글. 첫 문단 아래 "이어 읽기"와 짧은 가는 선. 닿으면 선이 조금 늘어나고 밝아진다 */
+.note__more { margin-top: 1.4em; interpolate-size: allow-keywords; }
+.note__open, .note__close { display: inline-flex; align-items: center; gap: 14px; min-height: 44px; font-size: var(--fs-small); letter-spacing: 0.02em; color: var(--soft); cursor: pointer; list-style: none; transition: color 400ms var(--ease); }
+.note__open::-webkit-details-marker { display: none; }
+.note__open::after, .note__close::after { content: ''; width: 2.6em; height: 1px; background: currentColor; opacity: 0.45; transition: width 600ms var(--ease), opacity 400ms var(--ease); }
+.note__open:hover, .note__open:focus-visible, .note__close:hover, .note__close:focus-visible { color: inherit; }
+.note__open:hover::after, .note__open:focus-visible::after, .note__close:hover::after, .note__close:focus-visible::after { width: 4.4em; opacity: 0.8; }
+.note__more[open] > .note__open { display: none; }
+/* 펼칠 때 높이가 천천히 열리고 글이 배어 나온다. 지원하지 않는 브라우저는 바로 열린다 */
+.note__more::details-content { block-size: 0; opacity: 0; overflow: clip; transition: block-size 800ms var(--ease), opacity 700ms var(--ease) 150ms, content-visibility 800ms allow-discrete; }
+.note__more[open]::details-content { block-size: auto; opacity: 1; }
+.note__more > p + p { margin-top: 1.15em; }
+.note .note__last { margin-top: 2.6em; }
+.note__close { margin-top: 2.2em; background: none; border: 0; padding: 0; font-family: inherit; }
+.note__close[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) { .note__more::details-content, .note__open::after, .note__close::after { transition: none; } }
+.note .note__by { margin-top: 1.4em; text-align: right; font-size: var(--fs-small); color: var(--soft); letter-spacing: var(--track-micro); }
+
+/* 글자로 된 동작. 버튼 모양이 아니다. 닿는 높이 44px, 밑줄은 가는 선 */
+.action { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline; text-decoration-color: var(--rule); text-decoration-thickness: 1px; text-underline-offset: 0.36em; min-height: 44px; display: inline-flex; align-items: center; transition: text-decoration-color 300ms var(--ease); }
+.action:hover { text-decoration-color: currentColor; }
+.action + .action { margin-left: 28px; }
+.action--text { text-decoration: none; }
+.action-row { margin-top: 8px; }
+.action-list { list-style: none; margin: 0; padding: 0; }
+.action-list li { display: grid; grid-template-columns: 7em 1fr; align-items: center; min-height: 56px; border-top: 1px solid var(--rule); column-gap: 16px; }
+.action-list li:last-child { border-bottom: 1px solid var(--rule); }
+.action-list__label { font-size: var(--fs-micro); letter-spacing: var(--track-micro); color: var(--soft); }
+.action-list__value { display: flex; flex-wrap: wrap; align-items: center; column-gap: 28px; }
+.action__done { margin-left: 16px; font-size: var(--fs-small); color: var(--soft); }
+/* 아이콘 줄(10/19 연출). 44px 자리에 24px 그림. 선 아이콘은 옅은 글자색, 닿으면 글자색. 상표 아이콘은 제 색 */
+.icons { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-left: -10px; }
+.icons li { display: flex; align-items: center; }
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; margin: 0; border: 0; background: none; color: var(--soft); cursor: pointer; transition: color 300ms var(--ease), opacity 300ms var(--ease); }
+.icon-btn:hover, .icon-btn:focus-visible { color: inherit; }
+.icon-btn svg { display: block; }
+.icons .action__done { margin-left: 4px; }
+.map + .icons, .venue + .icons { margin-top: 32px; }
+html:not(.js) .js-only { display: none; }
+
+/* ---- 작품 소개. 정오 ---- */
+.section--about::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: var(--floor); opacity: var(--video-dim, 0); transition: opacity 900ms var(--ease); }
+.section--about .wrap { position: relative; z-index: 1; }
+.video { margin-top: 12svh; }
+.video__facade { display: block; width: 100%; aspect-ratio: var(--video-aspect, 16 / 9); background: var(--deep); border: 0; padding: 0; cursor: pointer; position: relative; overflow: clip; }
+.video__poster { display: block; width: 100%; height: 100%; object-fit: cover; }
+.video__poster--blank { display: block; width: 100%; height: 100%; background: var(--deep); }
+.video__frame { display: block; width: 100%; aspect-ratio: var(--video-aspect, 16 / 9); border: 0; }
+.video__hint { font-size: var(--fs-small); color: var(--soft); margin-top: 10px; }
+
+/* ---- 나오는 사람들. 아침의 실내. 창으로 든 빛이 반듯하게 떨어진다 ---- */
+.window-light { position: absolute; inset: 0; pointer-events: none; overflow: clip;
+  mask-image: linear-gradient(to bottom, transparent 0, black 22%, black 70%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 22%, black 70%, transparent 100%); }
+/* 창 둘. 왼쪽(하수)의 긴 창은 복도를 보여 주는 창, 오른쪽(상수)의 꺾인 창은 마당이 보이는 창이고 그 너머에 나무가 있다.
+   빛만 바닥에 떨어진다. 창살은 흐린 줄로, 가장자리는 아침의 푸른 기운 */
+.window-light__long, .window-light__bent { position: absolute; filter: blur(14px); }
+.window-light__long { left: 2vw; width: 22vw; top: -6%; bottom: -6%; opacity: 0.85; transform: translate3d(0, var(--shadow-shift, 0px), 0);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--morning-shadow) 60%, transparent) 0, transparent 14%, transparent 47%, color-mix(in srgb, var(--morning-shadow) 70%, transparent) 47% 53%, transparent 53%, transparent 86%, color-mix(in srgb, var(--morning-shadow) 60%, transparent) 100%),
+    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--ivory) 66%, transparent) 0 23%, color-mix(in srgb, var(--morning-shadow) 55%, transparent) 23% 25%); }
+.window-light__bent { left: 60vw; width: 34vw; top: 6%; bottom: 18%; opacity: 0.7; transform: translate3d(0, var(--shadow-shift, 0px), 0) skewY(-11deg); overflow: hidden;
+  background:
+    linear-gradient(90deg, transparent 0 48%, color-mix(in srgb, var(--morning-shadow) 70%, transparent) 48% 52%, transparent 52%),
+    repeating-linear-gradient(to bottom, color-mix(in srgb, var(--ivory) 60%, transparent) 0 31%, color-mix(in srgb, var(--morning-shadow) 55%, transparent) 31% 33.5%); }
+.window-light__tree { position: absolute; inset: -12%; background: var(--leaves, none) 70% 10% / 130% auto no-repeat; opacity: 0.95; animation: leaves-sway 11s ease-in-out infinite alternate; }
+@media (min-width: 1024px) { .window-light__long { left: 3vw; width: 13vw; } .window-light__bent { left: 54vw; width: 22vw; } }
+/* 나무 그늘은 바람에 아주 조금 흔들린다 */
+@keyframes leaves-sway { from { transform: translate3d(-0.6%, 0, 0) rotate(-0.5deg); } to { transform: translate3d(0.8%, 0.5%, 0) rotate(0.6deg); } }
+@media (prefers-reduced-motion: reduce) { .window-light__tree, .room__tree { animation: none; } }
+.section--people .wrap { position: relative; }
+.section--people .section__caption { margin-top: 12px; }
+/* 등장인물표. 일곱 배역이 같은 크기의 줄로 선다 */
+.dramatis { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.role { border-bottom: 1px solid var(--rule); }
+.role__win { position: relative; }
+.role__win::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 900ms var(--ease);
+  background: radial-gradient(70% 140% at 22% 0%, color-mix(in srgb, var(--ivory) 80%, transparent), transparent 72%); }
+.role__win[open]::before { opacity: 1; }
+.role__summary { position: relative; list-style: none; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; column-gap: 16px; padding: 22px 0 20px; }
+.role__summary::-webkit-details-marker { display: none; }
+.role__name { font-size: clamp(22px, 5.8vw, 34px); line-height: 1.2; letter-spacing: -0.02em; }
+/* 배우 이름. 휴대폰에서도 한 줄에 나란히, 본문 크기(10/17 연출 "배역에 비해 너무 조용하다") */
+.role__actors { font-size: var(--fs-body); line-height: 1.6; text-align: right; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0 1em; color: var(--soft); transition: color 600ms var(--ease); }
+.role__win[open] .role__actors { color: currentColor; }
+.role__body { position: relative; padding: 0 0 28px; font-size: var(--fs-small); line-height: 1.75; max-width: 26em; }
+.role__script { color: var(--soft); }
+.role__note { margin-top: 4px; }
+/* 배우 사진(10/19). 배역의 두 사람이 나란히. 흰 스튜디오 바탕은 곱하기 혼합으로 방의 종이에 가라앉는다. 틀도 그림자도 없다 */
+.role__cast { list-style: none; margin: 20px 0 0; padding: 0; display: flex; gap: 14px; max-width: 26em; }
+.role__person { flex: 0 1 150px; min-width: 0; }
+.role__photo { display: block; width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; mix-blend-mode: multiply; }
+.role__photo--none { background: color-mix(in srgb, currentColor 6%, transparent); }
+.role__person-name { display: block; margin-top: 8px; font-size: var(--fs-small); }
+@media (min-width: 1024px) { .role__cast { gap: 20px; } .role__person { flex-basis: 170px; } }
+.role__line { margin-top: 18px; font-size: var(--fs-body); }
+@media (min-width: 1024px) {
+  .role__summary { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 26px 0 24px; }
+  .role__actors { text-align: left; justify-content: flex-start; gap: 0 1.4em; }
+  .role__body { margin-left: 50%; padding-left: 0; }
+}
+
+/* ---- 2년. 낮은 빛이 밤으로. 지문 한 줄. 10/17 화면 한 장 반에서 0.68로 줄였다 ---- */
+/* 빈 구간은 어느 화면에서도 화면 높이의 0.6배를 넘지 않는다(10/17). 앞뒤 여백을 합쳐 잰다 */
+.section--two-years { min-height: 68svh; padding: 0; }
+.stage-direction { position: absolute; top: 40%; left: var(--gutter); right: var(--gutter); font-size: var(--fs-quote); line-height: 1.5; letter-spacing: -0.02em; max-width: 15em; }
+@media (min-width: 1024px) { .stage-direction { left: calc(var(--gutter) + (100vw - var(--gutter) * 2 + 24px) * 5 / 12); max-width: 18em; } }
+
+/* ---- 일정과 예매, 오시는 길. 4막의 램프가 켜진 방 ---- */
+.showtimes { border: 0; padding: 0; margin: 0; min-width: 0; border-top: 1px solid var(--rule); }
+.day { border-bottom: 1px solid var(--rule); padding: 18px 0 20px; }
+.day__date { font-size: var(--fs-small); letter-spacing: 0.02em; display: flex; gap: 0.6em; align-items: baseline; }
+.day__wd { color: var(--soft); font-size: var(--fs-micro); letter-spacing: var(--track-micro); }
+.day__cells { display: flex; flex-wrap: wrap; gap: 4px 6px; margin: 10px 0 0 -14px; }
+@media (min-width: 1024px) {
+  .day { display: grid; grid-template-columns: 10em minmax(0, 1fr); align-items: center; padding: 14px 0; }
+  .day__date { flex-direction: column; gap: 2px; }
+  .day__cells { margin: 0 0 0 -14px; }
+  .day .cast { grid-column: 2; }
+}
+.cell { position: relative; display: inline-flex; align-items: baseline; gap: 10px; padding: 4px 14px 6px; cursor: pointer; color: inherit; white-space: nowrap; transition: background-color 600ms var(--ease), color 400ms var(--ease); }
+.cell:hover { background: color-mix(in srgb, currentColor 6%, transparent); }
+.cell__time { font-size: var(--fs-digits); font-weight: 400; line-height: 1.12; letter-spacing: -0.02em; font-variant-numeric: tabular-nums lining-nums; }
+/* 시간은 누를 수 있다. 가는 밑줄, 올리거나 초점이 가면 짙어진다(10/17) */
+.cell__time { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.12em; text-decoration-color: var(--rule); transition: text-decoration-color 300ms var(--ease); }
+.cell:hover .cell__time, .cell:has(.cell__input:focus-visible) .cell__time { text-decoration-color: currentColor; }
+.cell:has(.cell__input:checked) .cell__time { text-decoration-color: transparent; }
+.showtimes__hint { margin-top: 14px; font-size: var(--fs-micro); letter-spacing: var(--track-micro); color: var(--soft); }
+.facts--venue { margin-top: 28px; }
+.cell__status { font-size: var(--fs-micro); letter-spacing: var(--track-micro); }
+.cell__link { font-size: var(--fs-small); margin-left: auto; }
+.cell:has(.cell__input:checked) { background: var(--amber); color: var(--floor); }
+.cell:has(.cell__input:focus-visible) { outline: 1px solid var(--amber); outline-offset: 4px; }
+.cell[data-sold-out], .cell.is-past { color: color-mix(in srgb, currentColor 42%, transparent); }
+.cell[data-sold-out]:has(.cell__input:checked), .cell.is-past:has(.cell__input:checked) { background: color-mix(in srgb, var(--amber) 30%, transparent); color: inherit; }
+.cast__list { margin: 14px 0 4px; font-size: var(--fs-small); line-height: 1.65; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
+@media (min-width: 1024px) { .cast__list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.cast__list[hidden] { display: none; }
+.cast__head { grid-column: 1 / -1; }
+.cast__head dd { font-size: var(--fs-micro); letter-spacing: var(--track-micro); color: var(--soft); margin-bottom: 6px; }
+.cast__row { display: flex; gap: 12px; }
+.cast__row dt { color: var(--soft); min-width: 5.2em; }
+.book-link { margin-top: 56px; }
+.book-link a { font-size: var(--fs-h3); letter-spacing: -0.01em; text-decoration: none; display: inline-flex; align-items: baseline; gap: 14px; padding-bottom: 10px; border-bottom: 1px solid currentColor; min-height: 44px; }
+.book-link__hint { font-size: var(--fs-micro); letter-spacing: var(--track-micro); color: var(--soft); }
+.facts { margin-top: 64px; border-top: 1px solid var(--rule); }
+.facts__row { display: grid; grid-template-columns: 7em 1fr; column-gap: 16px; align-items: baseline; padding: 15px 0; border-bottom: 1px solid var(--rule); }
+.facts__row dt { font-size: var(--fs-micro); letter-spacing: var(--track-micro); color: var(--soft); }
+.facts__row dd { font-size: var(--fs-small); }
+.venue__name { font-size: var(--fs-h3); line-height: 1.45; letter-spacing: -0.01em; }
+.venue__address { color: var(--soft); margin-top: 4px; }
+
+
+/* 지도. 공연장이 늘 가운데. 램프 하나가 공연장을 비추고 가장자리는 밤으로 풀린다. 틀도 괘선도 없다 */
+@property --lamp { syntax: '<percentage>'; inherits: true; initial-value: 16%; }
+.map { margin: 36px 0 0; }
+.map__frame { position: relative; aspect-ratio: 4 / 5; overflow: hidden; container-type: size; --s: max(100cqw, 100cqh); --lamp: 16%; transition: --lamp 2400ms var(--ease); touch-action: manipulation; }
+.map__frame.is-lit { --lamp: 34%; transition-duration: 500ms; }
+/* 램프 빛이 공연장 둘레에 고인다. 지도가 어둠 속에서 보이게(10/17) */
+.map__frame::before { content: ''; position: absolute; inset: 0; background: radial-gradient(closest-side at 50% 50%, color-mix(in srgb, var(--amber) 26%, transparent) 0, color-mix(in srgb, var(--amber) 12%, transparent) 45%, transparent 100%); }
+@media (min-width: 600px) { .map__frame { aspect-ratio: 16 / 11; } }
+.map__ground { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; -webkit-mask-image: radial-gradient(closest-side at 50% 50%, #000 var(--lamp), rgb(0 0 0 / 0.7) calc(var(--lamp) + 24%), rgb(0 0 0 / 0.35) 78%, rgb(0 0 0 / 0.12) 100%); mask-image: radial-gradient(closest-side at 50% 50%, #000 var(--lamp), rgb(0 0 0 / 0.7) calc(var(--lamp) + 24%), rgb(0 0 0 / 0.35) 78%, rgb(0 0 0 / 0.12) 100%); }
+.map__station, .map__venue { position: absolute; left: calc(50% + var(--dx) * var(--s)); top: calc(50% + var(--dy) * var(--s)); }
+.map__station, .map__venue-name { paint-order: stroke fill; -webkit-text-stroke: 4px var(--room); }
+.map__station { font-size: var(--fs-micro); letter-spacing: 0.04em; line-height: 1; white-space: nowrap; color: color-mix(in srgb, currentColor 72%, transparent); padding-left: 10px; transform: translateY(-50%); }
+.map__station::before { content: ''; position: absolute; left: -2.5px; top: 50%; width: 5px; height: 5px; margin-top: -2.5px; background: currentColor; }
+/* 공연장 표시에 닿거나 오른쪽 끝을 넘는 역은 이름을 점의 왼쪽에 둔다(scripts/tickets.ts) */
+.map__station--left { padding-left: 0; padding-right: 10px; transform: translate(-100%, -50%); }
+.map__station--left::before { left: auto; right: -2.5px; }
+.map__venue { width: 0; height: 0; }
+.map__venue::after { content: ''; position: absolute; left: -19px; top: -19px; width: 38px; height: 38px; border-radius: 50%; border: 1px solid color-mix(in srgb, currentColor 38%, transparent); }
+.map__venue-name { position: absolute; left: 24px; top: 0; transform: translateY(-50%); white-space: nowrap; font-size: var(--fs-small); letter-spacing: 0.02em; color: currentColor; }
+.map__scale { position: absolute; left: 0; bottom: 6px; width: calc(var(--len) * var(--s)); padding-bottom: 6px; border-bottom: 1px solid color-mix(in srgb, currentColor 55%, transparent); font-size: 11px; letter-spacing: 0.06em; color: var(--soft); line-height: 1; }
+.map__ripple { position: absolute; width: 0; height: 0; border-radius: 50%; border: 1px solid color-mix(in srgb, currentColor 60%, transparent); transform: translate(-50%, -50%); pointer-events: none; animation: map-ripple 1700ms cubic-bezier(.2, .6, .3, 1) forwards; }
+.map__ripple + .map__ripple { animation-delay: 160ms; opacity: 0; }
+@keyframes map-ripple { 0% { width: 10px; height: 10px; opacity: 0.85; } 100% { width: 240px; height: 240px; opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .map__frame { transition: none; } .map__ripple { display: none; } }
+.map__credit { margin-top: 10px; font-size: 11px; letter-spacing: 0.04em; color: var(--soft); }
+
+/* ---- 끝. 포스터의 아랫단처럼 종이 위의 이름들 ---- */
+.section--credits { padding-bottom: calc(var(--section-pad) * 0.7); }
+.crew { font-size: var(--fs-small); line-height: 1.75; }
+.crew__row { display: grid; grid-template-columns: 5.6em 1fr; column-gap: 16px; padding: 9px 0; break-inside: avoid; }
+.crew__row dt { font-size: var(--fs-micro); letter-spacing: var(--track-micro); color: var(--soft); padding-top: 2px; }
+.crew__title { color: var(--soft); }
+@media (min-width: 1024px) { .crew { columns: 2; column-gap: 48px; } }
+.colophon { margin-top: 18svh; font-size: var(--fs-micro); letter-spacing: 0.06em; line-height: 1.9; color: var(--soft); }
+/* 맺음의 제목. 페이지의 맨 끝, 올라온 물 바로 위에 놓여 물에 비친다. 첫 화면과 짝 */
+.colophon__title { margin-top: 16svh; font-size: var(--fs-display); letter-spacing: -0.02em; color: var(--ink, currentColor); line-height: 1.1; }
+html.js .section--credits { padding-bottom: 0; }
+.colophon__icons { margin-top: 28px; }
+
+/* 자바스크립트가 없으면 방의 빛 대신 구간마다 고정된 빛 */
+html:not(.js) .section--about { background: var(--ivory); color: var(--floor); }
+html:not(.js) .section--people { background: var(--morning-room); color: var(--floor); }
+html:not(.js) .section--two-years { background: linear-gradient(to bottom, var(--morning-room), #2A3328 50%); color: var(--ivory); }
+html:not(.js) .section--tickets { background: #3B3A2E; color: var(--ivory); }
+html:not(.js) .section--credits { background: #F4F1E5; color: var(--floor); }
+
+@media (prefers-reduced-motion: reduce) {
+  .section--about::after, .cell, .role__win::before, .role__actors { transition: none; }
+}
