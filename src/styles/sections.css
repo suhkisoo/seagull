@@ -61,6 +61,14 @@
 .action-list__label { font-size: var(--fs-micro); letter-spacing: var(--track-micro); color: var(--soft); }
 .action-list__value { display: flex; flex-wrap: wrap; align-items: center; column-gap: 28px; }
 .action__done { margin-left: 16px; font-size: var(--fs-small); color: var(--soft); }
+/* 아이콘 줄(10/19 연출). 44px 자리에 24px 그림. 선 아이콘은 옅은 글자색, 닿으면 글자색. 상표 아이콘은 제 색 */
+.icons { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-left: -10px; }
+.icons li { display: flex; align-items: center; }
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; margin: 0; border: 0; background: none; color: var(--soft); cursor: pointer; transition: color 300ms var(--ease), opacity 300ms var(--ease); }
+.icon-btn:hover, .icon-btn:focus-visible { color: inherit; }
+.icon-btn svg { display: block; }
+.icons .action__done { margin-left: 4px; }
+.map + .icons, .venue + .icons { margin-top: 32px; }
 html:not(.js) .js-only { display: none; }
 
 /* ---- 작품 소개. 정오 ---- */
@@ -93,6 +101,7 @@ html:not(.js) .js-only { display: none; }
 @keyframes leaves-sway { from { transform: translate3d(-0.6%, 0, 0) rotate(-0.5deg); } to { transform: translate3d(0.8%, 0.5%, 0) rotate(0.6deg); } }
 @media (prefers-reduced-motion: reduce) { .window-light__tree, .room__tree { animation: none; } }
 .section--people .wrap { position: relative; }
+.section--people .section__caption { margin-top: 12px; }
 /* 등장인물표. 일곱 배역이 같은 크기의 줄로 선다 */
 .dramatis { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
 .role { border-bottom: 1px solid var(--rule); }
@@ -172,7 +181,7 @@ html:not(.js) .js-only { display: none; }
 .facts__row dd { font-size: var(--fs-small); }
 .venue__name { font-size: var(--fs-h3); line-height: 1.45; letter-spacing: -0.01em; }
 .venue__address { color: var(--soft); margin-top: 4px; }
-.venue + .action-list, .map + .action-list { margin-top: 40px; }
+
 
 /* 지도. 공연장이 늘 가운데. 램프 하나가 공연장을 비추고 가장자리는 밤으로 풀린다. 틀도 괘선도 없다 */
 @property --lamp { syntax: '<percentage>'; inherits: true; initial-value: 16%; }
@@ -211,11 +220,7 @@ html:not(.js) .js-only { display: none; }
 /* 맺음의 제목. 페이지의 맨 끝, 올라온 물 바로 위에 놓여 물에 비친다. 첫 화면과 짝 */
 .colophon__title { margin-top: 16svh; font-size: var(--fs-display); letter-spacing: -0.02em; color: var(--ink, currentColor); line-height: 1.1; }
 html.js .section--credits { padding-bottom: 0; }
-.colophon .action-list { margin-top: 32px; font-size: var(--fs-small); letter-spacing: 0; }
-/* 인스타그램 아이콘. 닿으면 밝아진다 */
-.colophon__social { margin-top: 28px; }
-.social { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-left: -11px; color: var(--soft); transition: color 300ms var(--ease); }
-.social:hover, .social:focus-visible { color: inherit; }
+.colophon__icons { margin-top: 28px; }
 
 /* 자바스크립트가 없으면 방의 빛 대신 구간마다 고정된 빛 */
 html:not(.js) .section--about { background: var(--ivory); color: var(--floor); }

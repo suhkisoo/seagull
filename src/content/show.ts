@@ -160,7 +160,7 @@ export const show = {
     ] as { text: string; source: string; act?: 'act1' | 'act4'; cue?: 'stage' | 'eyes' }[],
   },
   video: { youtubeId: '', aspect: '16/9', poster: '' }, // 비면 숨김
-  links: { instagram: 'https://www.instagram.com/sg_theatre_', contact: 'sogangtheatre@naver.com' },          // 비면 숨김
+  links: { instagram: 'https://www.instagram.com/sg_theatre_', contact: 'eunchaeko05@naver.com' },   // 메일은 기획 고은채(10/19)          // 비면 숨김
   sponsors: '',                                   // 비면 숨김
   meta: {
     title: '〈갈매기〉 서강연극회 118회 정기공연',   // 【확인】

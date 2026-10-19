@@ -1,6 +1,7 @@
 ---
 // 끝. 만든 사람들, 단체와 표기, 링크. 가장 어두운 초록. docs/plan.md 2.1 "끝", 9.5.3.
 import { show } from '../content/show';
+import Icon from './Icon.astro';
 ---
 <section class="section section--credits" id="credits" data-light="credits" aria-labelledby="credits-title">
   <div class="wrap grid">
@@ -21,13 +22,14 @@ import { show } from '../content/show';
         <!-- 판권면. 기획과 연출은 위 명단에, 일정과 극장은 일정 구간에 있으므로 되풀이하지 않는다(10/17). 작가는 여기에만 -->
         <p>{show.credits.author}</p>
         <p>{show.company}</p>
-        <!-- 인스타그램. 글자 대신 아이콘 하나(10/19 연출). 선은 글자색, 누르면 새 창 -->
-        {show.links.instagram && (
-          <p class="colophon__social"><a class="social" href={show.links.instagram} target="_blank" rel="noopener" aria-label="인스타그램 열기"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><rect x="2.5" y="2.5" width="19" height="19" rx="5.2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="4.3" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor"/></svg></a></p>
+        <!-- 인스타그램(제 색), 전화, 메일. 글자 대신 아이콘 셋(10/19 연출). 누르면 새 창, 전화, 메일 쓰기 -->
+        {(show.links.instagram || show.booking.contact || show.links.contact) && (
+          <ul class="icons colophon__icons" role="list" aria-label="연락">
+            {show.links.instagram && <li><a class="icon-btn" href={show.links.instagram} target="_blank" rel="noopener" aria-label="인스타그램 열기" title="인스타그램"><Icon name="instagram" /></a></li>}
+            {show.booking.contact && <li><a class="icon-btn" href={`tel:${show.booking.contact.replace(/\D/g, '')}`} aria-label={`전화 걸기 ${show.booking.contact}`} title={show.booking.contact}><Icon name="phone" /></a></li>}
+            {show.links.contact && <li><a class="icon-btn" href={`mailto:${show.links.contact}`} aria-label={`메일 보내기 ${show.links.contact}`} title={show.links.contact}><Icon name="mail" /></a></li>}
+          </ul>
         )}
-        {show.links.contact && <ul class="action-list" role="list">
-            {show.links.contact && <li><span class="action-list__label">문의</span><span class="action-list__value">{show.links.contact.includes('@') ? <a class="action" href={`mailto:${show.links.contact}`}>문의하기</a> : <span>{show.links.contact}</span>}</span></li>}
-        </ul>}
         {show.sponsors && <p>{show.sponsors}</p>}
         {show.credits.painting && <p class="colophon__painting">{show.credits.painting}</p>}
         <p class="colophon__title" data-end-title>〈{show.title}〉</p>
