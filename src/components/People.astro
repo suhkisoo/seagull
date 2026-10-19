@@ -23,7 +23,16 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
             <div class="role__body">
               <p class="role__script">{r.scriptName}</p>
               {r.scriptNote && <p class="role__note">{r.scriptNote}</p>}
-              {r.photo && <img class="role__photo" src={`${base}/${r.photo}`} alt={`${r.actors.join(', ')}, ${r.name}`} width="300" height="400" loading="lazy" decoding="async" />}
+              {r.actors.some((a) => r.photos[a]) && (
+                <ul class="role__cast" role="list">
+                  {r.actors.map((a) => (
+                    <li class="role__person">
+                      {r.photos[a] ? <img class="role__photo" src={`${base}/${r.photos[a]}`} alt="" width="480" height="640" loading="lazy" decoding="async" /> : <span class="role__photo role__photo--none" aria-hidden="true"></span>}
+                      <span class="role__person-name">{a}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
               {r.line && <p class="role__line">{r.line}</p>}
             </div>
           </details>

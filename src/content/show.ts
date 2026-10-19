@@ -15,7 +15,7 @@ export type Role = {
   scriptName: string;    // 대본의 이름 표기
   scriptNote: string;    // 대본의 인물 표기. 자리에서 뜻이 통하지 않으면 비운다
   actors: string[];      // 가나다순. 조 표기는 어디에도 쓰지 않는다
-  photo: string;         // 비면 없음
+  photos: Record<string, string>; // 배우 이름 → public/ 아래 사진 경로(3:4). 없는 배우는 이름만. 10/19 프로필 사진
   line: string;          // 대사 한 줄. 비면 없음
 };
 
@@ -60,8 +60,8 @@ export const show = {
     { label: '러닝타임', value: '135분' },
     { label: '인터미션', value: '없음' },
     { label: '관람 연령', value: '' },
-    { label: '지각 입장', value: '' },
-    { label: '취소와 환불', value: '' },
+    { label: '지각 입장', value: '있음' },                    // 10/19 기획. 자세한 안내는 인스타그램 게시물로
+    { label: '취소와 환불', value: '010-8255-2119로 문의' },    // 10/19 기획
     { label: '휠체어 접근', value: '' },
     { label: '촬영', value: '' },
   ],
@@ -105,13 +105,13 @@ export const show = {
   bookmarkImages: ['goods/bookmark-1.webp', 'goods/bookmark-2.webp'], // 티켓 책갈피(증정) 그림. scripts/make-goods.mjs
   tumblbug: { url: '', startAt: '', endAt: '' },  // 기간 안에서만 보인다
   roles: [
-    { id: 'arkadina', name: '아르카지나', scriptName: '이리나 니콜라예브나 아르카지나 (남편 성으로는 트레플레바)', scriptNote: '배우', actors: ['박세은', '서채림'], photo: '', line: '' },
-    { id: 'treplev', name: '트레플레프', scriptName: '콘스탄틴 가브릴로비치 트레플레프', scriptNote: '그녀의 아들, 청년', actors: ['백경환', '이영종'], photo: '', line: '' },
-    { id: 'sorin', name: '소린', scriptName: '표트르 니콜라예비치 소린', scriptNote: '그녀의 오빠', actors: ['부신빈'], photo: '', line: '' },
-    { id: 'nina', name: '니나', scriptName: '니나 미하일로브나 자레치나야', scriptNote: '젊은 처녀, 부유한 지주의 딸', actors: ['김시연', '김현아'], photo: '', line: '' },
-    { id: 'masha', name: '마샤', scriptName: '마샤', scriptNote: '영지 관리인의 딸', actors: ['이예림'], photo: '', line: '' },
-    { id: 'trigorin', name: '트리고린', scriptName: '보리스 알렉세예비치 트리고린', scriptNote: '소설가', actors: ['오규헌', '조민석'], photo: '', line: '' },
-    { id: 'dorn', name: '도른', scriptName: '예브게니야 세르게예브나 도른', scriptNote: '의사', actors: ['전아침'], photo: '', line: '' },
+    { id: 'arkadina', name: '아르카지나', scriptName: '이리나 니콜라예브나 아르카지나 (남편 성으로는 트레플레바)', scriptNote: '배우', actors: ['박세은', '서채림'], photos: { '박세은': 'people/arkadina_park-seeun.webp', '서채림': 'people/arkadina_seo-chaerim.webp' }, line: '' },
+    { id: 'treplev', name: '트레플레프', scriptName: '콘스탄틴 가브릴로비치 트레플레프', scriptNote: '그녀의 아들, 청년', actors: ['백경환', '이영종'], photos: { '백경환': 'people/treplev_baek-gyeonghwan.webp', '이영종': 'people/treplev_lee-yeongjong.webp' }, line: '' },
+    { id: 'sorin', name: '소린', scriptName: '표트르 니콜라예비치 소린', scriptNote: '그녀의 오빠', actors: ['부신빈'], photos: { '부신빈': 'people/sorin_bu-sinbin.webp' }, line: '' },
+    { id: 'nina', name: '니나', scriptName: '니나 미하일로브나 자레치나야', scriptNote: '젊은 처녀, 부유한 지주의 딸', actors: ['김시연', '김현아'], photos: { '김시연': 'people/nina_kim-siyeon.webp', '김현아': 'people/nina_kim-hyeona.webp' }, line: '' },
+    { id: 'masha', name: '마샤', scriptName: '마샤', scriptNote: '영지 관리인의 딸', actors: ['이예림'], photos: { '이예림': 'people/masha_lee-yerim.webp' }, line: '' },
+    { id: 'trigorin', name: '트리고린', scriptName: '보리스 알렉세예비치 트리고린', scriptNote: '소설가', actors: ['오규헌', '조민석'], photos: { '오규헌': 'people/trigorin_oh-gyuheon.webp', '조민석': 'people/trigorin_jo-minseok.webp' }, line: '' },
+    { id: 'dorn', name: '도른', scriptName: '예브게니야 세르게예브나 도른', scriptNote: '의사', actors: ['전아침'], photos: { '전아침': 'people/dorn_jeon-achim.webp' }, line: '' },
   ] as Role[],
   // 만든 사람들. 포스터의 명단과 직함을 따른다 【확인】. 각 팀의 첫 이름이 그 팀을 맡은 사람이다.
   crew: [

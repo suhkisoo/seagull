@@ -53,7 +53,7 @@
 * **예매 오픈과 링크.** `booking.openAt`에 `'2026-10-12T14:00:00+09:00'`처럼 한국 시간 오프셋을 붙여 적고, `booking.commonUrl`에 예매처 링크, `booking.vendorName`에 예매처 이름을 적는다. 회차마다 링크가 다르면 `shows[]`의 `url`에 적는다(없는 회차는 공통 링크로 간다). 오픈 전에는 버튼이 "10월 12일 예매 오픈", 오픈 뒤에는 "예매하기"가 된다. 둘 중 하나라도 비면 "예매 일정 보기"다.
 * **러닝타임, 관람 연령, 가격.** `runningMinutes`(인터미션 포함 분), `intermission`, `ageLimit`, `pricing`. 비어 있으면 숨기거나 "추후 공개"다. 러닝타임이 비는 동안 공연 끝은 마지막 회차 3시간 뒤로 본다.
 * **텀블벅.** `tumblbug`의 `url`, `startAt`, `endAt`(마감일 당일 24:00까지). 기간 안에서만 보인다.
-* **사진과 대사.** `roles[]`의 `photo`에 `public/` 아래 경로(예: `people/nina-kim.jpg`, 3:4), `line`에 대사 한 줄. 창을 열면 보인다.
+* **사진과 대사.** `roles[]`의 `photos`에 배우 이름마다 `public/` 아래 경로(예: `'김시연': 'people/nina_kim-siyeon.webp'`, 3:4). 원본은 `assets-src/people/`에 두고 `public/people/`에 480×640 webp로 넣는다. `line`에 대사 한 줄. 창을 열면 보인다.
 * **영상.** `video.youtubeId`에 유튜브 영상 id, `video.poster`에 `public/` 아래 썸네일 경로, `video.aspect`에 비율(`'16/9'`). id가 비면 영상 블록이 통째로 숨는다.
 * **연출의 말, 수면 대사.** `texts.directorsNote`(문단은 빈 줄로), `texts.waterLines`(멈추면 떠오르는 대사 목록. 받은 그대로 적는다).
 * **링크.** `links.instagram`, `links.contact`(이메일이면 "문의하기" 링크), `venue.naverMap`, `venue.kakaoMap`(비면 검색 링크).

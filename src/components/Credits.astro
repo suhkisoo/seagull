@@ -21,8 +21,11 @@ import { show } from '../content/show';
         <!-- 판권면. 기획과 연출은 위 명단에, 일정과 극장은 일정 구간에 있으므로 되풀이하지 않는다(10/17). 작가는 여기에만 -->
         <p>{show.credits.author}</p>
         <p>{show.company}</p>
-        {(show.links.instagram || show.links.contact) && <ul class="action-list" role="list">
-            {show.links.instagram && <li><span class="action-list__label">인스타그램</span><span class="action-list__value"><a class="action" href={show.links.instagram} target="_blank" rel="noopener">인스타그램 열기</a></span></li>}
+        <!-- 인스타그램. 글자 대신 아이콘 하나(10/19 연출). 선은 글자색, 누르면 새 창 -->
+        {show.links.instagram && (
+          <p class="colophon__social"><a class="social" href={show.links.instagram} target="_blank" rel="noopener" aria-label="인스타그램 열기"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><rect x="2.5" y="2.5" width="19" height="19" rx="5.2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="4.3" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor"/></svg></a></p>
+        )}
+        {show.links.contact && <ul class="action-list" role="list">
             {show.links.contact && <li><span class="action-list__label">문의</span><span class="action-list__value">{show.links.contact.includes('@') ? <a class="action" href={`mailto:${show.links.contact}`}>문의하기</a> : <span>{show.links.contact}</span>}</span></li>}
         </ul>}
         {show.sponsors && <p>{show.sponsors}</p>}

@@ -109,7 +109,13 @@ html:not(.js) .js-only { display: none; }
 .role__body { position: relative; padding: 0 0 28px; font-size: var(--fs-small); line-height: 1.75; max-width: 26em; }
 .role__script { color: var(--soft); }
 .role__note { margin-top: 4px; }
-.role__photo { display: block; width: 100%; max-width: 220px; height: auto; aspect-ratio: 3 / 4; object-fit: cover; margin-top: 20px; }
+/* 배우 사진(10/19). 배역의 두 사람이 나란히. 흰 스튜디오 바탕은 곱하기 혼합으로 방의 종이에 가라앉는다. 틀도 그림자도 없다 */
+.role__cast { list-style: none; margin: 20px 0 0; padding: 0; display: flex; gap: 14px; max-width: 26em; }
+.role__person { flex: 0 1 150px; min-width: 0; }
+.role__photo { display: block; width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; mix-blend-mode: multiply; }
+.role__photo--none { background: color-mix(in srgb, currentColor 6%, transparent); }
+.role__person-name { display: block; margin-top: 8px; font-size: var(--fs-small); }
+@media (min-width: 1024px) { .role__cast { gap: 20px; } .role__person { flex-basis: 170px; } }
 .role__line { margin-top: 18px; font-size: var(--fs-body); }
 @media (min-width: 1024px) {
   .role__summary { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); padding: 26px 0 24px; }
@@ -206,6 +212,10 @@ html:not(.js) .js-only { display: none; }
 .colophon__title { margin-top: 16svh; font-size: var(--fs-display); letter-spacing: -0.02em; color: var(--ink, currentColor); line-height: 1.1; }
 html.js .section--credits { padding-bottom: 0; }
 .colophon .action-list { margin-top: 32px; font-size: var(--fs-small); letter-spacing: 0; }
+/* 인스타그램 아이콘. 닿으면 밝아진다 */
+.colophon__social { margin-top: 28px; }
+.social { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-left: -11px; color: var(--soft); transition: color 300ms var(--ease); }
+.social:hover, .social:focus-visible { color: inherit; }
 
 /* 자바스크립트가 없으면 방의 빛 대신 구간마다 고정된 빛 */
 html:not(.js) .section--about { background: var(--ivory); color: var(--floor); }
