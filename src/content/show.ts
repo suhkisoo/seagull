@@ -54,10 +54,10 @@ export const show = {
     { id: '1114-1300', startAt: '2026-11-14T13:00:00+09:00', url: '', soldOut: false, cast: { arkadina: '서채림', treplev: '이영종', sorin: '부신빈', nina: '김시연', masha: '이예림', trigorin: '조민석', dorn: '전아침' } },
     { id: '1114-1800', startAt: '2026-11-14T18:00:00+09:00', url: '', soldOut: false, cast: { arkadina: '박세은', treplev: '백경환', sorin: '부신빈', nina: '김현아', masha: '이예림', trigorin: '오규헌', dorn: '전아침' } },
   ] as ShowTime[], // 회차별 출연은 10/17 연출이 준 표
-  runningMinutes: null as number | null,          // 인터미션 포함 총 시간. 비면 180분으로 본다 【확인】
+  runningMinutes: 135 as number | null,           // 인터미션 포함 총 시간. 비면 180분으로 본다. 10/19 연출
   // 예매 전 안내. 공연 일정과 예매의 "가격과 좌석", "예매 오픈" 아래에 놓인다. 값이 빈 행은 화면에 나오지 않는다. 값은 연출이 채운다 【빈칸】
   notices: [
-    { label: '러닝타임', value: '' },
+    { label: '러닝타임', value: '135분' },
     { label: '인터미션', value: '' },
     { label: '관람 연령', value: '' },
     { label: '지각 입장', value: '' },
