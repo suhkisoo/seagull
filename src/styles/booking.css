@@ -43,6 +43,15 @@
 .pick__day { font-size: var(--fs-small); letter-spacing: 0.02em; }
 .pick__time { font-size: clamp(26px, 7vw, 34px); letter-spacing: -0.02em; font-variant-numeric: tabular-nums lining-nums; }
 .pick__note { font-size: var(--fs-micro); letter-spacing: var(--track-micro); min-width: 2.5em; text-align: right; }
+/* 고른 회차의 출연. 고른 줄 바로 아래에 펼쳐진다(10/30 연출). 일정 구간의 출연 표와 같은 꼴 */
+.pick__cast { display: none; margin: 0; padding: 12px 0 14px; border-bottom: 1px solid var(--rule); font-size: var(--fs-small); line-height: 1.65; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 24px; }
+.pick__row:has(input:checked) + .pick__cast { display: grid; }
+.pick__cast-head { grid-column: 1 / -1; }
+.pick__cast-head dd { font-size: var(--fs-micro); letter-spacing: var(--track-micro); color: var(--soft); margin: 0 0 6px; }
+.pick__cast-row { display: flex; gap: 12px; margin: 0; }
+.pick__cast-row dt { color: var(--soft); min-width: 5.2em; }
+.pick__cast-row dd { margin: 0; }
+@media (min-width: 1024px) { .pick__cast { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
 /* 2. 좌석. 무대가 아래. A열이 무대에 가장 가깝다. 자리는 옅은 면, 고른 자리만 호박빛 */
 .hall { max-width: 600px; container-type: inline-size; }
