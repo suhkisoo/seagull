@@ -148,6 +148,8 @@
 .pay__amount { font-size: var(--fs-display); letter-spacing: -0.03em; line-height: 1.15; }
 .pay__value { font-size: var(--fs-h3); letter-spacing: -0.005em; }
 .pay__note { font-size: var(--fs-small); color: var(--soft); margin-top: 22px; max-width: var(--measure); }
+/* 환불 안내는 흐린 글자가 아니라 본문 색으로. 신청 전에 읽혀야 한다(11/11) */
+.pay__note--strong { color: inherit; }
 .done { padding: 22px 0 0; border-top: 1px solid var(--rule); }
 .done .step__title { margin-bottom: 26px; }
 .done .bill { margin-bottom: 40px; }

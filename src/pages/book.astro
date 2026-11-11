@@ -11,6 +11,8 @@ const DIM = goodsDims as Record<string, [number, number]>;
 const won = (n: number | null) => (n == null ? '추후 공개' : `${n.toLocaleString('ko-KR')}원`);
 const balconyPrice = show.booking.balconyPrice ?? show.booking.seatPrice;
 const sides = balconySides();
+// 취소와 환불 안내. 일정 구간과 같은 값을 확인 단계의 입금 안내 아래에도 보인다(11/11 기획)
+const refund = show.notices.find((n) => n.label === '취소와 환불')?.value || '';
 // 회차를 고르면 그 회차의 출연이 아래에 펼쳐진다(10/30 연출). 일정 구간과 같은 꼴, CSS만으로
 const castOf = (s: (typeof show.shows)[number]) => show.roles.map((r) => ({ role: r.name, actor: s.cast[r.id] || '' }));
 ---
@@ -163,6 +165,7 @@ const castOf = (s: (typeof show.shows)[number]) => show.roles.map((r) => ({ role
                 : <span class="pay__value">추후 공개</span>}
             </p>
             <p class="pay__note">예매 신청 뒤 {show.booking.holdHours}시간 안에 입금해 주세요. 기획팀이 입금을 확인하면 연락처로 예매 완료를 알립니다. 시간이 지나면 자리가 풀립니다.</p>
+            {refund && <p class="pay__note pay__note--strong">취소와 환불. {refund}.</p>}
             {show.booking.contact && <p class="pay__note">문의 {show.booking.contact}</p>}
           </div>
           <p class="field__error" data-confirm-error aria-live="polite"></p>
