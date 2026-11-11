@@ -1,0 +1,54 @@
+# 미리보기. 작업 브랜치를 올릴 때마다 빌드해 GitHub Pages에 둔다. 공개본은 연출의 서버에 올린다.
+name: preview
+on:
+  push:
+    branches: ['main', 'claude/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/configure-pages@v5
+        id: pages
+        with:
+          enablement: true
+      - run: npm ci
+      - run: npm run build
+        env:
+          ASTRO_TELEMETRY_DISABLED: '1'
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          SITE_URL: ${{ steps.pages.outputs.origin }}
+      # 예매 장부(Apps Script) 연결 확인. 읽기만 한다(회차 하나의 잡힌 자리). 세션 안에서는 script.google.com이 막혀 있어 여기서 본다
+      - name: 장부 연결 확인
+        continue-on-error: true
+        run: |
+          API=$(grep -oE "apiUrl: '[^']+'" src/content/show.ts | sed -E "s/apiUrl: '([^']+)'/\1/")
+          if [ -z "$API" ]; then echo "apiUrl 없음(미리보기)"; exit 0; fi
+          see() { echo "== $1"; shift; curl -sSL -m 30 -o /tmp/b -w 'HTTP %{http_code} 최종 %{url_effective}\n' "$@"; grep -o '<title>[^<]*</title>' /tmp/b | head -1; head -c 300 /tmp/b | tr -d '\n'; echo; }
+          see "GET" "$API"
+          see "GET 회차 상태" "$API?action=status&show=1112-1500"
+          see "POST 회차 상태(사이트가 쓰는 방식)" -H 'Content-Type: text/plain;charset=utf-8' --data '{"action":"status","show":"1112-1500"}' "$API"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment

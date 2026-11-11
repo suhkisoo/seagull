@@ -1,0 +1,19 @@
+---
+// 홍보영상. 썸네일(저장소 이미지)을 누르면 유튜브 플레이어를 불러온다. 【빈칸】이면 통째로 숨김. docs/plan.md 3.1의 9.
+import { show } from '../content/show';
+const v = show.video;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const [aw, ah] = (v.aspect || '16/9').split('/').map(Number);
+---
+{v.youtubeId && (
+  <div class="video" data-video data-youtube-id={v.youtubeId} style={`--video-aspect: ${aw} / ${ah}`}>
+    <button class="video__facade" type="button" data-video-open aria-label="영상 보기">
+      {v.poster
+        ? <img class="video__poster" src={`${base}/${v.poster}`} alt="" width={aw * 100} height={ah * 100} loading="lazy" decoding="async" />
+        : <span class="video__poster video__poster--blank" aria-hidden="true"></span>}
+    </button>
+    <p class="action-row"><button class="action" type="button" data-video-open>영상 보기</button></p>
+    <noscript><p class="action-row"><a class="action" href={`https://www.youtube.com/watch?v=${v.youtubeId}`} target="_blank" rel="noopener">영상 보기</a></p></noscript>
+    <p class="video__hint" data-video-hint hidden>영상을 누르면 재생됩니다</p>
+  </div>
+)}

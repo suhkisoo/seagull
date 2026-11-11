@@ -1,0 +1,30 @@
+---
+// 오시는 길 지도. OpenStreetMap 자료(src/content/map.json)를 빌드 때 그린 바탕(/map.svg) 위에 역 이름과 공연장을 얹는다. docs/plan.md 9.5.4.
+// 공연장이 언제나 가운데라서, 틀의 비율이 바뀌어 가장자리가 잘려도 자리를 다시 셈하지 않는다.
+// 램프 하나가 공연장을 비추고 멀어질수록 어두워진다. 닿으면 그 자리에서 물결이 한 번 번지고 빛이 잠깐 넓어진다(scripts/tickets.ts).
+import { show } from '../content/show';
+import map from '../content/map.json';
+
+type Station = { name: string; x: number; y: number };
+type MapData = { ready: true; size: number; metersPerUnit: number; stations: Station[] };
+const m = map as unknown as MapData | { ready: false };
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const at = (x: number, y: number, S: number) => `--dx:${((x - S / 2) / S).toFixed(4)};--dy:${((y - S / 2) / S).toFixed(4)}`;
+const scaleM = 200;
+// 이름이 같은 역(예: 2호선과 경의중앙선의 신촌역)은 공연장에 가까운 하나만 적는다
+const stations = m.ready ? m.stations.filter((s, _, all) => !all.some((o) => o !== s && o.name === s.name && Math.hypot(o.x - m.size / 2, o.y - m.size / 2) < Math.hypot(s.x - m.size / 2, s.y - m.size / 2))) : [];
+const label = m.ready ? `${show.venue.name} 둘레 지도${stations.length ? `. 가까운 역은 ${stations.map((s) => s.name).join(', ')}` : ''}` : '';
+---
+{m.ready && (
+  <figure class="map" data-map>
+    <div class="map__frame" role="img" aria-label={label}>
+      <img class="map__ground" src={`${base}/map.svg`} alt="" width={m.size} height={m.size} loading="lazy" decoding="async" />
+      {stations.map((s) => (
+        <span class="map__station" style={at(s.x, s.y, m.size)}>{s.name}</span>
+      ))}
+      <span class="map__venue" style="--dx:0;--dy:0"><span class="map__venue-name">{show.venue.mapLabel}</span></span>
+      <span class="map__scale" style={`--len:${(scaleM / m.metersPerUnit / m.size).toFixed(4)}`}>{scaleM}m</span>
+    </div>
+    <figcaption class="map__credit">지도 자료 © OpenStreetMap 기여자</figcaption>
+  </figure>
+)}
